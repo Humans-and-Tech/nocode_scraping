@@ -42,7 +42,7 @@ const ProductSheet: React.FC = () => {
               </Breadcrumb.Item>
               <Breadcrumb.Item href="">
                 <FolderOpenOutlined />
-                <span>Category</span>
+                <span>{t("breadcrumb_cat")}</span>
               </Breadcrumb.Item>
               <Breadcrumb.Item href="">
                 <FolderOpenOutlined />
