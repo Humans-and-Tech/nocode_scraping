@@ -1,1 +1,5 @@
 @import "~antd/dist/antd.css";
+
+.menu-item-title {
+  display: inline-block;
+}
