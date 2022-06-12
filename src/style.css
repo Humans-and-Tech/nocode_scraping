@@ -1,5 +1,49 @@
 @import "~antd/dist/antd.css";
 
-.menu-item-title {
-  display: inline-block;
+:root {
+  --gus-white: white;
+  --gus-dark-blue: #223b75;
+  --gus-light-gray: #eff2f5;
+  --gus-gray: rgb(107, 116, 118);
+}
+
+li.ant-menu-item.gus-item {
+  height: auto;
+}
+
+.gus-layout-helper {
+  height: 100%;
+  width: 100%;
+  background-color: var(--gus-light-gray);
+  color: var(--gus-gray);
+  margin-bottom: 1em;
+}
+
+.gus-layout-content {
+  background-color: var(--gus-white);
+}
+
+.gus-main-content {
+  width: 100vw;
+  height: 100vh;
+}
+
+.gus-main-row {
+  padding: 1em 2em;
+}
+
+.gus-row-breathe {
+  margin: 1em 0;
+}
+
+.gus-col-breathe {
+  margin: 0 1em;
+}
+
+.gus-scraping-element {
+  margin: 0 1em;
+}
+
+.gus-scraping-element:hover {
+  border: 1px solid var(--gus-dark-blue);
 }

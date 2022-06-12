@@ -1,6 +1,6 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Divider, Layout, Menu } from "antd";
+import { Button, Divider, Layout, Menu } from "antd";
 import { LayoutOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
@@ -19,32 +19,32 @@ const PageScraperLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Layout>
       <Header>
-        Le header présentera les actions possibles sur cette page (url à
-        scraper...)
+        <Button>{t("action_scrape_url")}</Button>
+      </Header>
+      <Header className="gus-layout-helper">
+        <p>{t("helper_text")}</p>
       </Header>
       <Layout>
         <Sider theme="light">
           <Menu>
-            <Menu.Item>
+            <Menu.Item className="gus-item">
               <LayoutOutlined />
-              <span className="menu-item-title">{t("menu_product_sheet")}</span>
-              <Divider></Divider>
-              <span className="menu-item-desc">
-                {t("menu_product_sheet_desc")}
-              </span>
+              <span>{t("menu_product_sheet")}</span>
+              <div>
+                <em>{t("menu_product_sheet_desc")}</em>
+              </div>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item className="gus-item">
               <LayoutOutlined />
-              <span className="menu-item-title">{t("menu_category_page")}</span>
-              <span className="menu-item-desc">
-                {t("menu_category_page_desc")}
-              </span>
+              <span>{t("menu_category_page")}</span>
+              <div>
+                <em>{t("menu_category_page_desc")}</em>
+              </div>
             </Menu.Item>
           </Menu>
         </Sider>
-        <Content>{children}</Content>
+        <Content className="gus-layout-content">{children}</Content>
       </Layout>
-      <Footer>Footer</Footer>
     </Layout>
   );
 };
