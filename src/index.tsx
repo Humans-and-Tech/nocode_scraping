@@ -1,6 +1,6 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import ProductPage from "./views/ProductPage/ProductPage";
+import ProductSheetElements from "./views/ProductPage/ProductSheet";
 
 const rootElement = document.getElementById("root");
 // to prevent TS compilation error
@@ -13,6 +13,6 @@ const root = createRoot(rootElement);
  */
 root.render(
   <StrictMode>
-    <ProductPage />
+    <ProductSheetElements />
   </StrictMode>
 );

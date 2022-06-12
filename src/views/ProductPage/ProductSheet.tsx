@@ -19,12 +19,18 @@ import "../../style.css";
 
 const { Header, Footer, Sider, Content } = Layout;
 
-const ProductPage: React.FC = () => {
+const ProductSheetElements: React.FC = () => {
   return (
     <Layout>
-      <Header>Header</Header>
+      <Header>
+        Le header présentera les actions possibles sur cette page (url à
+        scraper...)
+      </Header>
       <Layout>
-        <Sider theme="light">Sider</Sider>
+        <Sider theme="light">
+          Le sider présenter ici les différents layouts possibles (Product
+          sheet, category page)
+        </Sider>
         <Content>
           <Row>
             <Col>
@@ -113,4 +119,4 @@ const ProductPage: React.FC = () => {
   );
 };
 
-export default ProductPage;
+export default ProductSheetElements;
