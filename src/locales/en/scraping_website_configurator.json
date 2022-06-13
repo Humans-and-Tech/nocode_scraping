@@ -1,0 +1,15 @@
+{
+  "title": "Configure the scraping",
+
+  "website": {
+    "helper_text": "Enter below the URL of the page to be scraped",
+    "placeholder": "a valid URL starts with http(s)://",
+    "is_valid": "This URL is valid"
+  },
+
+  "proxy_config": {
+    "helper_text": "Optionally, enter below a proxy configuration",
+    "placeholder": "a valid config looks like ...",
+    "is_valid": "This config is valid"
+  }
+}

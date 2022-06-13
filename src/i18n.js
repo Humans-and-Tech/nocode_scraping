@@ -3,7 +3,8 @@ import { initReactI18next } from "react-i18next";
 
 import layoutTranslations from "./locales/en/layout.json";
 import productSheetTranslations from "./locales/en/product_sheet.json";
-import scrapingConfigTranslations from "./locales/en/scraping_configurator.json";
+import scrapingFieldConfigTranslations from "./locales/en/scraping_field_configurator.json";
+import scrapingWebsiteConfigTranslations from "./locales/en/scraping_website_configurator.json";
 
 // the translations
 // (tip move them in a JSON file and import them,
@@ -12,7 +13,8 @@ const resources = {
   en: {
     layout: layoutTranslations,
     product_sheet: productSheetTranslations,
-    scraping_configurator: scrapingConfigTranslations,
+    scraping_field_configurator: scrapingFieldConfigTranslations,
+    scraping_website_configurator: scrapingWebsiteConfigTranslations,
   },
 };
 

@@ -8,12 +8,12 @@ import { ScrapingElement } from "../../interfaces";
 
 const { TextArea } = Input;
 
-const ScrapingConfigurator = ({
+const Configurator = ({
   element,
 }: {
   element: ScrapingElement;
 }): JSX.Element => {
-  const { t } = useTranslation("scraping_configurator");
+  const { t } = useTranslation("scraping_field_configurator");
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
@@ -76,4 +76,4 @@ const ScrapingConfigurator = ({
   );
 };
 
-export default ScrapingConfigurator;
+export default Configurator;

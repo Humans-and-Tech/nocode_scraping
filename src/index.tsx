@@ -1,43 +1,33 @@
-import React, { StrictMode } from "react";
+import React, { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Button, Drawer, Layout, Menu } from "antd";
+import { Button, Layout, Menu } from "antd";
 import { LayoutOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 import "./i18n";
+import Configurator from "./components/Configurator/WebsiteConfigurator";
 import ProductSheet from "./views/ProductPage/ProductSheet";
-import { useState } from "react";
 
 const rootElement = document.getElementById("root");
 // to prevent TS compilation error
 if (!rootElement) throw new Error("Failed to find the root element");
 const root = createRoot(rootElement);
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Header, Sider, Content } = Layout;
 
 const ScraperLayout = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation("layout");
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
 
-  const toggleDrawer = (): void => {
-    setIsDrawerOpen(!isDrawerOpen);
+  const toggleConfig = (): void => {
+    setIsConfigOpen(!isConfigOpen);
   };
 
   return (
     <Layout>
       <Header>
-        <Button onClick={toggleDrawer}>{t("action.define_website_url")}</Button>
-        <Drawer
-          title={t("scraping_configuration.title")}
-          placement="right"
-          closable={false}
-          onClose={toggleDrawer}
-          visible={isDrawerOpen}
-        >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </Drawer>
+        <Button onClick={toggleConfig}>{t("action.define_website_url")}</Button>
+        <Configurator isOpen={isConfigOpen} />
       </Header>
       <Header className="gus-layout-helper">
         <h2>{t("helper.title")}</h2>

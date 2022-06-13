@@ -20,7 +20,7 @@ import { FiPackage } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
 import { ScrapingElement } from "../../interfaces";
-import ScrapingConfigurator from "../../components/Configurator/ScrapingConfigurator";
+import Configurator from "../../components/Configurator/FieldConfigurator";
 import "../../style.css";
 
 const ProductSheet: React.FC = () => {
@@ -55,7 +55,7 @@ const ProductSheet: React.FC = () => {
 
   return (
     <>
-      {element && <ScrapingConfigurator element={element} />}
+      {element && <Configurator element={element} />}
       <Space
         size={["large", 0]}
         direction="vertical"
