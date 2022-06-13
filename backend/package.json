@@ -5,8 +5,22 @@
   "main": "index.js",
   "author": "Guillaume Patin",
   "license": "GPL",
+  "scripts": {
+    "dev": "concurrently -k -n \"Typescript,Node\" -p \"[{name}]\" -c \"blue,green\" \"tsc --watch\" \"nodemon dist/index.js\"",
+    "start": "tsc && node dist/index.js",
+    "test": "jest --verbose",
+    "test-watch": "jest --verbose --watchAll"
+  },
   "dependencies": {
+    "@types/node": "^17.0.42",
     "express": "4",
+    "http": "^0.0.1-security",
     "socket.io": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.1",
+    "jest": "^28.1.1",
+    "ts-jest": "^28.0.4",
+    "typescript": "^4.7.3"
   }
 }
