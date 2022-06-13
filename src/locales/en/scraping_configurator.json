@@ -1,3 +1,13 @@
 {
-  "title": "Configure the scraping"
+  "title": "Configure the scraping",
+
+  "selector": {
+    "proposal": "We propose the following selector for this element",
+    "input_placeholder": "Enter a selector for this element",
+    "scrape_element": "Try to scrape this element"
+  },
+
+  "action": {
+    "evaluate_selector": "Evaluate this selector"
+  }
 }
