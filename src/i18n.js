@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import layoutTranslations from "./locales/en/layout.json";
+import productSheetTranslations from "./locales/en/product_sheet.json";
 
 // the translations
 // (tip move them in a JSON file and import them,
@@ -9,6 +10,7 @@ import layoutTranslations from "./locales/en/layout.json";
 const resources = {
   en: {
     layout: layoutTranslations,
+    product_sheet: productSheetTranslations,
   },
 };
 

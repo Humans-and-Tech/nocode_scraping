@@ -7,8 +7,22 @@
   --gus-gray: rgb(107, 116, 118);
 }
 
-li.ant-menu-item.gus-item {
+p {
+  line-height: normal;
+}
+
+li[role="menuitem"].gus-item {
   height: auto;
+}
+
+li[role="menuitem"] .menu-title {
+  font-size: larger;
+}
+
+li[role="menuitem"] em {
+  white-space: normal;
+  line-height: normal;
+  font-size: small;
 }
 
 .gus-layout-helper {
@@ -46,4 +60,5 @@ li.ant-menu-item.gus-item {
 
 .gus-scraping-element:hover {
   border: 1px solid var(--gus-dark-blue);
+  cursor: pointer;
 }

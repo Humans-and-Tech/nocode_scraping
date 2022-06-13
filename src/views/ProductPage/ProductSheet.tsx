@@ -21,7 +21,8 @@ import { useTranslation } from "react-i18next";
 import "../../style.css";
 
 const ProductSheet: React.FC = () => {
-  const { t } = useTranslation("product_page");
+  const { t } = useTranslation("product_sheet");
+
   return (
     <>
       <Space
@@ -29,11 +30,7 @@ const ProductSheet: React.FC = () => {
         direction="vertical"
         className="gus-main-content"
       >
-        <PageHeader
-          className="gus-scraping-element"
-          title={t("product_page_layout_title")}
-          subTitle={t("product_page_layout_subtitle")}
-        />
+        <PageHeader title={t("page.title")} subTitle={t("page.subtitle")} />
         <Row className="gus-main-row">
           <Col>
             <Breadcrumb className="gus-scraping-element">
@@ -42,11 +39,11 @@ const ProductSheet: React.FC = () => {
               </Breadcrumb.Item>
               <Breadcrumb.Item href="">
                 <FolderOpenOutlined />
-                <span>{t("breadcrumb_cat")}</span>
+                <span>{t("breadcrumb.category_level_0")}</span>
               </Breadcrumb.Item>
               <Breadcrumb.Item href="">
                 <FolderOpenOutlined />
-                <span>Sub Category</span>
+                <span>{t("breadcrumb.category_level_1")}</span>
               </Breadcrumb.Item>
             </Breadcrumb>
           </Col>
@@ -55,7 +52,7 @@ const ProductSheet: React.FC = () => {
           <Col>
             <Row className="gus-row-breathe">
               <Col>
-                <h1 className="gus-scraping-element">{t("product_label")}</h1>
+                <h1 className="gus-scraping-element">{t("product.label")}</h1>
               </Col>
             </Row>
             <Row className="gus-row-breathe">

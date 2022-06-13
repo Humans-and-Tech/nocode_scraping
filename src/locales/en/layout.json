@@ -1,6 +1,21 @@
 {
-  "menu_product_sheet": "Product Sheet",
-  "menu_product_sheet_desc": "lorem ipsum",
-  "menu_category_page": "Category Page",
-  "menu_category_page_desc": "Loremp ipsum"
+  "menu_layout_choice": {
+    "product_sheet": "Product Sheet",
+    "product_sheet_desc": "Use this layout to scrape the details of a product, like delivery options, GTIN, breadcrumb, price details...",
+    "category_page": "Category Page",
+    "category_page_desc": "Use this layout the scrape the macro-information of a product, as well as its ranking in the category page"
+  },
+
+  "action": {
+    "define_website_url": "Enter the URL to be scraped"
+  },
+
+  "helper": {
+    "title": "How to use ?",
+    "content": "Hover the layout, you will notice that you can interact with the elements of the page. When clicking on an element, a new configuration drawer will appear on the right where you'll be able to configure the selectors to apply"
+  },
+
+  "scraping_configuration": {
+    "title": "Configure the scraping"
+  }
 }

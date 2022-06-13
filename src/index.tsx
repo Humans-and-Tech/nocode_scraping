@@ -1,11 +1,12 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Button, Divider, Layout, Menu } from "antd";
+import { Button, Drawer, Layout, Menu } from "antd";
 import { LayoutOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 import "./i18n";
 import ProductSheet from "./views/ProductPage/ProductSheet";
+import { useState } from "react";
 
 const rootElement = document.getElementById("root");
 // to prevent TS compilation error
@@ -14,31 +15,53 @@ const root = createRoot(rootElement);
 
 const { Header, Footer, Sider, Content } = Layout;
 
-const PageScraperLayout = ({ children }: { children: React.ReactNode }) => {
+const ScraperLayout = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation("layout");
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+
+  const toggleDrawer = (): void => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
   return (
     <Layout>
       <Header>
-        <Button>{t("action_scrape_url")}</Button>
+        <Button onClick={toggleDrawer}>{t("action.define_website_url")}</Button>
+        <Drawer
+          title={t("scraping_configuration.title")}
+          placement="right"
+          closable={false}
+          onClose={toggleDrawer}
+          visible={isDrawerOpen}
+        >
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+        </Drawer>
       </Header>
       <Header className="gus-layout-helper">
-        <p>{t("helper_text")}</p>
+        <h2>{t("helper.title")}</h2>
+        <p>{t("helper.content")}</p>
       </Header>
       <Layout>
         <Sider theme="light">
           <Menu>
-            <Menu.Item className="gus-item">
-              <LayoutOutlined />
-              <span>{t("menu_product_sheet")}</span>
+            <Menu.Item key="product-sheet" className="gus-item">
+              <div className="menu-title">
+                <LayoutOutlined />
+                <span>{t("menu_layout_choice.product_sheet")}</span>
+              </div>
               <div>
-                <em>{t("menu_product_sheet_desc")}</em>
+                <em>{t("menu_layout_choice.product_sheet_desc")}</em>
               </div>
             </Menu.Item>
-            <Menu.Item className="gus-item">
-              <LayoutOutlined />
-              <span>{t("menu_category_page")}</span>
+            <Menu.Item key="category-page" className="gus-item">
+              <div className="menu-title">
+                <LayoutOutlined />
+                <span>{t("menu_layout_choice.category_page")}</span>
+              </div>
               <div>
-                <em>{t("menu_category_page_desc")}</em>
+                <em>{t("menu_layout_choice.category_page_desc")}</em>
               </div>
             </Menu.Item>
           </Menu>
@@ -55,8 +78,8 @@ const PageScraperLayout = ({ children }: { children: React.ReactNode }) => {
  */
 root.render(
   <StrictMode>
-    <PageScraperLayout>
+    <ScraperLayout>
       <ProductSheet />
-    </PageScraperLayout>
+    </ScraperLayout>
   </StrictMode>
 );
