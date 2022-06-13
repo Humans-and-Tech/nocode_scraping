@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Row,
   Col,
@@ -19,12 +19,15 @@ import {
 import { FiPackage } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
+import { SocketContext } from "../../socket";
 import { ScrapingElement } from "../../interfaces";
 import Configurator from "../../components/Configurator/FieldConfigurator";
 import "../../style.css";
 
 const ProductSheet: React.FC = () => {
   const { t } = useTranslation("product_sheet");
+
+  const socket = useContext(SocketContext);
 
   const [element, setElement] = useState<ScrapingElement | undefined>(
     undefined
@@ -52,6 +55,15 @@ const ProductSheet: React.FC = () => {
       label: t("product.price.currency"),
     },
   ];
+
+  useEffect(() => {
+    // as soon as the component is mounted, do the following tasks
+    socket.on("hello", () => console.log("hello"));
+
+    socket.emit("olleh", {});
+
+    console.log("socker initiated", socket);
+  }, [socket]);
 
   return (
     <>
