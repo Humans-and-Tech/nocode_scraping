@@ -4,7 +4,7 @@
   "description": "e-commerce scraping made easy",
   "main": "src/index.tsx",
   "author": "Guillaume Patin",
-  "license": "MIT",
+  "license": "GPL",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
