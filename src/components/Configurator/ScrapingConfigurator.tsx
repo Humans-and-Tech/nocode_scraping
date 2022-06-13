@@ -4,10 +4,12 @@ import { Drawer } from "antd";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 
+import { ScrapingElement } from "../../interfaces";
+
 const ScrapingConfigurator = ({
   element,
 }: {
-  element: string;
+  element: ScrapingElement;
 }): JSX.Element => {
   const { t } = useTranslation("scraping_configurator");
 
@@ -33,7 +35,8 @@ const ScrapingConfigurator = ({
       onClose={toggleDrawer}
       visible={isDrawerOpen}
     >
-      {element}
+      <h2>{element.label}</h2>
+      <p>{element.key}</p>
     </Drawer>
   );
 };

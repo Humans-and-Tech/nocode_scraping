@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Row,
   Col,
@@ -19,18 +19,39 @@ import {
 import { FiPackage } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
+import { ScrapingElement } from "../../interfaces";
 import ScrapingConfigurator from "../../components/Configurator/ScrapingConfigurator";
 import "../../style.css";
-import { useState } from "react";
 
 const ProductSheet: React.FC = () => {
   const { t } = useTranslation("product_sheet");
 
-  const [element, setElement] = useState<string | undefined>(undefined);
+  const [element, setElement] = useState<ScrapingElement | undefined>(
+    undefined
+  );
 
-  const showConfigurator = (element: string): void => {
+  const showConfigurator = (element: ScrapingElement): void => {
     setElement(element);
   };
+
+  const priceElements: Array<ScrapingElement> = [
+    {
+      key: "price.discount",
+      label: t("product.price.discount"),
+    },
+    {
+      key: "price.recommended",
+      label: t("product.price.recommended"),
+    },
+    {
+      key: "price.unit",
+      label: t("product.price.unit"),
+    },
+    {
+      key: "price.currency",
+      label: t("product.price.currency"),
+    },
+  ];
 
   return (
     <>
@@ -117,21 +138,16 @@ const ProductSheet: React.FC = () => {
                           </div>
                         }
                         bordered
-                        dataSource={[
-                          t("product.price.discount"),
-                          t("product.price.recommended"),
-                          t("product.price.unit"),
-                          t("product.price.currency"),
-                        ]}
-                        renderItem={(item) => (
+                        dataSource={priceElements}
+                        renderItem={(item: ScrapingElement) => (
                           <List.Item
-                            key={item}
+                            key={item.key}
                             className="gus-scraping-element"
                             onClick={() => {
                               showConfigurator(item);
                             }}
                           >
-                            {item}
+                            {item.label}
                           </List.Item>
                         )}
                       />
