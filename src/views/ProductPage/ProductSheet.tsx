@@ -19,13 +19,22 @@ import {
 import { FiPackage } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
+import ScrapingConfigurator from "../../components/Configurator/ScrapingConfigurator";
 import "../../style.css";
+import { useState } from "react";
 
 const ProductSheet: React.FC = () => {
   const { t } = useTranslation("product_sheet");
 
+  const [element, setElement] = useState<string | undefined>(undefined);
+
+  const showConfigurator = (element: string): void => {
+    setElement(element);
+  };
+
   return (
     <>
+      {element && <ScrapingConfigurator element={element} />}
       <Space
         size={["large", 0]}
         direction="vertical"
@@ -115,7 +124,13 @@ const ProductSheet: React.FC = () => {
                           t("product.price.currency"),
                         ]}
                         renderItem={(item) => (
-                          <List.Item className="gus-scraping-element">
+                          <List.Item
+                            key={item}
+                            className="gus-scraping-element"
+                            onClick={() => {
+                              showConfigurator(item);
+                            }}
+                          >
                             {item}
                           </List.Item>
                         )}
