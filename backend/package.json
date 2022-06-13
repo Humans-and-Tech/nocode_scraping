@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Real time features with socket.io",
+  "main": "index.js",
+  "author": "Guillaume Patin",
+  "license": "MIT",
+  "dependencies": {
+    "express": "4",
+    "socket.io": "^4.5.1"
+  }
+}
