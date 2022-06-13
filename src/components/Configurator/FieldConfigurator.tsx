@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Drawer, Input, Button, Space } from "antd";
-
+import { CheckCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 
@@ -19,6 +19,8 @@ const Configurator = ({
 
   const [proposal, setProposal] = useState<string | undefined>(undefined);
 
+  const [evaluation, setEvaluation] = useState<string | undefined>(undefined);
+
   const [selector, setSelector] = useState<string | undefined>(undefined);
 
   const toggleDrawer = (): void => {
@@ -33,6 +35,7 @@ const Configurator = ({
 
   const evaluateSelector = (): void => {
     console.log(selector);
+    setEvaluation("3.90");
   };
 
   /**
@@ -43,7 +46,7 @@ const Configurator = ({
    */
   useEffect(() => {
     toggleDrawer();
-    setProposal(undefined);
+    setProposal(".price");
   }, [element]);
 
   return (
@@ -55,18 +58,22 @@ const Configurator = ({
       visible={isDrawerOpen}
     >
       <h2>{element.label}</h2>
-      {proposal && (
-        <p>
-          {t("selector.proposal")}: {proposal}
-        </p>
-      )}
+      {proposal && <p>{t("selector.proposal", { value: proposal })}</p>}
 
       <Space direction="vertical" size="middle" style={{ display: "flex" }}>
         <TextArea
           rows={4}
           placeholder={t("selector.input_placeholder")}
           onChange={changeSelector}
+          value={proposal}
         />
+
+        {evaluation && (
+          <p>
+            <CheckCircleOutlined></CheckCircleOutlined>
+            {t("evaluation.result", { value: evaluation })}
+          </p>
+        )}
 
         <Button onClick={evaluateSelector}>
           {t("action.evaluate_selector")}
