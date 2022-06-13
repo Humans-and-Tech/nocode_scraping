@@ -1,11 +1,27 @@
 {
   "page": {
     "title": "Product sheet layout",
-    "subtitle": "Use this layout to scrape details of a product"
+    "subtitle": "Use this layout to scrape details of a product",
+    "scraping_available": "Click an element to configure the scraping",
+    "scraping_not_available": "this element cannot be scraped yet"
   },
 
   "product": {
-    "label": "Your Product label"
+    "label": "Your Product label",
+    "price": {
+      "header": "Price information",
+      "unit": "Price Unit (ex: Kg, m2)",
+      "currency": "Currency ($, €...)",
+      "recommended": "Recommended price",
+      "discount": "Discount price"
+    },
+    "delivery": {
+      "header": "Delivery options",
+      "price": "Price of the delivery option",
+      "currency": "Currency ($, €...)",
+      "delay": "Delay to deliver",
+      "mode": "Delivery mode (pick-up, at home...)"
+    }
   },
 
   "breadcrumb": {
