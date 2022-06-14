@@ -21,13 +21,33 @@ io.on("connect_error", (err: unknown) => {
   console.error(`connect_error due to ${err}`);
 });
 
+/**
+ * all the socket events are listed here
+ * kind of "routes" in similarity to a REST API
+ */
 io.on('connection', (socket: Socket) => {
-  // console.debug(socket);
-  socket.send('hello', {});
-});
 
-io.on('olleh', () => {
-  console.info("olleh received");
+  /**
+   * user just connected
+   */
+  socket.emit('connection', {
+    "id": socket.id
+  });
+
+  /**
+   * user changed website config
+   */
+  socket.on('set-website', (data) => {
+    console.info("new website config", data);
+  });
+
+  /**
+   * user changed proxy config
+   */
+  socket.on('set-proxy', (data) => {
+    console.info("new proxy config", data);
+  });
+
 });
 
 
