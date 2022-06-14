@@ -1,26 +1,26 @@
 import { webkit } from 'playwright-webkit';
+import { JSDOM } from 'jsdom'
+import { microdata } from '@cucumber/microdata';
+import { Offer } from 'schema-dts';
 
-/**
- * Get the title of a website by its URL
- * @param url URL of the website we want to get the title from
- * @returns The title as a string
- */
-export const getWordFromTarget = async (): Promise<string> => {
-    // Browser initializitation
+export const getSelector = async (url: string): Promise<string> => {
+
     const browser = await webkit.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
 
     // Go to page
-    await page.goto('https://scraping-target.niels.codes');
-    // Wait one second to ensure everything has loaded in
-    await page.waitForTimeout(1000);
+    await page.goto(url);
+    // await page.waitForTimeout(1000);
 
-    // Get the title element by its CSS selector
-    const wordElement = await page.$('#output-element');
-    // Extract the inner text from the element
-    const word = await wordElement?.innerText()!;
-    await browser.close();
-    return word;
+    const document = await page.content();
 
+    console.log(document);
+
+    const dom = new JSDOM(document);
+    const offer = microdata('https://schema.org/Offer', dom.window.document.documentElement) as Offer;
+
+    console.log('offer', offer);
+
+    return '.price';
 };

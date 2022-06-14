@@ -3,8 +3,8 @@ import express from 'express';
 import http from 'http';
 import { Socket, Server } from "socket.io";
 
-import { ScrapingElement } from './interfaces';
-import { getWordFromTarget } from './scraping'
+import { ScrapingElement, Selector } from './interfaces';
+import { getSelector } from './scraping'
 
 const app = express();
 const server = http.createServer(app);
@@ -62,9 +62,11 @@ io.on('connection', (socket: Socket) => {
    * the client requests a selector proposal
    * for the given element
    */
-  socket.on('propose-selector', (element: string, callback) => {
-    getWordFromTarget().then((response: string) => {
-      callback(response);
+  socket.on('propose-selector', (url: string, selector: Selector, callback: (selector: Selector) => void) => {
+    getSelector(url).then((path: string) => {
+      console.log("new proposal for ", selector, path);
+      selector.path = path;
+      callback(selector);
     })
   });
 
