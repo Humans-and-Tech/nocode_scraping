@@ -40,19 +40,19 @@ const ProductSheet: React.FC = () => {
 
   const priceElements: Array<ScrapingElement> = [
     {
-      key: "price.discount",
+      name: "price.discount",
       label: t("product.price.discount"),
     },
     {
-      key: "price.recommended",
+      name: "price.recommended",
       label: t("product.price.recommended"),
     },
     {
-      key: "price.unit",
+      name: "price.unit",
       label: t("product.price.unit"),
     },
     {
-      key: "price.currency",
+      name: "price.currency",
       label: t("product.price.currency"),
     },
   ];
@@ -136,7 +136,7 @@ const ProductSheet: React.FC = () => {
                         dataSource={priceElements}
                         renderItem={(item: ScrapingElement) => (
                           <List.Item
-                            key={item.key}
+                            key={item.name}
                             className="gus-scraping-element"
                             onClick={() => {
                               showConfigurator(item);

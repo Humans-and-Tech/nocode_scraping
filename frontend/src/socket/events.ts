@@ -17,3 +17,18 @@ export const emit = (_socket: Socket, event: string, data: unknown) => {
         console.log("emit", event, data);
     }, 500)();
 };
+
+
+/**
+ * request the backend to propose an selector
+ * for the given element name
+ * 
+ * @param _socket 
+ * @param element 
+ * @param callback 
+ */
+export const propose = (_socket: Socket, name: string, callback: (proposal: string) => void) => {
+    _socket.emit('propose-selector', name, (proposal: string) => {
+        callback(proposal);
+    });
+};

@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Drawer, Input, Button, Space } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
+import { Socket } from "socket.io-client";
 
+import { SocketContext } from "../../socket";
+import { emit, propose } from '../../socket/events';
 import { ScrapingElement } from "../../interfaces";
 
 const { TextArea } = Input;
@@ -17,11 +20,11 @@ const Configurator = ({
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
-  const [proposal, setProposal] = useState<string | undefined>(undefined);
-
   const [evaluation, setEvaluation] = useState<string | undefined>(undefined);
 
   const [selector, setSelector] = useState<string | undefined>(undefined);
+
+  const socket = useContext<Socket>(SocketContext);
 
   const toggleDrawer = (): void => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -31,22 +34,30 @@ const Configurator = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setSelector(e.target.value);
+
+    // pass the target value
+    // not the selector, because the selector might
+    // not be updated yet while the event is sent to the socket
+    emit(socket, "set-scraping-element", {
+      'name': element.name,
+      'selector': e.target.value
+    });
   };
 
   const evaluateSelector = (): void => {
-    console.log(selector);
     setEvaluation("3.90");
   };
 
   /**
    * reload the Drawer when the element
    * to be configured changes
-   *
-   * --> fetch the proposal for this element
+   * and fetch a proposal for this element
    */
   useEffect(() => {
     toggleDrawer();
-    setProposal(".price");
+    propose(socket, element.name, (proposal) => {
+      setSelector(proposal);
+    })
   }, [element]);
 
   return (
@@ -58,14 +69,14 @@ const Configurator = ({
       visible={isDrawerOpen}
     >
       <h2>{element.label}</h2>
-      {proposal && <p>{t("selector.proposal", { value: proposal })}</p>}
+      {selector && <p>{t("selector.proposal", { value: selector })}</p>}
 
       <Space direction="vertical" size="middle" style={{ display: "flex" }}>
         <TextArea
           rows={4}
           placeholder={t("selector.input_placeholder")}
           onChange={changeSelector}
-          value={proposal}
+          value={selector}
         />
 
         {evaluation && (

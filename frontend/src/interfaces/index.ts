@@ -1,4 +1,4 @@
 export interface ScrapingElement {
-  key: string;
+  name: string;
   label: string;
 }
