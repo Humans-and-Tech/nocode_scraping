@@ -7,7 +7,7 @@
   "license": "GPLv3",
   "scripts": {
     "dev": "concurrently -k -n \"Typescript,Node\" -p \"[{name}]\" -c \"blue,green\" \"tsc --watch\" \"nodemon dist/index.js\"",
-    "start": "tsc && DEBUG=socket* node dist/index.js",
+    "start": "tsc && node dist/index.js",
     "test": "jest --verbose",
     "test-watch": "jest --verbose --watchAll"
   },

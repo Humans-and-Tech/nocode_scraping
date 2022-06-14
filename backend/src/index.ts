@@ -7,7 +7,6 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
@@ -16,6 +15,12 @@ const io = new Server(server, {
     credentials: false
   }
 });
+
+interface ScrapingElement {
+  name: string;
+  selector: string;
+  language?: "css" | "xpath";
+}
 
 io.on("connect_error", (err: unknown) => {
   console.error(`connect_error due to ${err}`);
@@ -46,6 +51,22 @@ io.on('connection', (socket: Socket) => {
    */
   socket.on('set-proxy', (data) => {
     console.info("new proxy config", data);
+  });
+
+  /**
+   * receive a scraping element
+   * from the client
+   */
+  socket.on('set-scraping-element', (data: ScrapingElement) => {
+    console.info("new scraping element", data);
+  });
+
+  /**
+   * the client requests a selector proposal
+   * for the given element
+   */
+  socket.on('propose-selector', (element: string, callback) => {
+    callback(element);
   });
 
 });
