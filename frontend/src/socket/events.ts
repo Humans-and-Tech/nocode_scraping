@@ -5,7 +5,7 @@ import debounce from "lodash/debounce";
  * debounces a user input before sending the data
  * 
  * @param event 
- * @param data 
+ * @param data
  */
 export const emit = (_socket: Socket, event: string, data: unknown) => {
 
@@ -24,8 +24,8 @@ export const emit = (_socket: Socket, event: string, data: unknown) => {
  * for the given element name
  * 
  * @param _socket 
- * @param element 
- * @param callback 
+ * @param element string
+ * @param callback a void function which sends proposal back to the requester
  */
 export const propose = (_socket: Socket, name: string, callback: (proposal: string) => void) => {
     _socket.emit('propose-selector', name, (proposal: string) => {

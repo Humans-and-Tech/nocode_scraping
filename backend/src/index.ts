@@ -1,13 +1,14 @@
 
-// import { ClientToServerEvents } from './interfaces/socket';
+import express from 'express';
+import http from 'http';
+import { Socket, Server } from "socket.io";
 
-import { Socket } from "socket.io";
+import { ScrapingElement } from './interfaces';
+import { getWordFromTarget } from './scraping'
 
-const express = require('express');
 const app = express();
-const http = require('http');
 const server = http.createServer(app);
-const { Server } = require("socket.io");
+
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -16,11 +17,7 @@ const io = new Server(server, {
   }
 });
 
-interface ScrapingElement {
-  name: string;
-  selector: string;
-  language?: "css" | "xpath";
-}
+
 
 io.on("connect_error", (err: unknown) => {
   console.error(`connect_error due to ${err}`);
@@ -66,7 +63,9 @@ io.on('connection', (socket: Socket) => {
    * for the given element
    */
   socket.on('propose-selector', (element: string, callback) => {
-    callback(element);
+    getWordFromTarget().then((response: string) => {
+      callback(response);
+    })
   });
 
 });
