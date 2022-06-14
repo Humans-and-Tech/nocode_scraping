@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client";
 import debounce from "lodash/debounce";
+import { Selector } from "../interfaces"
 
 /**
  * debounces a user input before sending the data
@@ -20,15 +21,19 @@ export const emit = (_socket: Socket, event: string, data: unknown) => {
 
 
 /**
- * request the backend to propose an selector
- * for the given element name
  * 
  * @param _socket 
- * @param element string
- * @param callback a void function which sends proposal back to the requester
+ * @param p Selector
+ * @param callback a void function taking a Selector as param
  */
-export const propose = (_socket: Socket, name: string, callback: (proposal: string) => void) => {
-    _socket.emit('propose-selector', name, (proposal: string) => {
-        callback(proposal);
+export const propose = (_socket: Socket, p: Selector, callback: (proposal: Selector) => void) => {
+    _socket.emit('propose-selector', {
+        "url": p.url,
+        "element": p.element.name
+    }, (proposal: string) => {
+        callback({
+            element: p.element,
+            path: proposal
+        });
     });
 };

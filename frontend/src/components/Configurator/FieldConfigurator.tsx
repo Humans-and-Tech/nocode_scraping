@@ -7,7 +7,7 @@ import { Socket } from "socket.io-client";
 
 import { SocketContext } from "../../socket";
 import { emit, propose } from '../../socket/events';
-import { ScrapingElement } from "../../interfaces";
+import { ScrapingElement, Selector } from "../../interfaces";
 
 const { TextArea } = Input;
 
@@ -22,7 +22,7 @@ const Configurator = ({
 
   const [evaluation, setEvaluation] = useState<string | undefined>(undefined);
 
-  const [selector, setSelector] = useState<string | undefined>(undefined);
+  const [selector, setSelector] = useState<Selector | undefined>(undefined);
 
   const socket = useContext<Socket>(SocketContext);
 
@@ -33,7 +33,12 @@ const Configurator = ({
   const changeSelector = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setSelector(e.target.value);
+    setSelector({
+      element: {
+        name: selector?.element.name
+      },
+      path: e.target.value
+    });
 
     // pass the target value
     // not the selector, because the selector might
@@ -55,7 +60,15 @@ const Configurator = ({
    */
   useEffect(() => {
     toggleDrawer();
-    propose(socket, element.name, (proposal) => {
+
+    // p is a SelectorProposal
+    const p = {
+      "url": "view-source:https://www.manomano.fr/p/echelle-de-toit-5-plans-modulable-jusque-685m-pas-de-33-17337447",
+      "element": {
+        "name": "price"
+      }
+    }
+    propose(socket, p, (proposal) => {
       setSelector(proposal);
     })
   }, [element]);
@@ -76,7 +89,7 @@ const Configurator = ({
           rows={4}
           placeholder={t("selector.input_placeholder")}
           onChange={changeSelector}
-          value={selector}
+          value={selector?.path}
         />
 
         {evaluation && (
