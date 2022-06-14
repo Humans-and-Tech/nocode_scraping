@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Drawer, Input, Space } from "antd";
 import { useTranslation } from "react-i18next";
 import { CheckCircleOutlined } from "@ant-design/icons";
+
+import { SocketContext } from "../../socket";
+import { emit } from '../../socket/events';
+import { Socket } from "socket.io-client";
+import debounce from "lodash/debounce";
 
 const { TextArea } = Input;
 
@@ -18,16 +23,32 @@ const Configurator = ({ isOpen }: { isOpen: boolean }): JSX.Element => {
 
   const [proxyConfig, setProxyConfig] = useState<string | undefined>(undefined);
 
+  const socket = useContext<Socket>(SocketContext);
+
   const changeWebsite = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setWebsite(e.target.value);
+
+    // pass the target value
+    // not the website, because the website might
+    // not be updated yet while the event is sent to the socket
+    emit(socket, "set-website", {
+      'value': e.target.value
+    });
   };
 
   const changeProxyConfig = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setProxyConfig(e.target.value);
+
+    // pass the target value
+    // not the website, because the website might
+    // not be updated yet while the event is sent to the socket
+    emit(socket, "set-proxy", {
+      'value': e.target.value
+    });
   };
 
   const closeDrawer = () => {
