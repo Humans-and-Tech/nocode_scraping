@@ -51,19 +51,18 @@ io.on('connection', (socket: Socket) => {
   });
 
   /**
-   * receive a scraping element
-   * from the client
+   * receive a scraping element (a selector path)
+   * save it
    */
   socket.on('set-scraping-element', (data: ScrapingElement) => {
-    console.info("new scraping element", data);
+    console.info("new scraping element to save", data);
   });
 
   /**
    * the client requests a selector proposal
-   * for the given element
    */
   socket.on('propose-selector', (url: string, selector: Selector, callback: (selector: Selector) => void) => {
-    getSelector(url).then((path: string) => {
+    getSelector(url).then((path: string | undefined) => {
       console.log("new proposal for ", selector, path);
       selector.path = path;
       callback(selector);

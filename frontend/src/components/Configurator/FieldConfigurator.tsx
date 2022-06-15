@@ -30,7 +30,7 @@ const Configurator = ({
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const changeSelector = (
+  const changeSelectorPath = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setSelector({
@@ -49,7 +49,7 @@ const Configurator = ({
     });
   };
 
-  const evaluateSelector = (): void => {
+  const evaluateSelectorPath = (): void => {
     setEvaluation("3.90");
   };
 
@@ -88,7 +88,7 @@ const Configurator = ({
         <TextArea
           rows={4}
           placeholder={t("selector.input_placeholder")}
-          onChange={changeSelector}
+          onChange={changeSelectorPath}
           value={selector?.path}
         />
 
@@ -99,7 +99,7 @@ const Configurator = ({
           </p>
         )}
 
-        <Button onClick={evaluateSelector}>
+        <Button onClick={evaluateSelectorPath}>
           {t("action.evaluate_selector")}
         </Button>
       </Space>

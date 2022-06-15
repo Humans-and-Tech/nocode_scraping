@@ -3,7 +3,13 @@ import { JSDOM } from 'jsdom'
 import { microdata } from '@cucumber/microdata';
 import { Offer } from 'schema-dts';
 
-export const getSelector = async (url: string): Promise<string> => {
+// TODO:
+// Microdata
+// JSONLD
+// autre ?
+// interface Offer (dont stock), Breadcrumb, Product, etc...
+
+export const getSelector = async (url: string): Promise<string | undefined> => {
 
     const browser = await webkit.launch();
     const context = await browser.newContext();
@@ -22,5 +28,10 @@ export const getSelector = async (url: string): Promise<string> => {
 
     console.log('offer', offer);
 
+    if (offer == null || offer == undefined) {
+        return undefined;
+    }
+
+    // return the microdata path
     return '.price';
 };
