@@ -33,7 +33,13 @@ export const propose = (_socket: Socket, p: Selector, callback: (proposal: Selec
 };
 
 
-
+/**
+ * fetches the content of the css selector and provides it back to the callback function
+ * 
+ * @param _socket 
+ * @param p a selector containing a URL and path to evaluate a css selector 
+ * @param callback a void function containing the content fetched
+ */
 export const evaluate = (_socket: Socket, p: Selector, callback: (content: string | null) => void) => {
     _socket.emit('get-selector-content', p, (content: string) => {
         callback(content);
