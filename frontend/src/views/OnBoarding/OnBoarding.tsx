@@ -52,12 +52,21 @@ const OnBoarding: React.FC = () => {
      * and navigate to the next step
      */
     const nextStep = () => {
-        if (name == '') {
-            setCurrentStep(0);
-            setNameStatus('error');
-        }
-        else if (currentStep < 2) {
-            setCurrentStep(currentStep + 1);
+
+        if (currentStep == 0) {
+            if (name == '') {
+                setNameStatus('error');
+            } else {
+                setCurrentStep(currentStep + 1);
+            }
+        } else if (currentStep == 1) {
+            if (pageType == undefined) {
+                // TODO: notify of the error
+            } else {
+                setCurrentStep(currentStep + 1);
+            }
+        } else if (currentStep == 2) {
+            // do nothing
         }
     };
 
@@ -157,7 +166,7 @@ const OnBoarding: React.FC = () => {
                                 onClick={chooseProductSheet}
                                 extra={
                                     pageType == PageType.ProductSheet
-                                        ? <Space direction="horizontal" align="end" className="card-selected"><AiOutlineCheckCircle />{t('page_type.selected')}</Space>
+                                        ? <Space direction="horizontal" align="end" className="card-selected"><AiOutlineCheckCircle />{t('page_type.product_sheet_selected')}</Space>
                                         : <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
                                 }
                             >
@@ -171,7 +180,7 @@ const OnBoarding: React.FC = () => {
                                 onClick={chooseCategoryPage}
                                 extra={
                                     pageType == PageType.CategoryPage
-                                        ? <Space direction="horizontal" align="end" className="card-selected"><AiOutlineCheckCircle />{t('page_type.selected')}</Space>
+                                        ? <Space direction="horizontal" align="end" className="card-selected"><AiOutlineCheckCircle />{t('page_type.category_page_selected')}</Space>
                                         : <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
                                 }
                             >
