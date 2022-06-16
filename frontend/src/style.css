@@ -5,6 +5,8 @@
   --gus-dark-blue: #223b75;
   --gus-light-gray: #eff2f5;
   --gus-gray: rgb(107, 116, 118);
+  --gus-red: red;
+  --gus-green: green;
 }
 
 p {
