@@ -1,6 +1,11 @@
 import React, { useContext, useState } from "react";
 import {
+    Space,
     Steps,
+    Result,
+    Button,
+    Card,
+    Divider
 } from "antd";
 
 
@@ -12,6 +17,8 @@ import "../../style.css";
 
 const { Step } = Steps;
 
+const { Meta } = Card;
+
 const OnBoarding: React.FC = () => {
     const { t } = useTranslation("onboarding");
 
@@ -21,12 +28,44 @@ const OnBoarding: React.FC = () => {
 
     return (
         <>
+            <Space size="large" direction="vertical" align="center">
+                <Steps current={currentStep}>
+                    <Step title={t('step.configure')} description={t('step.configure_desc')} />
+                    <Step title={t('step.choose_page_type')} description={t('step.choose_page_type_desc')} />
+                    <Step title={t('step.finished')} description={t('step.finished_desc')} />
+                </Steps>
 
-            <Steps current={currentStep}>
-                <Step title="Configure the website" description="Configure its URL and an optional proxy configuration" />
-                <Step title="Choose the Page type" description="Is it a Product Page or a Category Page" />
-                <Step title="Define the selectore" description="Define the CSS selector for each element of the page" />
-            </Steps>
+                <Space split={<Divider type="vertical" style={{ 'height': '300px' }} />}>
+                    <Card
+                        hoverable
+                        style={{ width: 240, 'margin': '1em 2em' }}
+                        cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                    >
+                        <Meta title={t('page_type.product_sheet')} description={t('page_type.product_sheet_desc')} />
+                    </Card>
+
+                    <Card
+                        hoverable
+                        style={{ width: 240, 'margin': '1em 2em' }}
+                        cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                    >
+                        <Meta title={t('page_type.category_page')} description={t('page_type.category_page_desc')} />
+                    </Card>
+
+                </Space>
+
+                <Result
+                    status="success"
+                    title={t('finished.start_scraping')}
+                    subTitle={t('finished.start_scraping_subtitle')}
+                    extra={[
+                        <Button type="primary" key="console">
+                            {t('finished.start_scraping_action')}
+                        </Button>,
+                    ]}
+                />
+
+            </Space>
 
         </>
     );
