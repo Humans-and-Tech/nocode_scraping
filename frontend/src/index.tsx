@@ -11,7 +11,7 @@ import "./i18n";
 import { SocketContext, socket } from "./socket";
 import ProductSheet from "./views/ProductPage/ProductSheet";
 import OnBoarding from './views/OnBoarding/OnBoarding';
-import { ScraperLayout } from './Layout'
+import { ScraperLayout, OnBoardingLayout } from './Layout'
 
 
 
@@ -35,7 +35,9 @@ root.render(
           <Route
             path="/onboarding"
             element={
-              <OnBoarding />
+              <OnBoardingLayout>
+                <OnBoarding />
+              </OnBoardingLayout>
             }
           />
 

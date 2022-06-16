@@ -33,7 +33,13 @@ li[role="menuitem"] em {
   margin-bottom: 1em;
 }
 
-.gus-layout-content {
+.gus-onboarding-layout-content {
+  background-color: var(--gus-white);
+  padding: 4em;
+
+}
+
+.gus-scraper-layout-content {
   background-color: var(--gus-white);
 }
 

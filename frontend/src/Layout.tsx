@@ -8,6 +8,23 @@ import Configurator from "./components/Configurator/WebsiteConfigurator";
 
 const { Header, Sider, Content } = Layout;
 
+
+export const OnBoardingLayout = ({ children }: { children: React.ReactNode }) => {
+    const { t } = useTranslation("layout");
+
+    return (
+        <Layout>
+            <Header className="gus-layout-helper">
+                <h2>{t("helper.onboarding.title")}</h2>
+                <p>{t("helper.onboarding.content")}</p>
+            </Header>
+            <Layout>
+                <Content className="gus-onboarding-layout-content">{children}</Content>
+            </Layout>
+        </Layout>
+    );
+};
+
 export const ScraperLayout = ({ children }: { children: React.ReactNode }) => {
     const { t } = useTranslation("layout");
     const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
@@ -25,8 +42,8 @@ export const ScraperLayout = ({ children }: { children: React.ReactNode }) => {
                 <Configurator isOpen={isConfigOpen} />
             </Header>
             <Header className="gus-layout-helper">
-                <h2>{t("helper.title")}</h2>
-                <p>{t("helper.content")}</p>
+                <h2>{t("helper.scraper.title")}</h2>
+                <p>{t("helper.scraper.content")}</p>
             </Header>
             <Layout>
                 <Sider theme="light">
@@ -51,7 +68,7 @@ export const ScraperLayout = ({ children }: { children: React.ReactNode }) => {
                         </Menu.Item>
                     </Menu>
                 </Sider>
-                <Content className="gus-layout-content">{children}</Content>
+                <Content className="gus-scraper-layout-content">{children}</Content>
             </Layout>
         </Layout>
     );

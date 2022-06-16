@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
     Steps,
 } from "antd";
@@ -17,14 +17,15 @@ const OnBoarding: React.FC = () => {
 
     const socket = useContext(SocketContext);
 
+    const [currentStep, setCurrentStep] = useState<number>(0);
 
     return (
         <>
 
-            <Steps current={1}>
-                <Step title="Finished" description="This is a description." />
-                <Step title="In Progress" subTitle="Left 00:00:08" description="This is a description." />
-                <Step title="Waiting" description="This is a description." />
+            <Steps current={currentStep}>
+                <Step title="Configure the website" description="Configure its URL and an optional proxy configuration" />
+                <Step title="Choose the Page type" description="Is it a Product Page or a Category Page" />
+                <Step title="Define the selectore" description="Define the CSS selector for each element of the page" />
             </Steps>
 
         </>
