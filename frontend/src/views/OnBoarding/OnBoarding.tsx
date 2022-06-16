@@ -5,7 +5,8 @@ import {
     Result,
     Button,
     Card,
-    Divider
+    Divider,
+    Input
 } from "antd";
 
 
@@ -16,8 +17,8 @@ import { SocketContext } from "../../socket";
 import "../../style.css";
 
 const { Step } = Steps;
-
 const { Meta } = Card;
+const { TextArea } = Input;
 
 const OnBoarding: React.FC = () => {
     const { t } = useTranslation("onboarding");
@@ -34,6 +35,9 @@ const OnBoarding: React.FC = () => {
                     <Step title={t('step.choose_page_type')} description={t('step.choose_page_type_desc')} />
                     <Step title={t('step.finished')} description={t('step.finished_desc')} />
                 </Steps>
+
+                <Input placeholder={t('configure.website_placeholder')} />
+                <TextArea placeholder={t('configure.proxy_placeholder')} />
 
                 <Space split={<Divider type="vertical" style={{ 'height': '300px' }} />}>
                     <Card
