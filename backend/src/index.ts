@@ -4,7 +4,7 @@ import http from 'http';
 import { Socket, Server } from "socket.io";
 
 import { ScrapingElement, Selector } from './interfaces';
-import { getSelector } from './scraping'
+import { getContent } from './scraping'
 
 const app = express();
 const server = http.createServer(app);
@@ -44,6 +44,18 @@ io.on('connection', (socket: Socket) => {
   });
 
   /**
+   * fetch the content of a CSS selector node
+   *  used by the frontend to evaluate a selector
+   */
+  socket.on('get-selector-content', (selector: Selector, callback: (content: string | null) => void) => {
+    console.info("get-selector-content", selector);
+    getContent(selector).then((content: string | null) => {
+      callback(content);
+    })
+
+  });
+
+  /**
    * user changed proxy config
    */
   socket.on('set-proxy', (data) => {
@@ -62,11 +74,11 @@ io.on('connection', (socket: Socket) => {
    * the client requests a selector proposal
    */
   socket.on('propose-selector', (url: string, selector: Selector, callback: (selector: Selector) => void) => {
-    getSelector(url).then((path: string | undefined) => {
-      console.log("new proposal for ", selector, path);
-      selector.path = path;
-      callback(selector);
-    })
+    // getSelector(url).then((path: string | undefined) => {
+    //   console.log("new proposal for ", selector, path);
+    //   // selector.path = path;
+    //   callback(selector);
+    // })
   });
 
 });

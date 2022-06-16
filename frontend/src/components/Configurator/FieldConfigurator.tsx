@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from "../../socket";
-import { emit, propose } from '../../socket/events';
+import { emit, evaluate } from '../../socket/events';
 import { ScrapingElement, Selector } from "../../interfaces";
 
 const { TextArea } = Input;
@@ -20,7 +20,7 @@ const Configurator = ({
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
-  const [evaluation, setEvaluation] = useState<string | undefined>(undefined);
+  const [evaluation, setEvaluation] = useState<string | null>(null);
 
   const [selector, setSelector] = useState<Selector | undefined>(undefined);
 
@@ -34,6 +34,7 @@ const Configurator = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setSelector({
+      url: "https://www.manomano.fr/p/echelle-de-toit-5-plans-modulable-jusque-685m-pas-de-33-17337447",
       element: {
         name: selector?.element.name
       },
@@ -49,8 +50,17 @@ const Configurator = ({
     });
   };
 
-  const evaluateSelectorPath = (): void => {
-    setEvaluation("3.90");
+  const evaluateSelectorPath = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ): void => {
+    event.preventDefault();
+    const s = selector;
+    if (s !== undefined) {
+      evaluate(socket, s, (content: string | null) => {
+        console.log("evaluate", s, content);
+        setEvaluation(content);
+      })
+    }
   };
 
   /**
@@ -61,16 +71,9 @@ const Configurator = ({
   useEffect(() => {
     toggleDrawer();
 
-    // p is a SelectorProposal
-    const p = {
-      "url": "view-source:https://www.manomano.fr/p/echelle-de-toit-5-plans-modulable-jusque-685m-pas-de-33-17337447",
-      "element": {
-        "name": "price"
-      }
-    }
-    propose(socket, p, (proposal) => {
-      setSelector(proposal);
-    })
+    // TODO: propose a select
+    // from the backend
+
   }, [element]);
 
   return (

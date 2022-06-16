@@ -4,9 +4,9 @@ export interface ScrapingElement {
 }
 
 export interface Selector {
-  url?: string;
+  url: string;
   element: ScrapingElement;
-  path?: string;
+  path: string;
   language?: "css" | "xpath";
 }
 

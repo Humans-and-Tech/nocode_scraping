@@ -3,9 +3,26 @@ export interface ScrapingElement {
     label?: string;
 }
 
+interface DeliveryOption {
+    mode: string;
+    delay: number;
+    price: number;
+}
+
+export interface Offer {
+    gtin?: string;
+    sku?: string;
+    mpn?: string;
+    discount?: boolean;
+    recommededPrice?: number;
+    originalPrice: number;
+    seller?: string;
+    deliveryOptions?: Array<DeliveryOption>;
+}
+
 export interface Selector {
-    url?: string;
+    url: string;
     element: ScrapingElement;
-    path?: string;
+    path: string;
     language?: "css" | "xpath";
 }

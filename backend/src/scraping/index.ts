@@ -1,37 +1,22 @@
 import { webkit } from 'playwright-webkit';
-import { JSDOM } from 'jsdom'
-import { microdata } from '@cucumber/microdata';
-import { Offer } from 'schema-dts';
+import { Selector } from '../interfaces'
 
-// TODO:
-// Microdata
-// JSONLD
-// autre ?
-// interface Offer (dont stock), Breadcrumb, Product, etc...
-
-export const getSelector = async (url: string): Promise<string | undefined> => {
+export const getContent = async (selector: Selector): Promise<string | null> => {
 
     const browser = await webkit.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    // Go to page
-    await page.goto(url);
-    // await page.waitForTimeout(1000);
+    await page.goto(selector.url);
 
-    const document = await page.content();
+    // TODO
+    // handle UnhandledPromiseRejectionWarning: locator.textContent: Timeout 30000ms exceeded.
+    // mettre un short timeout 
+    // pour revenir rapidos vers le user
+    const content = await page.locator(selector.path).textContent();
 
-    console.log(document);
+    console.log(`found ${content} for selector ${selector.path}`);
 
-    const dom = new JSDOM(document);
-    const offer = microdata('https://schema.org/Offer', dom.window.document.documentElement) as Offer;
+    return content
 
-    console.log('offer', offer);
-
-    if (offer == null || offer == undefined) {
-        return undefined;
-    }
-
-    // return the microdata path
-    return '.price';
 };

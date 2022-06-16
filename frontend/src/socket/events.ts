@@ -27,13 +27,15 @@ export const emit = (_socket: Socket, event: string, data: unknown) => {
  * @param callback a void function taking a Selector as param
  */
 export const propose = (_socket: Socket, p: Selector, callback: (proposal: Selector) => void) => {
-    _socket.emit('propose-selector', {
-        "url": p.url,
-        "element": p.element.name
-    }, (proposal: string) => {
-        callback({
-            element: p.element,
-            path: proposal
-        });
+    _socket.emit('propose-selector', p, (proposal: Selector) => {
+        callback(proposal);
+    });
+};
+
+
+
+export const evaluate = (_socket: Socket, p: Selector, callback: (content: string | null) => void) => {
+    _socket.emit('get-selector-content', p, (content: string) => {
+        callback(content);
     });
 };
