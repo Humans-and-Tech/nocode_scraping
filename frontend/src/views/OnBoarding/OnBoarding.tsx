@@ -41,6 +41,9 @@ const OnBoarding: React.FC = () => {
 
     const reset = () => {
         setCurrentStep(0);
+        setName('');
+        setProxy('');
+        setPageType(undefined);
         configProvider.setConfig(null);
     };
 
