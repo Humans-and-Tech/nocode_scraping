@@ -7,6 +7,7 @@ import isURL from 'validator/lib/isURL';
 
 import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
 import './Configurator.scoped.css';
+import { config } from "process";
 
 const { TextArea } = Input;
 
@@ -33,20 +34,26 @@ export const PageURLConfigurator = (): JSX.Element => {
             setUrl('');
             setStatus('error');
         }
+
+        // update the config in the local storage
+        const conf = configProvider.getConfig();
+        conf.pageUrl = e.target.value;
+        configProvider.setConfig(conf);
     };
 
 
     /**
-     * update the config on URL change
+     * initialize the page url
+     * with the config
      */
     useEffect(() => {
 
         const conf = configProvider.getConfig();
-        conf.pageUrl = url;
-        configProvider.setConfig(conf);
-        setUrl(conf.pageUrl);
+        if (conf.pageUrl !== undefined) {
+            setUrl(conf.pageUrl);
+        }
 
-    }, [url, configProvider]);
+    }, [configProvider]);
 
     return (
         <>

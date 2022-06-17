@@ -6,7 +6,7 @@ export interface ScrapingConfigProvider {
     setConfig: (config: ScrapingConfig | null) => void;
 }
 
-const createConfig = (): ScrapingConfig => {
+export const createConfig = (): ScrapingConfig => {
     return {
         websiteConfig: {},
     };

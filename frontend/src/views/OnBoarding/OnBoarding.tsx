@@ -10,10 +10,10 @@ import {
 } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 
-import { PageType } from '../../interfaces'
+import { PageType, ScrapingConfig } from '../../interfaces'
 import { useTranslation } from "react-i18next";
 
-import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
+import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext'
 
 import "../../style.css";
 import "./OnBoarding.scoped.css"
@@ -28,7 +28,9 @@ const { TextArea } = Input;
 const OnBoarding: React.FC = () => {
     const { t } = useTranslation("onboarding");
 
-    const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext)
+    const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
+
+    const [config, setConfig] = useState<ScrapingConfig>(createConfig());
 
     const [currentStep, setCurrentStep] = useState<number>(0);
 
@@ -45,7 +47,31 @@ const OnBoarding: React.FC = () => {
         setName('');
         setProxy('');
         setPageType(undefined);
-        configProvider.setConfig(null);
+        setConfig(createConfig());
+    };
+
+    /**
+     * merges the existing config from the local storage
+     * with the new config options decided in this onboarding
+     * 
+     * does not reset the existing config !
+     */
+    const saveConfig = (config: ScrapingConfig): void => {
+        const oldConfig = configProvider.getConfig();
+
+        if (config.pageType !== undefined) {
+            oldConfig.pageType = config.pageType;
+        }
+        if (config.pageUrl !== undefined) {
+            oldConfig.pageUrl = config.pageUrl;
+        }
+        if (config.websiteConfig.name !== undefined) {
+            oldConfig.websiteConfig.name = config.websiteConfig.name;
+        }
+        if (config.websiteConfig.proxy !== undefined) {
+            oldConfig.websiteConfig.proxy = config.websiteConfig.proxy;
+        }
+        configProvider.setConfig(oldConfig);
     };
 
     /**
@@ -58,16 +84,19 @@ const OnBoarding: React.FC = () => {
             if (name == '') {
                 setNameStatus('error');
             } else {
+                saveConfig(config);
                 setCurrentStep(currentStep + 1);
             }
         } else if (currentStep == 1) {
             if (pageType == undefined) {
                 // TODO: notify of the error
             } else {
+                saveConfig(config);
                 setCurrentStep(currentStep + 1);
             }
         } else if (currentStep == 2) {
             // do nothing
+            saveConfig(config);
         }
     };
 
@@ -79,42 +108,34 @@ const OnBoarding: React.FC = () => {
 
     const chooseProductSheet = () => {
         setPageType(PageType.ProductSheet);
+        config.pageType = PageType.ProductSheet;
+        setConfig(config);
     };
 
     const chooseCategoryPage = () => {
         setPageType(PageType.CategoryPage);
+        config.pageType = PageType.CategoryPage;
+        setConfig(config);
     };
 
     const changeName = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const val = e.target.value;
+
         if (val == '') {
             setNameStatus('error');
         } else {
             setNameStatus('');
             setName(e.target.value);
         }
-        if (name !== undefined) {
-            configProvider.setConfig({
-                websiteConfig: {
-                    name: e.target.value,
-                    proxy: proxy
-                },
-                pageType: pageType
-            });
-        }
+
+        config.websiteConfig.name = val;
+        setConfig(config);
     };
 
     const changeProxy = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setProxy(e.target.value);
-        if (name !== undefined) {
-            configProvider.setConfig({
-                websiteConfig: {
-                    name: name,
-                    proxy: e.target.value
-                },
-                pageType: pageType
-            });
-        }
+        config.websiteConfig.proxy = e.target.value;
+        setConfig(config);
     };
 
     /**
@@ -128,7 +149,7 @@ const OnBoarding: React.FC = () => {
         setName(config?.websiteConfig?.name);
         setProxy(config?.websiteConfig?.proxy);
         setPageType(config?.pageType);
-    }, []);
+    }, [configProvider]);
 
     return (
         <>
