@@ -1,16 +1,23 @@
 {
   "page_url": {
     "title": "Enter the page to be scraped",
-    "subtitle": "You can change this URL whenever you want"
-  },
-  "title": "Configure the scraping",
-  "website": {
-    "helper_text": "Enter below the URL of the page to be scraped",
-    "placeholder": "a valid URL starts with http(s)://",
-    "is_valid": "This URL is valid"
-  },
-  "url": {
+    "subtitle": "You can change this URL whenever you want",
     "error": "This URL is not valid",
     "success": "This is a valid URL"
+  },
+  "field": {
+    "title": "Configure the scraping",
+    "selector": {
+      "proposal": "Analyzing the website, we propose the following selector for this element : {{ value }}",
+      "input_placeholder": "Enter a selector for this element",
+      "scrape_element": "Try to scrape this element"
+    },
+    "evaluation": {
+      "no_url": "Configure the URL to be scraped to evaluate this selector",
+      "result": "We fetched the following data with this selector: {{ value }}"
+    },
+    "action": {
+      "evaluate_selector": "Evaluate this selector"
+    }
   }
 }

@@ -35,13 +35,22 @@ export const PageURLConfigurator = (): JSX.Element => {
      */
     useEffect(() => {
 
-        const conf = configProvider.getConfig();
-        if (conf !== null && url !== '') {
-            conf.pageUrl = url;
+        let conf = configProvider.getConfig();
+        if (url !== '') {
+
+            if (conf !== null) {
+                conf.pageUrl = url;
+            } else {
+                // generate a new config
+                conf = {
+                    websiteConfig: {},
+                    pageUrl: url
+                }
+            }
             configProvider.setConfig(conf);
         }
 
-    }, [url])
+    }, [url]);
 
     return (
         <>
@@ -49,11 +58,11 @@ export const PageURLConfigurator = (): JSX.Element => {
             <em>
                 {
                     status == 'error' &&
-                    <Space direction="horizontal" align="start" className="error"><CloseCircleOutlined /><span>{t('url.error')}</span></Space>
+                    <Space direction="horizontal" align="start" className="error"><CloseCircleOutlined /><span>{t('page_url.error')}</span></Space>
                 }
                 {
                     status && status !== 'error' &&
-                    <Space direction="horizontal" align="start" className="success"><CheckCircleOutlined /><span>{t('url.success')}</span></Space>
+                    <Space direction="horizontal" align="start" className="success"><CheckCircleOutlined /><span>{t('page_url.success')}</span></Space>
                 }
             </em>
         </>

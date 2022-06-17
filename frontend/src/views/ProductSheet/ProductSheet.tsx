@@ -68,24 +68,29 @@ const ProductSheet: React.FC = () => {
         direction="vertical"
         className="gus-main-content"
       >
-        <PageHeader title={t("page.title")} subTitle={t("page.subtitle")} />
+
         <Row className="gus-main-row">
           <Col>
-            <Tooltip title={t("page.scraping_not_available")} color="orange">
-              <Breadcrumb className="gus-scraping-element">
-                <Breadcrumb.Item href="">
-                  <HomeOutlined />
-                </Breadcrumb.Item>
-                <Breadcrumb.Item href="">
-                  <FolderOpenOutlined />
-                  <span>{t("breadcrumb.category_level_0")}</span>
-                </Breadcrumb.Item>
-                <Breadcrumb.Item href="">
-                  <FolderOpenOutlined />
-                  <span>{t("breadcrumb.category_level_1")}</span>
-                </Breadcrumb.Item>
-              </Breadcrumb>
-            </Tooltip>
+
+            <Row>
+              <Col>
+                <Tooltip title={t("page.scraping_not_available")} color="orange">
+                  <Breadcrumb className="gus-scraping-element">
+                    <Breadcrumb.Item href="">
+                      <HomeOutlined />
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item href="">
+                      <FolderOpenOutlined />
+                      <span>{t("breadcrumb.category_level_0")}</span>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item href="">
+                      <FolderOpenOutlined />
+                      <span>{t("breadcrumb.category_level_1")}</span>
+                    </Breadcrumb.Item>
+                  </Breadcrumb>
+                </Tooltip>
+              </Col>
+            </Row>
           </Col>
         </Row>
         <Row className="gus-main-row">
@@ -102,11 +107,19 @@ const ProductSheet: React.FC = () => {
             </Row>
             <Row className="gus-row-breathe">
               <Col>
-                <Rate
-                  allowHalf
-                  defaultValue={2.5}
-                  className="gus-scraping-element"
-                />
+                <Space direction="horizontal" align="start">
+                  <Rate
+                    allowHalf
+                    defaultValue={2.5}
+                    className="gus-scraping-element"
+                  />
+                  <Tooltip
+                    title={t("page.scraping_not_available")}
+                    color="orange"
+                  >
+                    <span className="gus-scraping-element">{t('product.rating')}</span>
+                  </Tooltip>
+                </Space>
               </Col>
             </Row>
             <Row className="gus-row-breathe">

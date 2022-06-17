@@ -10,7 +10,7 @@ export interface ScrapingConfig {
 }
 
 export interface WebsiteConfig {
-  name: string;
+  name?: string;
   // proxy is usually a JSON object 
   // very depending on the 
   // proxy provider, and depending 

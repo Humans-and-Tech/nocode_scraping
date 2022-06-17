@@ -57,8 +57,8 @@ export const ScraperLayout = ({ header, children }: { header: React.ReactNode, c
                 </Sider>
                 <Content className="gus-scraper-layout-content">
                     <Header className="gus-scraper-layout-content-header">
-                        <h2>{t("helper.example_url")}</h2>
-                        <p>{t("helper.example_url_desc")}</p>
+                        <h2>{t("helper.page_url")}</h2>
+                        <p>{t("helper.page_url_desc")}</p>
                         {header}
                     </Header>
                     {children}

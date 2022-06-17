@@ -4,7 +4,6 @@ import { initReactI18next } from "react-i18next";
 import layoutTranslations from "./locales/en/layout.json";
 import onboardingTranslations from "./locales/en/onboarding.json";
 import productSheetTranslations from "./locales/en/product_sheet.json";
-import scrapingFieldConfigTranslations from "./locales/en/scraping_field_configurator.json";
 import configuratorTranslations from "./locales/en/configurator.json";
 
 // the translations
@@ -15,7 +14,6 @@ const resources = {
     layout: layoutTranslations,
     onboarding: onboardingTranslations,
     product_sheet: productSheetTranslations,
-    scraping_field_configurator: scrapingFieldConfigTranslations,
     configurator: configuratorTranslations,
   },
 };

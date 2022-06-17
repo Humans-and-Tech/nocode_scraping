@@ -8,7 +8,7 @@
   "helper": {
     "title": "How to use ?",
     "content": "Hover the layout, you will notice that you can interact with the elements of the page. When clicking on an element, a new configuration drawer will appear on the right where you'll be able to configure the selectors to apply",
-    "example_url": "Example of URL to be scraped",
-    "example_url_desc": "Enter an example of URL, this will enable to evaluate the selectors for the elements to be scraped"
+    "page_url": "URL to be scraped",
+    "page_url_desc": "this will enable to evaluate the selectors for the elements to be scraped. It can be changed anytime"
   }
 }

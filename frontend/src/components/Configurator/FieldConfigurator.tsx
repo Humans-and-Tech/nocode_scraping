@@ -18,9 +18,11 @@ const Configurator = ({
 }: {
   element: ScrapingElement;
 }): JSX.Element => {
-  const { t } = useTranslation("scraping_field_configurator");
+  const { t } = useTranslation("configurator");
 
   const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
+
+  const [evalUrl, setEvalUrl] = useState<string | undefined>(undefined);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
@@ -61,39 +63,37 @@ const Configurator = ({
     const s = selector;
     if (s !== undefined) {
       evaluate(socket, s, (content: string | null) => {
-        console.log("evaluate", s, content);
         setEvaluation(content);
       })
     }
   };
 
   /**
-   * reload the Drawer when the element
-   * to be configured changes
-   * and fetch a proposal for this element
+   * load the scraped URL
+   * will be used to evaluate the selector
    */
   useEffect(() => {
     toggleDrawer();
-
-
-
+    const config = configProvider.getConfig();
+    setEvalUrl(config?.pageUrl);
+    console.log('evalUrl', config?.pageUrl);
   }, [element]);
 
   return (
     <Drawer
-      title={t("title")}
+      title={t("field.title")}
       placement="right"
       closable={false}
       onClose={toggleDrawer}
       visible={isDrawerOpen}
     >
       <h2>{element.label}</h2>
-      {selector && <p>{t("selector.proposal", { value: selector })}</p>}
+      {selector && <p>{t("field.selector.proposal", { value: selector })}</p>}
 
       <Space direction="vertical" size="middle" style={{ display: "flex" }}>
         <TextArea
           rows={4}
-          placeholder={t("selector.input_placeholder")}
+          placeholder={t("field.selector.input_placeholder")}
           onChange={changeSelectorPath}
           value={selector?.path}
         />
@@ -101,13 +101,27 @@ const Configurator = ({
         {evaluation && (
           <p>
             <CheckCircleOutlined></CheckCircleOutlined>
-            {t("evaluation.result", { value: evaluation })}
+            {t("field.evaluation.result", { value: evaluation })}
           </p>
         )}
 
-        <Button onClick={evaluateSelectorPath}>
-          {t("action.evaluate_selector")}
-        </Button>
+        {
+          evalUrl !== undefined &&
+          <Button onClick={evaluateSelectorPath}>
+            {t("field.action.evaluate_selector")}
+          </Button>
+        }
+
+        {
+          evalUrl === undefined &&
+          <>
+            <Button disabled>
+              {t("field.action.evaluate_selector")}
+            </Button>
+            <p>{t('field.evaluation.no_url')}</p>
+          </>
+        }
+
       </Space>
     </Drawer>
   );

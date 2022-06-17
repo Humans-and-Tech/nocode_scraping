@@ -5,9 +5,9 @@
     "scraping_available": "Click an element to configure the scraping",
     "scraping_not_available": "this element cannot be scraped yet"
   },
-
   "product": {
     "label": "Your Product label",
+    "rating": "Rating & rating count",
     "price": {
       "header": "Price information",
       "unit": "Price Unit (ex: Kg, m2)",
@@ -23,7 +23,6 @@
       "mode": "Delivery mode (pick-up, at home...)"
     }
   },
-
   "breadcrumb": {
     "category_level_0": "Parent Category",
     "category_level_1": "Sub Category"
