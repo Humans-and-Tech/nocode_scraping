@@ -8,6 +8,8 @@ import { Socket } from "socket.io-client";
 import { SocketContext } from "../../socket";
 import { emit, evaluate } from '../../socket/events';
 import { ScrapingElement, Selector } from "../../interfaces";
+import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
+
 
 const { TextArea } = Input;
 
@@ -17,6 +19,8 @@ const Configurator = ({
   element: ScrapingElement;
 }): JSX.Element => {
   const { t } = useTranslation("scraping_field_configurator");
+
+  const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
@@ -71,8 +75,7 @@ const Configurator = ({
   useEffect(() => {
     toggleDrawer();
 
-    // TODO: propose a select
-    // from the backend
+
 
   }, [element]);
 

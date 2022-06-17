@@ -1,21 +1,14 @@
 {
-  "menu_layout_choice": {
-    "product_sheet": "Product Sheet",
-    "product_sheet_desc": "Use this layout to scrape the details of a product, like delivery options, GTIN, breadcrumb, price details...",
-    "category_page": "Category Page",
-    "category_page_desc": "Use this layout the scrape the macro-information of a product, as well as its ranking in the category page"
+  "menu": {
+    "change_config": "Configure this spider",
+    "change_config_desc": "Change the spider name and proxy configuration",
+    "change_layout": "Category the page type",
+    "change_layout_desc": "Change the page type to be scraped"
   },
-
-  "action": {
-    "define_website_url": "Enter the URL to be scraped"
-  },
-
   "helper": {
     "title": "How to use ?",
-    "content": "Hover the layout, you will notice that you can interact with the elements of the page. When clicking on an element, a new configuration drawer will appear on the right where you'll be able to configure the selectors to apply"
-  },
-
-  "scraping_configuration": {
-    "title": "Configure the scraping"
+    "content": "Hover the layout, you will notice that you can interact with the elements of the page. When clicking on an element, a new configuration drawer will appear on the right where you'll be able to configure the selectors to apply",
+    "example_url": "Example of URL to be scraped",
+    "example_url_desc": "Enter an example of URL, this will enable to evaluate the selectors for the elements to be scraped"
   }
 }

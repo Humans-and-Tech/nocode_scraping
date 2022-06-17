@@ -20,11 +20,11 @@
         "product_sheet_image": "image of a product sheet",
         "product_sheet_selected": "You chose to scrape a product sheet",
         "click_to_select_helper": "Click the card to select this kind of page",
-        "product_sheet": "The page is a product sheet",
+        "product_sheet": "Product sheet",
         "product_sheet_desc": "A product sheet contains all the details of the product: offer, reviews, delivery options...",
         "category_page_image": "image of a category page",
         "category_page_selected": "You chose to scrape a category page",
-        "category_page": "The page is a category page",
+        "category_page": "Category page",
         "category_page_desc": "A category page presents several products with summary infos like price, availability, ranking in ths category..."
     },
     "action": {

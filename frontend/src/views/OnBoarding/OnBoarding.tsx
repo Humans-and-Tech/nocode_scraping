@@ -8,15 +8,16 @@ import {
     Divider,
     Input
 } from "antd";
-import { AiOutlineCheckCircle } from 'react-icons/ai'
+import { CheckCircleOutlined } from "@ant-design/icons";
 
 import { PageType } from '../../interfaces'
 import { useTranslation } from "react-i18next";
 
-import { ScrapingContext, ScrapingConfigProvider } from '../../index'
+import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
 
 import "../../style.css";
 import "./OnBoarding.scoped.css"
+
 
 const { Step } = Steps;
 const { Meta } = Card;
@@ -166,7 +167,7 @@ const OnBoarding: React.FC = () => {
                                 onClick={chooseProductSheet}
                                 extra={
                                     pageType == PageType.ProductSheet
-                                        ? <Space direction="horizontal" align="end" className="card-selected"><AiOutlineCheckCircle />{t('page_type.product_sheet_selected')}</Space>
+                                        ? <Space direction="horizontal" align="end" className="card-selected"><CheckCircleOutlined />{t('page_type.product_sheet_selected')}</Space>
                                         : <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
                                 }
                             >
@@ -180,7 +181,7 @@ const OnBoarding: React.FC = () => {
                                 onClick={chooseCategoryPage}
                                 extra={
                                     pageType == PageType.CategoryPage
-                                        ? <Space direction="horizontal" align="end" className="card-selected"><AiOutlineCheckCircle />{t('page_type.category_page_selected')}</Space>
+                                        ? <Space direction="horizontal" align="end" className="card-selected"><CheckCircleOutlined />{t('page_type.category_page_selected')}</Space>
                                         : <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
                                 }
                             >

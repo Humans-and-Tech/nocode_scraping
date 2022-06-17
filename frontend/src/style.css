@@ -7,6 +7,7 @@
   --gus-gray: rgb(107, 116, 118);
   --gus-red: red;
   --gus-green: green;
+  --gus-broken-white: beige;
 }
 
 p {
@@ -46,6 +47,12 @@ li[role="menuitem"] em {
 
 .gus-scraper-layout-content {
   background-color: var(--gus-white);
+}
+
+.gus-scraper-layout-content-header {
+  height: auto;
+  padding: 1em;
+  background-color: var(--gus-broken-white);
 }
 
 .gus-main-content {

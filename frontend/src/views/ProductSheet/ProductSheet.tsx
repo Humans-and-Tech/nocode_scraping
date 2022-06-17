@@ -10,11 +10,12 @@ import {
   Space,
   Divider,
   Tooltip,
+  Input
 } from "antd";
 import {
   HomeOutlined,
   FolderOpenOutlined,
-  DollarOutlined,
+  DollarOutlined
 } from "@ant-design/icons";
 import { FiPackage } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
@@ -23,6 +24,8 @@ import { SocketContext } from "../../socket";
 import { ScrapingElement } from "../../interfaces";
 import Configurator from "../../components/Configurator/FieldConfigurator";
 import "../../style.css";
+
+const { TextArea } = Input
 
 
 const ProductSheet: React.FC = () => {

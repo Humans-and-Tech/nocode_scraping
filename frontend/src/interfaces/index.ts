@@ -6,6 +6,7 @@ export enum PageType {
 export interface ScrapingConfig {
   websiteConfig: WebsiteConfig;
   pageType?: PageType | undefined;
+  pageUrl?: string;
 }
 
 export interface WebsiteConfig {

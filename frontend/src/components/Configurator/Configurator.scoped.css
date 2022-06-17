@@ -1,0 +1,7 @@
+.success {
+    color: var(--gus-green);
+}
+
+.error {
+    color: var(--gus-red);
+}

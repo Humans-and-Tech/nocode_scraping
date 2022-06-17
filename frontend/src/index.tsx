@@ -9,10 +9,11 @@ import {
 } from 'react-router-dom';
 import "./i18n";
 import { SocketContext, socket } from "./socket";
-import ProductSheet from "./views/ProductPage/ProductSheet";
+import ProductSheet from "./views/ProductSheet/ProductSheet";
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScraperLayout, OnBoardingLayout } from './Layout'
-import { ScrapingConfig } from "./interfaces";
+import { ScrapingContext, ConfigProvider } from './ConfigurationContext'
+import { PageURLConfigurator } from './components/Configurator/ScrapedPage';
 
 
 
@@ -22,47 +23,7 @@ if (!rootElement) throw new Error("Failed to find the root element");
 const root = createRoot(rootElement);
 
 
-export interface ScrapingConfigProvider {
-  getConfig: () => ScrapingConfig | null;
-  setConfig: (config: ScrapingConfig | null) => void;
-}
 
-/**
- * the website config is only stored locally
- * it is not savec by the backend 
- * 
- * @returns 
- */
-function useConfig(): ScrapingConfigProvider {
-
-  // TODO
-  // prevent errors by try/catch 
-  const getConfig = (): ScrapingConfig | null => {
-    const stored = localStorage.getItem('config');
-    if (stored !== null) {
-      return JSON.parse(stored);
-    }
-    return null;
-  };
-
-  const setConfig = (config: ScrapingConfig | null): void => {
-    if (config == null) {
-      localStorage.removeItem('config');
-    } else {
-      localStorage.setItem('config', JSON.stringify(config));
-    }
-  };
-
-  return { getConfig, setConfig };
-}
-
-const configProvider: ScrapingConfigProvider = useConfig();
-
-/**
- * the scraping context will convey
- * the config accross all elements
- */
-export const ScrapingContext = React.createContext<ScrapingConfigProvider>(configProvider);
 
 
 /**
@@ -79,7 +40,7 @@ root.render(
             path="/onboarding"
             element={
               <OnBoardingLayout>
-                <ScrapingContext.Provider value={configProvider}>
+                <ScrapingContext.Provider value={ConfigProvider}>
                   <OnBoarding />
                 </ScrapingContext.Provider>
               </OnBoardingLayout>
@@ -90,7 +51,9 @@ root.render(
             path="/product-sheet"
             element={
 
-              <ScraperLayout>
+              <ScraperLayout header={
+                <PageURLConfigurator />
+              }>
                 <ProductSheet />
               </ScraperLayout>
 
