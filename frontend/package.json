@@ -20,6 +20,8 @@
     "@types/validator": "^13.7.3",
     "antd": "^4.21.0",
     "craco-plugin-scoped-css": "^1.1.1",
+    "http-browserify": "^1.7.0",
+    "https-browserify": "^1.0.0",
     "i18next": "^21.8.9",
     "lodash": "^4.17.21",
     "normalize-css": "^2.3.1",

@@ -1,20 +1,31 @@
 import React, { useState, useContext } from "react";
 import { Drawer, Input, Button, Space } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
+
 import { SocketContext } from "../../socket";
-import { emit, evaluate } from '../../socket/events';
+import { emit, evaluate, validateCssSelector } from '../../socket/events';
 import { ScrapingElement, Selector } from "../../interfaces";
 import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
 
 
 const { TextArea } = Input;
 
+
+const createSelector = (): Selector => {
+  return {
+    element: {
+      name: undefined
+    }
+  }
+};
+
+
 const Configurator = ({
-  element,
+  element
 }: {
   element: ScrapingElement;
 }): JSX.Element => {
@@ -22,13 +33,23 @@ const Configurator = ({
 
   const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
 
+  /**
+   * the URL from the config
+   * to evaluate the CSS selector
+   */
   const [evalUrl, setEvalUrl] = useState<string | undefined>(undefined);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
+  /**
+   * the result of the CSS Selector evaluation on the URL (evalUrl)
+   * scraped by the backend
+   */
   const [evaluation, setEvaluation] = useState<string | null>(null);
 
   const [selector, setSelector] = useState<Selector | undefined>(undefined);
+
+  const [isSelectorPathValid, setIsSelectorPathValid] = useState<boolean | undefined>(undefined);
 
   const socket = useContext<Socket>(SocketContext);
 
@@ -36,25 +57,27 @@ const Configurator = ({
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const changeSelectorPath = (
+  const changeSelectorPath = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setSelector({
-      url: "https://www.manomano.fr/p/echelle-de-toit-5-plans-modulable-jusque-685m-pas-de-33-17337447",
-      element: {
-        name: selector?.element.name
-      },
-      path: e.target.value
-    });
 
-    // pass the target value
-    // not the selector, because the selector might
-    // not be updated yet while the event is sent to the socket
-    emit(socket, "set-scraping-element", {
-      'name': element.name,
-      'selector': e.target.value
+    let p = selector;
+    if (p === undefined) {
+      p = createSelector();
+    }
+    p.path = e.target.value;
+
+    validateCssSelector(socket, p, (isValid: boolean) => {
+      if (isValid) {
+        setSelector(p);
+        setIsSelectorPathValid(true);
+      } else {
+        console.log('notify the user, selector is not valid');
+        setIsSelectorPathValid(false);
+      }
     });
   };
+
 
   const evaluateSelectorPath = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -97,6 +120,22 @@ const Configurator = ({
           onChange={changeSelectorPath}
           value={selector?.path}
         />
+
+        {
+          isSelectorPathValid &&
+          <Space direction="horizontal">
+            <CheckCircleOutlined />
+            <span className="success">{t("field.css.valid")}</span>
+          </Space>
+        }
+
+        {
+          !isSelectorPathValid &&
+          <Space direction="horizontal">
+            <CloseCircleOutlined />
+            <span className="error">{t("field.css.invalid")}</span>
+          </Space>
+        }
 
         {evaluation && (
           <p>

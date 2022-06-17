@@ -5,6 +5,9 @@ import { Socket, Server } from "socket.io";
 
 import { ScrapingElement, Selector } from './interfaces';
 import { getContent } from './scraping'
+import { validateSelector } from './configure/selector'
+
+
 
 const app = express();
 const server = http.createServer(app);
@@ -79,6 +82,26 @@ io.on('connection', (socket: Socket) => {
     //   // selector.path = path;
     //   callback(selector);
     // })
+  });
+
+  /**
+   * validate a CSS selector
+   */
+  socket.on('validate-css-selector', (selector: Selector, callback: (isValid: boolean) => void) => {
+    validateSelector(
+      selector
+    ).then((b: boolean | null) => {
+      if (b !== null) {
+        callback(b);
+      }
+      else {
+        console.error("unable to return the result of validateSelector, return result is null; assuming false");
+        callback(false);
+      }
+    }).catch((e) => {
+      console.error("Error validaing CSS ", selector, e);
+      callback(false);
+    })
   });
 
 });

@@ -4,6 +4,7 @@ const path = require("path");
 After that apply all the rules in module.rules and produce the output and place it in main.js in the public folder.*/
 
 module.exports = {
+
   /** "mode"
    * the environment - development, production, none. tells webpack
    * to use its built-in optimizations accordingly. default is production

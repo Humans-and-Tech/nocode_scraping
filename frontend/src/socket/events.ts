@@ -45,3 +45,17 @@ export const evaluate = (_socket: Socket, p: Selector, callback: (content: strin
         callback(content);
     });
 };
+
+
+/**
+ * validation of a selector by the backend
+ * 
+ * @param _socket 
+ * @param p 
+ * @param callback 
+ */
+export const validateCssSelector = (_socket: Socket, p: Selector, callback: (isValid: boolean) => void) => {
+    _socket.emit('validate-css-selector', p, (isValid: boolean) => {
+        callback(isValid);
+    });
+};

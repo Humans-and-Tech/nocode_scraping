@@ -125,8 +125,8 @@ const OnBoarding: React.FC = () => {
      */
     useEffect(() => {
         const config = configProvider.getConfig();
-        setName(config?.websiteConfig.name);
-        setProxy(config?.websiteConfig.proxy);
+        setName(config?.websiteConfig?.name);
+        setProxy(config?.websiteConfig?.proxy);
         setPageType(config?.pageType);
     }, []);
 
