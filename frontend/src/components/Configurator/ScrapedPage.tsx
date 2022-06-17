@@ -50,11 +50,15 @@ export const PageURLConfigurator = (): JSX.Element => {
             configProvider.setConfig(conf);
         }
 
+        if (conf?.pageUrl !== undefined) {
+            setUrl(conf?.pageUrl);
+        }
+
     }, [url]);
 
     return (
         <>
-            <TextArea rows={2} onChange={changeUrl}></TextArea>
+            <TextArea rows={2} onChange={changeUrl} value={url}></TextArea>
             <em>
                 {
                     status == 'error' &&

@@ -106,20 +106,30 @@ const Configurator = ({
         )}
 
         {
-          evalUrl !== undefined &&
+          evalUrl !== undefined && selector?.path &&
           <Button onClick={evaluateSelectorPath}>
             {t("field.action.evaluate_selector")}
           </Button>
         }
 
         {
+          selector?.path == undefined &&
+          <Space direction="vertical" size="middle">
+            <Button disabled>
+              {t("field.action.evaluate_selector")}
+            </Button>
+            <p>{t('field.evaluation.no_selector_path')}</p>
+          </Space>
+        }
+
+        {
           evalUrl === undefined &&
-          <>
+          <Space direction="vertical" size="middle">
             <Button disabled>
               {t("field.action.evaluate_selector")}
             </Button>
             <p>{t('field.evaluation.no_url')}</p>
-          </>
+          </Space>
         }
 
       </Space>
