@@ -49,13 +49,17 @@ export const evaluate = (_socket: Socket, p: Selector, callback: (content: strin
 
 /**
  * validation of a selector by the backend
+ * this backend called is debounced because it takes a bit of time
+ * so don't emit a socket message for the backend each time
  * 
  * @param _socket 
  * @param p 
  * @param callback 
  */
 export const validateCssSelector = (_socket: Socket, p: Selector, callback: (isValid: boolean) => void) => {
-    _socket.emit('validate-css-selector', p, (isValid: boolean) => {
-        callback(isValid);
-    });
+    debounce(() => {
+        _socket.emit('validate-css-selector', p, (isValid: boolean) => {
+            callback(isValid);
+        });
+    }, 1000)();
 };

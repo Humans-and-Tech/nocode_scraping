@@ -2,9 +2,15 @@ import React from "react";
 import { ScrapingConfig } from "./interfaces";
 
 export interface ScrapingConfigProvider {
-    getConfig: () => ScrapingConfig | null;
+    getConfig: () => ScrapingConfig;
     setConfig: (config: ScrapingConfig | null) => void;
 }
+
+const createConfig = (): ScrapingConfig => {
+    return {
+        websiteConfig: {},
+    };
+};
 
 /**
  * the website config is only stored locally
@@ -14,14 +20,13 @@ export interface ScrapingConfigProvider {
  */
 function useConfig(): ScrapingConfigProvider {
 
-    // TODO
-    // prevent errors by try/catch 
-    const getConfig = (): ScrapingConfig | null => {
+    const getConfig = (): ScrapingConfig => {
         const stored = localStorage.getItem('config');
         if (stored !== null) {
             return JSON.parse(stored);
         }
-        return null;
+        // create a void config
+        return createConfig();
     };
 
     const setConfig = (config: ScrapingConfig | null): void => {

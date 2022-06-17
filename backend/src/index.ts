@@ -54,7 +54,10 @@ io.on('connection', (socket: Socket) => {
     console.info("get-selector-content", selector);
     getContent(selector).then((content: string | null) => {
       callback(content);
-    })
+    }).catch((e) => {
+      console.error("Could not evaluated selector ", e);
+      callback(null);
+    });
 
   });
 

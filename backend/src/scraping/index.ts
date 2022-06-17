@@ -7,16 +7,17 @@ export const getContent = async (selector: Selector): Promise<string | null> => 
     const context = await browser.newContext();
     const page = await context.newPage();
 
+    // timeout of 2 seconds
+    // TODO: configure this by env. variable
+    page.setDefaultTimeout(2000);
+
     await page.goto(selector.url);
 
-    // TODO
-    // handle UnhandledPromiseRejectionWarning: locator.textContent: Timeout 30000ms exceeded.
-    // mettre un short timeout 
-    // pour revenir rapidos vers le user
-    const content = await page.locator(selector.path).textContent();
-
-    console.log(`found ${content} for selector ${selector.path}`);
-
-    return content
+    try {
+        const content = await page.locator(selector.path).textContent();
+        return Promise.resolve(content);
+    } catch (error) {
+        return Promise.reject(error);
+    }
 
 };

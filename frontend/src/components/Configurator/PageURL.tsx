@@ -10,7 +10,9 @@ import './Configurator.scoped.css';
 
 const { TextArea } = Input;
 
+
 export const PageURLConfigurator = (): JSX.Element => {
+
     const { t } = useTranslation("configurator");
 
     const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
@@ -20,9 +22,13 @@ export const PageURLConfigurator = (): JSX.Element => {
 
     const changeUrl = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         const val = e.target.value;
-        if (isURL(val)) {
+        if (isURL(val) || val == '') {
             setUrl(val);
-            setStatus('sucess');
+            if (val !== '') {
+                setStatus('sucess');
+            } else {
+                setStatus(undefined);
+            }
         } else {
             setUrl('');
             setStatus('error');
@@ -35,26 +41,12 @@ export const PageURLConfigurator = (): JSX.Element => {
      */
     useEffect(() => {
 
-        let conf = configProvider.getConfig();
-        if (url !== '') {
+        const conf = configProvider.getConfig();
+        conf.pageUrl = url;
+        configProvider.setConfig(conf);
+        setUrl(conf.pageUrl);
 
-            if (conf !== null) {
-                conf.pageUrl = url;
-            } else {
-                // generate a new config
-                conf = {
-                    websiteConfig: {},
-                    pageUrl: url
-                }
-            }
-            configProvider.setConfig(conf);
-        }
-
-        if (conf?.pageUrl !== undefined) {
-            setUrl(conf?.pageUrl);
-        }
-
-    }, [url]);
+    }, [url, configProvider]);
 
     return (
         <>

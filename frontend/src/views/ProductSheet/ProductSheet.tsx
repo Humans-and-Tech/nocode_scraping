@@ -1,16 +1,14 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import {
   Row,
   Col,
   Breadcrumb,
-  PageHeader,
   Rate,
   Image,
   List,
   Space,
   Divider,
-  Tooltip,
-  Input
+  Tooltip
 } from "antd";
 import {
   HomeOutlined,
@@ -23,9 +21,8 @@ import { useTranslation } from "react-i18next";
 import { SocketContext } from "../../socket";
 import { ScrapingElement } from "../../interfaces";
 import Configurator from "../../components/Configurator/FieldConfigurator";
-import "../../style.css";
 
-const { TextArea } = Input
+import "../../style.css";
 
 
 const ProductSheet: React.FC = () => {
