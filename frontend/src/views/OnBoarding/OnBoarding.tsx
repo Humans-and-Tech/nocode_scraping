@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
     Space,
     Steps,
@@ -33,6 +34,8 @@ const OnBoarding: React.FC = () => {
     const { t } = useTranslation("onboarding");
 
     const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
+
+    const navigate = useNavigate();
 
     const [config, setConfig] = useState<ScrapingConfig>(createConfig());
 
@@ -117,6 +120,16 @@ const OnBoarding: React.FC = () => {
         setPageType(PageType.CategoryPage);
         config.pageType = PageType.CategoryPage;
         setConfig(config);
+    };
+
+
+    const goToScraping = () => {
+        console.log('pageType', pageType);
+        if (pageType == PageType.ProductSheet) {
+            navigate('/product-sheet');
+        } else {
+            console.log('stay here');
+        }
     };
 
 
@@ -220,7 +233,7 @@ const OnBoarding: React.FC = () => {
                         title={t('finished.start_scraping')}
                         subTitle={t('finished.start_scraping_subtitle')}
                         extra={[
-                            <Button type="primary" key="start_scraping">
+                            <Button type="primary" key="start_scraping" onClick={goToScraping}>
                                 {t('action.start_scraping_action')}
                             </Button>,
                             <Button key="reset" onClick={reset}>
