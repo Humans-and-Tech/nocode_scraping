@@ -4,17 +4,19 @@
   "description": "Real time features with socket.io",
   "main": "index.js",
   "author": "Guillaume Patin",
-  "license": "GPLv3",
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "concurrently -k -n \"Typescript,Node\" -p \"[{name}]\" -c \"blue,green\" \"tsc --watch\" \"nodemon dist/index.js\"",
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && GOOGLE_APPLICATION_CREDENTIALS=./firestore-creds.json node dist/index.js",
     "test": "jest --verbose",
     "test-watch": "jest --verbose --watchAll"
   },
   "dependencies": {
     "@cucumber/microdata": "^2.0.0",
+    "@google-cloud/firestore": "^5.0.2",
     "@types/node": "^17.0.42",
     "express": "4",
+    "firebase": "^9.8.3",
     "http": "^0.0.1-security",
     "jsdom": "^19.0.0",
     "playwright-webkit": "^1.22.2",

@@ -4,9 +4,9 @@ import http from 'http';
 import { Socket, Server } from "socket.io";
 
 import { ScrapingElement, Selector } from './interfaces';
-import { getContent } from './scraping'
-import { validateSelector } from './configure/selector'
-
+import { getContent } from './features/scraping'
+import { validateSelector } from './features/configure/selector'
+import { saveData } from './database'
 
 
 const app = express();
@@ -40,10 +40,13 @@ io.on('connection', (socket: Socket) => {
   });
 
   /**
-   * user changed website config
+   * persis the spider config
    */
-  socket.on('set-website', (data) => {
-    console.info("new website config", data);
+  socket.on('save-config', (data) => {
+    console.info("save-config", data);
+    saveData().then(() => {
+      console.log("data saved");
+    });
   });
 
   /**

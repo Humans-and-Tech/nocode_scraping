@@ -1,5 +1,5 @@
 import { webkit } from 'playwright-webkit';
-import { Selector } from '../interfaces'
+import { Selector } from '../../interfaces'
 
 export const getContent = async (selector: Selector): Promise<string | null> => {
 

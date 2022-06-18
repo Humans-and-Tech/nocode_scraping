@@ -1,5 +1,5 @@
 import cssValidator from 'w3c-css-validator';
-import { Selector } from '../interfaces'
+import { Selector } from '../../interfaces'
 
 /**
  * 
