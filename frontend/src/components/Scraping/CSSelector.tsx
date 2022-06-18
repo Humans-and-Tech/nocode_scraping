@@ -65,7 +65,17 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     const onChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
-        setPath(e.target.value);
+        const val = e.target.value;
+        setPath(val);
+        if (val !== undefined && val !== '') {
+            setCheckEnabled(true);
+        }
+
+        const p = newSelector;
+        if (p?.url !== undefined && p.url !== '') {
+            console.log('enabling evaluation');
+            setEvaluationEnabled(true);
+        }
     };
 
 
@@ -164,7 +174,7 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             setCheckEnabled(true);
         }
 
-    }, [selector, pageUrl]);
+    }, [selector, pageUrl, path]);
 
     return (
 
