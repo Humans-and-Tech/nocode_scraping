@@ -168,18 +168,18 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
 
     return (
 
-        <Space direction="vertical" size="middle" style={{ display: "flex" }}>
+        <Space direction="vertical" size="middle">
 
             {(newSelector?.path == undefined || newSelector?.path == '') &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                    <p>{t('field.evaluation.no_selector_path')}</p>
+                    <span>{t('field.evaluation.no_selector_path')}</span>
                 </Space>
             }
             {(newSelector?.url == undefined || newSelector?.url == '') &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                    <p>{t('field.evaluation.no_url')}</p>
+                    <span>{t('field.evaluation.no_url')}</span>
                 </Space>
             }
             <TextArea
@@ -204,10 +204,6 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             }
 
             {
-                isLoading && <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
-            }
-
-            {
                 isSelectorPathValid &&
                 <Space direction="horizontal">
                     <CheckCircleOutlined className="success" />
@@ -222,6 +218,11 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                     <span>{t("field.css.invalid")}</span>
                 </Space>
             }
+
+            {
+                isLoading && <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
+            }
+
 
             {evaluation && (
                 <Space direction="horizontal">
