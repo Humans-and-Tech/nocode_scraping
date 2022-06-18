@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 
 import { SocketContext } from "../../socket";
 import { ScrapingElement } from "../../interfaces";
-import Configurator from "../../components/Configurator/FieldConfigurator";
+import Configurator from "../../components/Scraping/FieldConfigurator";
 
 import "../../style.css";
 

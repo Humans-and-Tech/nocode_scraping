@@ -14,7 +14,10 @@
         "name_input_invalid": "the name cannot be null !",
         "proxy_title": "Optionnally you can add a proxy configuration",
         "proxy_subtitle": "The configuration of the proxy is very depending on the proxy provider and on the scraping system.",
-        "proxy_placeholder": "For scrapy for example, the proxy config is usually a JSON"
+        "proxy_placeholder": "For scrapy for example, the proxy config is usually a JSON",
+        "proposal": "We have found an existing spider with this name",
+        "select_proposal": "Select the existing spider",
+        "edit_config_title": "Editing the spider {{ name }}"
     },
     "page_type": {
         "product_sheet_image": "image of a product sheet",

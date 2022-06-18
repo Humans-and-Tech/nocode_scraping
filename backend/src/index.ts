@@ -39,15 +39,20 @@ io.on('connection', (socket: Socket) => {
     "id": socket.id
   });
 
+  ////////////////////
+  ///// user actions
+  ////////////////////
+
+  ////////////////////
+  ///// config actions
+  ////////////////////
+
   /**
    * read the config from the DB
    */
   socket.on('get-config', (name: string, user: User, callback: (data: ScrapingConfig | undefined) => void) => {
 
-    // TODO:
-    // const org = user.organization;
-    // and pass the org to the updateScrapingConfig
-    getScrapingConfig({}, name).then((data: ScrapingConfig | undefined) => {
+    getScrapingConfig(user, name).then((data: ScrapingConfig | undefined) => {
       console.log("data found", data);
       callback(data);
     }).catch((err) => {
@@ -61,16 +66,17 @@ io.on('connection', (socket: Socket) => {
    */
   socket.on('save-config', (data: ScrapingConfig, user: User) => {
 
-    // TODO:
-    // const org = user.organization;
-    // and pass the org to the updateScrapingConfig
-    updateScrapingConfig({}, data).then((b: boolean) => {
+    updateScrapingConfig(user, data).then((b: boolean) => {
       console.log("data saved", b);
     }).catch((err) => {
       console.log(err);
     });
 
   });
+
+  ////////////////////
+  ///// scraping actions
+  ////////////////////
 
   /**
    * fetch the content of a CSS selector node
@@ -87,12 +93,6 @@ io.on('connection', (socket: Socket) => {
 
   });
 
-  /**
-   * user changed proxy config
-   */
-  socket.on('set-proxy', (data) => {
-    console.info("new proxy config", data);
-  });
 
   /**
    * receive a scraping element (a selector path)
@@ -106,11 +106,8 @@ io.on('connection', (socket: Socket) => {
    * the client requests a selector proposal
    */
   socket.on('propose-selector', (url: string, selector: Selector, callback: (selector: Selector) => void) => {
-    // getSelector(url).then((path: string | undefined) => {
-    //   console.log("new proposal for ", selector, path);
-    //   // selector.path = path;
-    //   callback(selector);
-    // })
+    console.log('propose-selector', url);
+    callback(selector);
   });
 
   /**

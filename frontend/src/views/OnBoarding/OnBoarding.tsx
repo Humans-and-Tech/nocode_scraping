@@ -6,8 +6,9 @@ import {
     Button,
     Card,
     Divider,
-    Input
+    Input,
 } from "antd";
+
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { Socket } from "socket.io-client";
 
@@ -15,8 +16,9 @@ import { PageType, ScrapingConfig } from '../../interfaces'
 import { useTranslation } from "react-i18next";
 
 import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext';
+import { SelectConfig } from '../../components/Config/SelectConfig'
 import { SocketContext } from "../../socket";
-import { emit, getConfig } from '../../socket/events'
+import { emit } from '../../socket/events'
 
 import "../../style.css";
 import "./OnBoarding.scoped.css"
@@ -25,7 +27,6 @@ import "./OnBoarding.scoped.css"
 const { Step } = Steps;
 const { Meta } = Card;
 const { TextArea } = Input;
-
 
 
 const OnBoarding: React.FC = () => {
@@ -37,10 +38,6 @@ const OnBoarding: React.FC = () => {
 
     const [currentStep, setCurrentStep] = useState<number>(0);
 
-    const [name, setName] = useState<string | undefined>('');
-
-    const [nameStatus, setNameStatus] = useState<'' | 'error'>('');
-
     const [proxy, setProxy] = useState<string | undefined>('');
 
     const [pageType, setPageType] = useState<PageType | undefined>(undefined);
@@ -49,10 +46,10 @@ const OnBoarding: React.FC = () => {
 
     const reset = () => {
         setCurrentStep(0);
-        setName('');
         setProxy('');
         setPageType(undefined);
         setConfig(createConfig());
+        configProvider.setConfig(null);
     };
 
     /**
@@ -89,12 +86,8 @@ const OnBoarding: React.FC = () => {
     const nextStep = () => {
 
         if (currentStep == 0) {
-            if (name == '') {
-                setNameStatus('error');
-            } else {
-                saveConfig(config);
-                setCurrentStep(currentStep + 1);
-            }
+            saveConfig(config);
+            setCurrentStep(currentStep + 1);
         } else if (currentStep == 1) {
             if (pageType == undefined) {
                 // TODO: notify of the error
@@ -126,26 +119,13 @@ const OnBoarding: React.FC = () => {
         setConfig(config);
     };
 
-    const changeName = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const val = e.target.value;
 
-        console.log("changeName", val);
-
-        if (val == '') {
-            setNameStatus('error');
-        } else {
-            setNameStatus('');
-        }
-
-        setName(e.target.value);
-        config.websiteConfig.name = val;
-        setConfig(config);
-
-        // read the config that might be existing
-        // to pre-load this onboarding with saved values
-        getConfig(socket, e.target.value, (data: ScrapingConfig | undefined) => {
-            console.log('loaded config', data);
-        });
+    /**
+     * config changed externally, reload it
+     */
+    const onConfigChange = () => {
+        setConfig(configProvider.getConfig());
+        // notify the user
     };
 
     const changeProxy = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -162,7 +142,6 @@ const OnBoarding: React.FC = () => {
      */
     useEffect(() => {
         const config = configProvider.getConfig();
-        setName(config?.websiteConfig?.name);
         setProxy(config?.websiteConfig?.proxy);
         setPageType(config?.pageType);
     }, [configProvider]);
@@ -179,10 +158,7 @@ const OnBoarding: React.FC = () => {
                 {currentStep == 0 &&
                     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
 
-                        <h2>{t('configure.name_input_title')}</h2>
-                        <em>{t('configure.name_input_subtitle')}</em>
-                        <Input status={nameStatus} onChange={changeName} value={name} placeholder={t('configure.name_placeholder')} />
-                        {nameStatus == 'error' && <em className="error">{t('configure.name_input_invalid')}</em>}
+                        <SelectConfig onChange={onConfigChange} />
 
                         <h2>{t('configure.proxy_title')}</h2>
                         <em>{t('configure.proxy_subtitle')}</em>

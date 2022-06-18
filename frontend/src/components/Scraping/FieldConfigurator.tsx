@@ -9,7 +9,7 @@ import { SocketContext } from "../../socket";
 import { ScrapingElement, Selector } from "../../interfaces";
 import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
 
-import './Configurator.scoped.css';
+import './Scraping.scoped.css';
 import { CSSSelector } from "./CSSelector";
 
 

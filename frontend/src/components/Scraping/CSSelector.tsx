@@ -9,7 +9,7 @@ import { evaluate, validateCssSelector } from '../../socket/events';
 import { Selector } from "../../interfaces";
 
 
-import './Configurator.scoped.css';
+import './Scraping.scoped.css';
 
 const { TextArea } = Input;
 

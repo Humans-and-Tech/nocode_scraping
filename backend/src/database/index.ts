@@ -90,8 +90,6 @@ export async function getScrapingConfig(organization: Organization, name: string
 
     try {
         const snap: DocumentSnapshot<ScrapingConfig> = await document.get();
-        console.log(`${organizationName}/spiders/${name}`, snap.data());
-        // Transform the doc into a ScrapingConfig
         return Promise.resolve(snap.data());
 
     } catch (error: unknown) {
