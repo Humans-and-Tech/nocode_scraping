@@ -13,7 +13,7 @@ import './Scraping.scoped.css';
 import { CSSSelector } from "./CSSelector";
 
 
-const Configurator = ({
+export const ScrapingField = ({
   element
 }: {
   element: ScrapingElement;
@@ -61,4 +61,4 @@ const Configurator = ({
   );
 };
 
-export default Configurator;
+
