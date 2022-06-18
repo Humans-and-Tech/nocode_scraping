@@ -15,7 +15,6 @@ interface FireStoreError {
 }
 
 function isFireStoreError(obj: any): obj is FireStoreError {
-    // 👇️ check for type property
     return 'code' in obj && 'details' in obj && Number.isFinite(obj.code);
 }
 
@@ -40,9 +39,12 @@ async function upsert(organization: Organization, data: any, document: any): Pro
         if (isFireStoreError(error) && error.code === 5) {
             // this is a document not found error
             await document.create({
-                'proxy': data.websiteConfig.proxy || JSON.stringify({}),
                 'pageType': data.pageType,
                 'url': data.pageUrl,
+                'websiteConfig': {
+                    'proxy': data.websiteConfig.proxy || JSON.stringify({}),
+                    'name': data.websiteConfig.name || ''
+                }
             });
             return Promise.resolve(true);
         } else {

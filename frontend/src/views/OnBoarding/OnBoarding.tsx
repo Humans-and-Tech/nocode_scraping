@@ -125,7 +125,6 @@ const OnBoarding: React.FC = () => {
      */
     const onConfigChange = () => {
         setConfig(configProvider.getConfig());
-        // notify the user
     };
 
     const changeProxy = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
