@@ -9,11 +9,14 @@ import {
     Input
 } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
+import { Socket } from "socket.io-client";
 
 import { PageType, ScrapingConfig } from '../../interfaces'
 import { useTranslation } from "react-i18next";
 
-import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext'
+import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext';
+import { SocketContext } from "../../socket";
+import { emit } from '../../socket/events'
 
 import "../../style.css";
 import "./OnBoarding.scoped.css"
@@ -41,6 +44,8 @@ const OnBoarding: React.FC = () => {
     const [proxy, setProxy] = useState<string | undefined>('');
 
     const [pageType, setPageType] = useState<PageType | undefined>(undefined);
+
+    const socket = useContext<Socket>(SocketContext);
 
     const reset = () => {
         setCurrentStep(0);
@@ -72,6 +77,9 @@ const OnBoarding: React.FC = () => {
             oldConfig.websiteConfig.proxy = config.websiteConfig.proxy;
         }
         configProvider.setConfig(oldConfig);
+
+        // store the config
+        emit(socket, "save-config", oldConfig);
     };
 
     /**

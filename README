@@ -1,0 +1,14 @@
+# Izzy Scraping
+
+## Backend installation
+
+1. Install a file called `firestore-creds.json` at the root of the backend directory
+2. `yarn install`
+
+## Backend Startup
+
+```console
+
+backend git:(master) yarn start 
+
+```
