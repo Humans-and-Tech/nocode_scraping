@@ -52,14 +52,14 @@ export const SelectConfig = (props: SelectConfigProps): JSX.Element => {
             setNameStatus('');
         }
 
-        // tmp update the config
+        setIsProposalAccepted(false);
+        setConfigProposal(undefined);
+        setIsLoading(true);
         setName(e.target.value);
+
         const config = configProvider.getConfig();
         config.websiteConfig.name = val;
         configProvider.setConfig(config);
-
-        setIsLoading(true);
-        setConfigProposal(undefined);
 
         // load the config if existing
         getConfig(socket, val, (data: ScrapingConfig | undefined) => {
@@ -79,6 +79,7 @@ export const SelectConfig = (props: SelectConfigProps): JSX.Element => {
         if (configProposal !== undefined) {
             configProvider.setConfig(configProposal);
             setIsProposalAccepted(true);
+            setConfigProposal(undefined);
             onChange();
         }
     }
@@ -97,7 +98,7 @@ export const SelectConfig = (props: SelectConfigProps): JSX.Element => {
 
     return (
 
-        <Space size="large" direction="vertical">
+        <Space size="large" direction="vertical" style={{ 'width': '100%' }}>
 
             <h2>
                 {isProposalAccepted
@@ -107,7 +108,7 @@ export const SelectConfig = (props: SelectConfigProps): JSX.Element => {
             </h2>
             <em>{t('configure.name_input_subtitle')}</em>
 
-            <Input size="large" style={{ 'width': '100%' }} status={nameStatus} onChange={changeName} value={name} placeholder={t('configure.name_placeholder')} />
+            <Input size="large" status={nameStatus} onChange={changeName} value={name} placeholder={t('configure.name_placeholder')} />
             {nameStatus == 'error' && <em className="error">{t('configure.name_input_invalid')}</em>}
 
             {
