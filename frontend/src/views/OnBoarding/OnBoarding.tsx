@@ -121,13 +121,15 @@ const OnBoarding: React.FC = () => {
     const changeName = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const val = e.target.value;
 
+        console.log("changeName", val);
+
         if (val == '') {
             setNameStatus('error');
         } else {
             setNameStatus('');
-            setName(e.target.value);
         }
 
+        setName(e.target.value);
         config.websiteConfig.name = val;
         setConfig(config);
     };
