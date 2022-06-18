@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 
 import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext';
 import { SocketContext } from "../../socket";
-import { emit } from '../../socket/events'
+import { emit, getConfig } from '../../socket/events'
 
 import "../../style.css";
 import "./OnBoarding.scoped.css"
@@ -140,6 +140,12 @@ const OnBoarding: React.FC = () => {
         setName(e.target.value);
         config.websiteConfig.name = val;
         setConfig(config);
+
+        // read the config that might be existing
+        // to pre-load this onboarding with saved values
+        getConfig(socket, e.target.value, (data: ScrapingConfig | undefined) => {
+            console.log('loaded config', data);
+        });
     };
 
     const changeProxy = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

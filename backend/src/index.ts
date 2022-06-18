@@ -3,10 +3,10 @@ import express from 'express';
 import http from 'http';
 import { Socket, Server } from "socket.io";
 
-import { ScrapingElement, Selector } from './interfaces';
+import { ScrapingElement, Selector, ScrapingConfig, User } from './interfaces';
 import { getContent } from './features/scraping'
 import { validateSelector } from './features/configure/selector'
-import { saveData } from './database'
+import { updateScrapingConfig, getScrapingConfig } from './database'
 
 
 const app = express();
@@ -40,13 +40,36 @@ io.on('connection', (socket: Socket) => {
   });
 
   /**
-   * persis the spider config
+   * read the config from the DB
    */
-  socket.on('save-config', (data) => {
-    console.info("save-config", data);
-    saveData().then(() => {
-      console.log("data saved");
+  socket.on('get-config', (name: string, user: User, callback: (data: ScrapingConfig | undefined) => void) => {
+
+    // TODO:
+    // const org = user.organization;
+    // and pass the org to the updateScrapingConfig
+    getScrapingConfig({}, name).then((data: ScrapingConfig | undefined) => {
+      console.log("data found", data);
+      callback(data);
+    }).catch((err) => {
+      console.log(err);
     });
+
+  });
+
+  /**
+   * persist the spider config
+   */
+  socket.on('save-config', (data: ScrapingConfig, user: User) => {
+
+    // TODO:
+    // const org = user.organization;
+    // and pass the org to the updateScrapingConfig
+    updateScrapingConfig({}, data).then((b: boolean) => {
+      console.log("data saved", b);
+    }).catch((err) => {
+      console.log(err);
+    });
+
   });
 
   /**
