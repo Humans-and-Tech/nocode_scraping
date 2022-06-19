@@ -11,7 +11,7 @@ import { Socket } from "socket.io-client";
 import { ScrapingConfig } from '../../interfaces'
 import { useTranslation } from "react-i18next";
 
-import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext';
+import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext';
 import { SocketContext } from "../../socket";
 import { getConfig } from '../../socket/events'
 

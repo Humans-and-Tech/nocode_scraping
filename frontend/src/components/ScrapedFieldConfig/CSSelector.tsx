@@ -117,11 +117,6 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                 setIsLoading(false);
                 if (isValid) {
                     setIsSelectorPathValid(true);
-
-                    // control for TS Compilation
-                    if (newSelector !== undefined) {
-                        onConfigured(newSelector);
-                    }
                 } else {
                     console.log('notify the user, selector is not valid');
                     setIsSelectorPathValid(false);
@@ -131,12 +126,22 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     };
 
 
+    /**
+     * evaluates the CSS selector path
+     * 
+     * @param event 
+     */
     const evaluateSelectorPath = (
         event: React.MouseEvent<HTMLButtonElement>
     ): void => {
 
         event.preventDefault();
+
         setIsLoading(true);
+
+        // reset the evaluation status !
+        setEvaluationStatus(undefined);
+
         const s = newSelector;
 
         if (s !== undefined) {
@@ -156,7 +161,9 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     /**
      * create a selector if undefined
      * and fallback the selector url to the pageUrl
-     * of the config
+     * 
+     * calls back the onConfigured
+     * when the evaluation is successful
      */
     useEffect(() => {
 
@@ -180,6 +187,11 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
 
         if (newSelector?.path !== undefined && newSelector?.path !== '') {
             setIsCheckEnabled(true);
+        }
+
+        // callback when evaluation is successful
+        if (newSelector !== undefined && evaluationStatus == 'success') {
+            onConfigured(newSelector);
         }
 
     }, [newSelector, pageUrl, path]);
