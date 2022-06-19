@@ -45,11 +45,7 @@ export const ScrapedFieldDrawer = ({
    * so that it can be evaluated
    */
   useEffect(() => {
-    // reset selector
-    // or fetch it from the backend
-    // setSelector(undefined);
     toggleDrawer();
-    console.log('setIsConfigured(true);', isConfigured);
   }, [element]);
 
   return (

@@ -180,6 +180,12 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             }
         }
 
+        // reset the pageUrl 
+        // it may change between 2 openings of the drawer
+        if (newSelector !== undefined) {
+            newSelector.url = pageUrl;
+        }
+
         // update the button states
         if (newSelector?.url !== undefined && newSelector?.url !== '' && newSelector?.path !== undefined && newSelector?.path !== '') {
             setIsEvaluationEnabled(true);
