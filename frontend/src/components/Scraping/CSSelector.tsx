@@ -244,7 +244,7 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                     <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
                     {
                         newSelector !== null && newSelector?.url &&
-                        <>
+                        <Space direction="vertical" size="small">
                             <span style={{ 'display': 'inline-block' }}>
                                 {t('field.evaluation.evaluating_on')}
                             </span>
@@ -253,13 +253,10 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                                     {newSelector.url}
                                 </a>
                             </span>
-                        </>
+                        </Space>
                     }
                 </Space>
             }
-
-
-
 
             {evaluation && (
                 <Space direction="horizontal">
