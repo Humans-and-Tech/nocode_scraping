@@ -14,7 +14,7 @@ export const DataAlterators = (): JSX.Element => {
 
 
     return (
-        <Space direction="vertical" size="middle">
+        <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
             <RemoveCharAlterator />
 
