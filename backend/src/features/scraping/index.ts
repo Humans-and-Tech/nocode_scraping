@@ -5,11 +5,11 @@ import isURL from 'validator/lib/isURL';
 import { Selector, ScrapingResponse } from '../../interfaces';
 
 /**
- * Takes a screenshot and evaluates the content of the DOM 
- * targeted by the CSS selector
+ * Takes a screenshot of the locator 
+ * and evaluates the content of the DOM targeted by the CSS selector
  * 
  * @param selector 
- * @returns a promise of a ScrapingResponse
+ * @returns a promise of a ScrapingResponse : screenshot + content scraped
  */
 export const getContent = async (selector: Selector): Promise<ScrapingResponse> => {
 
@@ -35,7 +35,7 @@ export const getContent = async (selector: Selector): Promise<ScrapingResponse> 
     // await the page to be ready
     // before evaluating the content
     // some JS may need to be executed 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
     // TODO: externalise the root path
     // to store screenshots
@@ -51,7 +51,7 @@ export const getContent = async (selector: Selector): Promise<ScrapingResponse> 
         // remove the screenshot file
         await unlink(screenshotPath);
     } catch (err) {
-        console.error(err);
+        imageAsBase64 = '';
     }
 
     try {
@@ -62,7 +62,7 @@ export const getContent = async (selector: Selector): Promise<ScrapingResponse> 
         });
     } catch (error) {
         return Promise.reject({
-            screenshot: `data:image/gif;base64,${imageAsBase64}`,
+            screenshot: '',
             content: null,
             message: error
         });

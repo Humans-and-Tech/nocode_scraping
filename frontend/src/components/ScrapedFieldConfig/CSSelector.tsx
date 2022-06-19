@@ -308,12 +308,17 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                         <CheckCircleOutlined className="success"></CheckCircleOutlined>
                         <span>{t("field.evaluation.result", { value: evaluation.content })}</span>
                     </Space>
-                    <h4>{t('field.evaluation.screenshot')}</h4>
-                    <Image
-                        width={300}
-                        height={150}
-                        style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
-                        src={evaluation.screenshot}></Image>
+                    {
+                        evaluation.screenshot !== undefined && evaluation.screenshot != '' &&
+                        <>
+                            <h4>{t('field.evaluation.screenshot')}</h4>
+                            <Image
+                                width={300}
+                                height={150}
+                                style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
+                                src={evaluation.screenshot}></Image>
+                        </>
+                    }
                 </Space>
             )}
 
@@ -323,12 +328,6 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
                         <span>{t("field.evaluation.failure", { value: evaluation.content })}</span>
                     </Space>
-                    <h4>{t('field.evaluation.screenshot')}</h4>
-                    <Image
-                        width={300}
-                        height={150}
-                        style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
-                        src={evaluation.screenshot}></Image>
                 </Space>
             )}
 
