@@ -14,6 +14,12 @@ import { CSSSelector } from "./CSSelector";
 import { DataAlterators } from '../Alterators/DataAlterators'
 
 
+/**
+ * Builds a UI to configure a Selector for the given scraping element
+ * 
+ * @param element: a ScrapingElement 
+ * @returns 
+ */
 export const ScrapedFieldDrawer = ({
   element
 }: {

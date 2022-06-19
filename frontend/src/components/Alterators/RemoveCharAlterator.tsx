@@ -26,7 +26,7 @@ export const RemoveCharAlterator = (): JSX.Element => {
 
 
     return (
-        <Space direction="vertical" size="middle">
+        <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
             <Space direction="horizontal" size="middle">
                 <Switch onChange={onSelection} checked={isChecked} /><h4>{t('remove_char.title')}</h4>
