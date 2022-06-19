@@ -1,24 +1,27 @@
-import React, { useState, useContext } from "react";
-import { Space, Switch } from "antd";
+import React, { useState } from "react";
+import { Space, Switch, Input } from "antd";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
-import { Socket } from "socket.io-client";
 
 
-import { SocketContext } from "../../socket";
-import { ScrapingElement, Selector } from "../../interfaces";
-import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
 import './Alterators.scoped.css';
 
 
 export const RemoveCharAlterator = (): JSX.Element => {
 
-    const { t } = useTranslation("configurator");
+    const { t } = useTranslation("alterators");
 
     const [isChecked, setIsChecked] = useState<boolean>(false);
 
-    const onChange = (checked: boolean) => {
-        setIsChecked(!isChecked);
+    const [nameStatus, setNameStatus] = useState<'' | 'error'>('');
+
+    const [character, setCharacter] = useState<string>('');
+
+    const onSelection = (checked: boolean) => {
+        setIsChecked(checked);
+    };
+
+    const onChangeCharacter = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        console.log('onChangeCharacter', e.target.value);
     };
 
 
@@ -26,9 +29,15 @@ export const RemoveCharAlterator = (): JSX.Element => {
         <Space direction="vertical" size="middle">
 
             <Space direction="horizontal" size="middle">
-                <Switch onChange={onChange} checked={isChecked} /><h4>{t('alterator.remove_char.title')}</h4>
+                <Switch onChange={onSelection} checked={isChecked} /><h4>{t('remove_char.title')}</h4>
             </Space>
-
+            {
+                isChecked &&
+                <>
+                    <span>{t('remove_char.input_label')}</span>
+                    <Input size="large" status={nameStatus} onChange={onChangeCharacter} value={character} placeholder={t('remove_char.placeholder')} />
+                </>
+            }
 
         </Space>
     );

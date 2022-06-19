@@ -275,6 +275,14 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                 </Space>
             }
 
+
+            {
+                isSelectorPathValid &&
+                <Space direction="horizontal" size="middle">
+                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
+                </Space>
+            }
+
             {
                 isLoading &&
                 <Space direction="vertical" size="large">
@@ -324,12 +332,6 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                         src={evaluation.screenshot}></Image>
                 </Space>
             )}
-
-            {evaluation && evaluation !== null && evaluationStatus == 'error' &&
-                <Space direction="horizontal" size="middle">
-                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
-                </Space>
-            }
 
         </Space>
 

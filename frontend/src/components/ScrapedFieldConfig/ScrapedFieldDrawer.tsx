@@ -55,6 +55,7 @@ export const ScrapedFieldDrawer = ({
   return (
     <Drawer
       title={t("field.title")}
+      size="large"
       placement="right"
       closable={false}
       onClose={toggleDrawer}
@@ -67,7 +68,7 @@ export const ScrapedFieldDrawer = ({
 
         {isConfigured &&
           <Space direction="vertical" size="middle">
-            <h2>{t('field.adaptors_title')}</h2>
+            <h2>{t('field.alterators_title')}</h2>
             <DataAlterators />
           </Space>
         }

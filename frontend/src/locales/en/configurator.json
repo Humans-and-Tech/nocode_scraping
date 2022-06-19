@@ -20,7 +20,7 @@
       "evaluating_on": "Evaluating the selector on",
       "link_title": "Selector Evaluation external link",
       "screenshot": "Screenshot of the page scraped",
-      "bypass_evaluation": "I am sure of this selector"
+      "bypass_evaluation": "Don't evaluate, I am sure of this selector"
     },
     "action": {
       "evaluate_selector": "Evaluate this selector",
@@ -29,7 +29,8 @@
     "css": {
       "valid": "This selector is valid",
       "invalid": "This selector is not valid"
-    }
+    },
+    "alterators_title": "Adapt the data"
   },
   "loading": "Wait a bit please..."
 }
