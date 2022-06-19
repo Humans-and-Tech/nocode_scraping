@@ -296,7 +296,7 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             }
 
             {
-                isSelectorPathValid && evaluationStatus != 'success' &&
+                evaluationStatus !== 'success' &&
                 <Space direction="horizontal" size="middle">
                     <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
                 </Space>
