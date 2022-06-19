@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Input, Button, Space, Spin, Anchor } from "antd";
+import { Input, Button, Space, Spin, Image } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
@@ -7,13 +7,12 @@ import { Socket } from "socket.io-client";
 
 import { SocketContext } from "../../socket";
 import { evaluate, validateCssSelector } from '../../socket/events';
-import { Selector } from "../../interfaces";
+import { ScrapingResponse, Selector } from "../../interfaces";
 
 
 import './Scraping.scoped.css';
 
 const { TextArea } = Input;
-const { Link } = Anchor
 
 const createSelector = (): Selector => {
     return {
@@ -27,6 +26,7 @@ const createSelector = (): Selector => {
 interface CSSSelectorPropsType {
     selector: Selector | undefined;
     onConfigured: (selector: Selector) => void;
+    onError: () => void;
 
     // the default page Url if none is passed in the selector
     // this is a fallback for the selector
@@ -38,7 +38,7 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
-    const { selector, onConfigured, pageUrl } = props;
+    const { selector, onConfigured, onError, pageUrl } = props;
 
     const [path, setPath] = useState<string>('');
 
@@ -57,7 +57,7 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
      * the result of the CSS Selector evaluation on the URL (evalUrl)
      * scraped by the backend
      */
-    const [evaluation, setEvaluation] = useState<string | null>(null);
+    const [evaluation, setEvaluation] = useState<ScrapingResponse | undefined>(undefined);
 
     const [evaluationStatus, setEvaluationStatus] = useState<'error' | 'success' | undefined>(undefined);
 
@@ -145,12 +145,11 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
         const s = newSelector;
 
         if (s !== undefined) {
-            evaluate(socket, s, (content: string | null) => {
-                if (content === null) {
-                    // notify the user
+            evaluate(socket, s, (response: ScrapingResponse) => {
+                setEvaluation(response);
+                if (response.content === null || response.content === undefined) {
                     setEvaluationStatus('error');
                 } else {
-                    setEvaluation(content);
                     setEvaluationStatus('success');
                 }
                 setIsLoading(false);
@@ -198,9 +197,11 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
         // callback when evaluation is successful
         if (newSelector !== undefined && evaluationStatus == 'success') {
             onConfigured(newSelector);
+        } else {
+            onError();
         }
 
-    }, [newSelector, pageUrl, path]);
+    }, [newSelector, pageUrl, path, evaluationStatus]);
 
     return (
 
@@ -276,17 +277,33 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                 </Space>
             }
 
-            {evaluation && (
-                <Space direction="horizontal">
-                    <CheckCircleOutlined className="success"></CheckCircleOutlined>
-                    <span>{t("field.evaluation.result", { value: evaluation })}</span>
+            {evaluation && evaluation !== null && evaluationStatus == 'success' && (
+                <Space direction="vertical" size="middle">
+                    <Space direction="horizontal">
+                        <CheckCircleOutlined className="success"></CheckCircleOutlined>
+                        <span>{t("field.evaluation.result", { value: evaluation.content })}</span>
+                    </Space>
+                    <h4>{t('field.evaluation.screenshot')}</h4>
+                    <Image
+                        width={300}
+                        height={150}
+                        style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
+                        src={evaluation.screenshot}></Image>
                 </Space>
             )}
 
-            {evaluationStatus == 'error' && (
-                <Space direction="horizontal">
-                    <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                    <span>{t("field.evaluation.failure")}</span>
+            {evaluation && evaluation !== null && evaluationStatus == 'error' && (
+                <Space direction="vertical" size="middle">
+                    <Space direction="horizontal">
+                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                        <span>{t("field.evaluation.failure", { value: evaluation.content })}</span>
+                    </Space>
+                    <h4>{t('field.evaluation.screenshot')}</h4>
+                    <Image
+                        width={300}
+                        height={150}
+                        style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
+                        src={evaluation.screenshot}></Image>
                 </Space>
             )}
 

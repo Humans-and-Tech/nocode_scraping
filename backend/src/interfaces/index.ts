@@ -1,3 +1,9 @@
+export interface ScrapingResponse {
+    screenshot: string;
+    content: string | null;
+    message?: unknown;
+}
+
 export interface Organization {
     // TODO : this will modelize
     // an organization to which the user belongs

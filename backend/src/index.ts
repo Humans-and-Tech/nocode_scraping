@@ -3,7 +3,7 @@ import express from 'express';
 import http from 'http';
 import { Socket, Server } from "socket.io";
 
-import { ScrapingElement, Selector, ScrapingConfig, User } from './interfaces';
+import { ScrapingElement, Selector, ScrapingConfig, User, ScrapingResponse } from './interfaces';
 import { getContent } from './features/scraping'
 import { validateSelector } from './features/configure/selector'
 import { updateScrapingConfig, getScrapingConfig } from './database'
@@ -82,13 +82,12 @@ io.on('connection', (socket: Socket) => {
    * fetch the content of a CSS selector node
    *  used by the frontend to evaluate a selector
    */
-  socket.on('get-selector-content', (selector: Selector, callback: (content: string | null) => void) => {
+  socket.on('get-selector-content', (selector: Selector, callback: (response: ScrapingResponse) => void) => {
     console.info("get-selector-content", selector);
-    getContent(selector).then((content: string | null) => {
-      callback(content);
-    }).catch((e) => {
-      console.error("Could not evaluated selector ", e);
-      callback(null);
+    getContent(selector).then((response: ScrapingResponse) => {
+      callback(response);
+    }).catch((response) => {
+      callback(response);
     });
 
   });

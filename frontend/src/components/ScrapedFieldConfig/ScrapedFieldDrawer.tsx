@@ -40,6 +40,10 @@ export const ScrapedFieldDrawer = ({
     setIsConfigured(true);
   };
 
+  const onError = (): void => {
+    setIsConfigured(false);
+  };
+
   /**
    * the page URL is passed to the selector
    * so that it can be evaluated
@@ -58,7 +62,7 @@ export const ScrapedFieldDrawer = ({
     >
       <h2>{element.label}</h2>
       <Space direction="vertical" size="large">
-        <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onConfigured={onConfigured} />
+        <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onConfigured={onConfigured} onError={onError} />
 
 
         {isConfigured &&

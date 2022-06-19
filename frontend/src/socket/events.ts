@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
 import debounce from "lodash/debounce";
-import { ScrapingConfig, Selector } from "../interfaces"
+import { ScrapingConfig, Selector, ScrapingResponse } from "../interfaces"
 
 /**
  * debounces a user input before sending the data
@@ -58,9 +58,9 @@ export const propose = (_socket: Socket, p: Selector, callback: (proposal: Selec
  * @param p a selector containing a URL and path to evaluate a css selector 
  * @param callback a void function containing the content fetched
  */
-export const evaluate = (_socket: Socket, p: Selector, callback: (content: string | null) => void) => {
-    _socket.emit('get-selector-content', p, (content: string) => {
-        callback(content);
+export const evaluate = (_socket: Socket, p: Selector, callback: (response: ScrapingResponse) => void) => {
+    _socket.emit('get-selector-content', p, (response: ScrapingResponse) => {
+        callback(response);
     });
 };
 

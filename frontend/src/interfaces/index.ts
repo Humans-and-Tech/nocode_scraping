@@ -1,3 +1,9 @@
+export interface ScrapingResponse {
+  screenshot: string;
+  content: string | null;
+  message?: unknown;
+}
+
 export enum PageType {
   ProductSheet = 'ProductSheet',
   CategoryPage = 'CategoryPage'
