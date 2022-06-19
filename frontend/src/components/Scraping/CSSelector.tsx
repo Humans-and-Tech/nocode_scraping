@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Input, Button, Space, Spin } from "antd";
+import { Input, Button, Space, Spin, Anchor } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
+
 
 import { SocketContext } from "../../socket";
 import { evaluate, validateCssSelector } from '../../socket/events';
@@ -12,7 +13,7 @@ import { Selector } from "../../interfaces";
 import './Scraping.scoped.css';
 
 const { TextArea } = Input;
-
+const { Link } = Anchor
 
 const createSelector = (): Selector => {
     return {
@@ -25,7 +26,7 @@ const createSelector = (): Selector => {
 
 interface CSSSelectorPropsType {
     selector: Selector | undefined;
-    onPathConfigured: (selector: Selector) => void;
+    onConfigured: (selector: Selector) => void;
 
     // the default page Url if none is passed in the selector
     // this is a fallback for the selector
@@ -37,10 +38,20 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
-    const { selector, onPathConfigured, pageUrl } = props;
+    const { selector, onConfigured, pageUrl } = props;
 
     const [path, setPath] = useState<string>('');
-    const [newSelector, setNewSelector] = useState<Selector | undefined>(selector);
+
+    /**
+     * the newSelector is the selector being configured
+     * It is initialized with the selector prop passed by the user
+     * the newSelector will be sent back by the component when calling the onConfigured callback prop
+     * 
+     * All evaluations that required the selector should use this newSelector state
+     * not the selector !
+     * 
+     */
+    const [newSelector, setNewSelector] = useState<Selector | undefined>(undefined);
 
     /**
      * the result of the CSS Selector evaluation on the URL (evalUrl)
@@ -51,14 +62,13 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     const [evaluationStatus, setEvaluationStatus] = useState<'error' | 'success' | undefined>(undefined);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isSelectorPathValid, setIsSelectorPathValid] = useState<boolean | undefined>(undefined);
 
     /**
      * action buttons enabled or not
      */
-    const [evaluationEnabled, setEvaluationEnabled] = useState<boolean>(false);
-    const [checkEnabled, setCheckEnabled] = useState<boolean>(false);
-
-    const [isSelectorPathValid, setIsSelectorPathValid] = useState<boolean | undefined>(undefined);
+    const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
+    const [isCheckEnabled, setIsCheckEnabled] = useState<boolean>(false);
 
     const socket = useContext<Socket>(SocketContext);
 
@@ -68,13 +78,12 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
         const val = e.target.value;
         setPath(val);
         if (val !== undefined && val !== '') {
-            setCheckEnabled(true);
+            setIsCheckEnabled(true);
         }
 
         const p = newSelector;
         if (p?.url !== undefined && p.url !== '') {
-            console.log('enabling evaluation');
-            setEvaluationEnabled(true);
+            setIsEvaluationEnabled(true);
         }
     };
 
@@ -89,12 +98,12 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
         }
         p.path = path;
         if (p?.path !== undefined && p.path !== '') {
-            setCheckEnabled(true);
+            setIsCheckEnabled(true);
         }
 
         if (p?.url !== undefined && p.url !== '') {
             console.log('enabling evaluation');
-            setEvaluationEnabled(true);
+            setIsEvaluationEnabled(true);
         }
         setNewSelector(p);
     };
@@ -111,7 +120,7 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
 
                     // control for TS Compilation
                     if (newSelector !== undefined) {
-                        onPathConfigured(newSelector);
+                        onConfigured(newSelector);
                     }
                 } else {
                     console.log('notify the user, selector is not valid');
@@ -151,30 +160,29 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
      */
     useEffect(() => {
 
-        console.log('path:', selector?.path);
-        console.log('url:', selector?.url);
+        // just initially
+        if (newSelector == undefined) {
 
-        if (selector === undefined) {
-            const s = createSelector();
-            s.url = pageUrl;
-            setNewSelector(s);
-        } else {
-            selector.url = pageUrl;
-            setNewSelector(selector);
+            if (selector === undefined) {
+                const s = createSelector();
+                s.url = pageUrl;
+                setNewSelector(s);
+            } else if (selector !== undefined) {
+                selector.url = pageUrl;
+                setNewSelector(selector);
+            }
         }
 
-        // make the test on selector
-        // not on newSelector because
-        // it might not be updated yet
-        if (selector?.url !== undefined && selector?.url !== '' && selector?.path !== undefined && selector?.path !== '') {
-            setEvaluationEnabled(true);
+        // update the button states
+        if (newSelector?.url !== undefined && newSelector?.url !== '' && newSelector?.path !== undefined && newSelector?.path !== '') {
+            setIsEvaluationEnabled(true);
         }
 
-        if (selector?.path !== undefined && selector?.path !== '') {
-            setCheckEnabled(true);
+        if (newSelector?.path !== undefined && newSelector?.path !== '') {
+            setIsCheckEnabled(true);
         }
 
-    }, [selector, pageUrl, path]);
+    }, [newSelector, pageUrl, path]);
 
     return (
 
@@ -203,10 +211,11 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             {
                 <Space direction="vertical" size="middle">
                     <Space direction="horizontal" size="middle">
-                        <Button onClick={evaluateSelectorPath} disabled={!evaluationEnabled}>
+
+                        <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled}>
                             {t("field.action.evaluate_selector")}
                         </Button>
-                        <Button onClick={checkSelectorValidity} disabled={!checkEnabled}>
+                        <Button onClick={checkSelectorValidity} disabled={!isCheckEnabled}>
                             {t("field.action.check_selector_validity")}
                         </Button>
                     </Space>
@@ -230,8 +239,26 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             }
 
             {
-                isLoading && <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
+                isLoading &&
+                <Space direction="vertical" size="large">
+                    <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
+                    {
+                        newSelector !== null && newSelector?.url &&
+                        <>
+                            <span style={{ 'display': 'inline-block' }}>
+                                {t('field.evaluation.evaluating_on')}
+                            </span>
+                            <span style={{ 'display': 'inline-block' }}>
+                                <a href={newSelector.url} title={t('field.evaluation.link_title')} target="_blank" rel="noreferrer">
+                                    {newSelector.url}
+                                </a>
+                            </span>
+                        </>
+                    }
+                </Space>
             }
+
+
 
 
             {evaluation && (

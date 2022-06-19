@@ -16,7 +16,9 @@
       "no_url": "Configure the URL to be scraped to evaluate this selector",
       "result": "We fetched the following data with this selector: {{ value }}",
       "no_selector_path": "Enter a valid  CSS path to evaluate the selector",
-      "failure": "We could not find this selector in the page !"
+      "failure": "We could not find this selector in the page !",
+      "evaluating_on": "Evaluating the selector on",
+      "link_title": "Selector Evaluation external link"
     },
     "action": {
       "evaluate_selector": "Evaluate this selector",

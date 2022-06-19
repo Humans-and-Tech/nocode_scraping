@@ -11,6 +11,7 @@ import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationCont
 
 import './Scraping.scoped.css';
 import { CSSSelector } from "./CSSelector";
+import { DataAlterators } from './DataAlterators'
 
 
 export const ScrapingField = ({
@@ -32,7 +33,7 @@ export const ScrapingField = ({
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const onSelectorPath = (s: Selector): void => {
+  const onConfigured = (s: Selector): void => {
     setSelector(s);
   };
 
@@ -56,7 +57,10 @@ export const ScrapingField = ({
       visible={isDrawerOpen}
     >
       <h2>{element.label}</h2>
-      <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onPathConfigured={onSelectorPath} />
+      <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onConfigured={onConfigured} />
+
+
+      {selector && <DataAlterators />}
     </Drawer>
   );
 };
