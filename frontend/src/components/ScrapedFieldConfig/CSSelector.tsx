@@ -23,7 +23,7 @@ const createSelector = (): Selector => {
 };
 
 
-interface CSSSelectorPropsType {
+interface ICSSSelectorPropsType {
     selector: Selector | undefined;
     onConfigured: (selector: Selector) => void;
     onError: () => void;
@@ -34,7 +34,22 @@ interface CSSSelectorPropsType {
 }
 
 
-export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
+/**
+ * this component provides features to validate a CSS path 
+ * and to evaluate a CSS selector. When the evaluation is successful, 
+ * onConfigured callback is called
+ * 
+ * The validation can be bypassed, in such a case the CSS path
+ * is considered as valid and the onConfigured callback is called
+ * 
+ * When the evaluation fails, and the user does not bypass the evaluation
+ * the onError is called
+ * 
+ * 
+ * @param props ICSSSelectorPropsType
+ * @returns JSX.Element
+ */
+export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
@@ -78,9 +93,17 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
     const [isCheckEnabled, setIsCheckEnabled] = useState<boolean>(false);
 
+    /**
+     * the socket to the backend services
+     */
     const socket = useContext<Socket>(SocketContext);
 
-    const onChange = (
+    /**
+     * triggered when the CSS selector input changes value
+     * 
+     * @param e : an input event
+     */
+    const onSelectorChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const val = e.target.value;
@@ -96,7 +119,13 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     };
 
 
-    const onBlur = (
+    /**
+     * triggered when the CSS selector input is blurred
+     * (looses focus)
+     * 
+     * @param e an input event
+     */
+    const onSelectorBlur = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
 
@@ -117,6 +146,12 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     };
 
 
+    /**
+     * calls the backend to validate that the CSS selector
+     * is valid 
+     * 
+     * @param event a mouse click
+     */
     const checkSelectorValidity = (event: React.MouseEvent<HTMLButtonElement>): void => {
 
         if (newSelector !== undefined) {
@@ -166,13 +201,26 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
     };
 
 
+    /**
+     * triggered when the user clicks on the select switch
+     * 
+     * @param checked a boolean
+     */
     const byPassEvaluation = (checked: boolean): void => {
         setIsByPassEvaluation(checked);
     };
 
     /**
-     * create a selector if undefined
-     * and fallback the selector url to the pageUrl
+     * initializes "newSelector" state if undefined
+     * and populates it with the pageUrl passed as a prop
+     * 
+     * sets the booleans isEvaluationEnabled and isCheckEnabled to true
+     * when the url passed in the props is not blank and when
+     * the path state coming from the user input is not blank
+     * 
+     * finally, calls back the onError and onConfigured
+     * when everything is fine from this component standpoint
+     * (user forces the bypass, or selector is really validated by the component)
      * 
      * calls back the onConfigured
      * when the evaluation is successful
@@ -240,8 +288,8 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             <TextArea
                 rows={4}
                 placeholder={t("field.selector.input_placeholder")}
-                onBlur={onBlur}
-                onChange={onChange}
+                onBlur={onSelectorBlur}
+                onChange={onSelectorChange}
                 value={path}
             />
 
