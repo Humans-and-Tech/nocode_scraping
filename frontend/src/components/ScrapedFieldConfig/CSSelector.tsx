@@ -271,7 +271,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
 
     return (
 
-        <Space direction="vertical" size="middle">
+        <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
             {(newSelector?.path == undefined || newSelector?.path == '') &&
                 <Space direction="horizontal">
@@ -294,7 +294,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             />
 
             {
-                <Space direction="vertical" size="middle">
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
 
                         <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled}>
@@ -325,7 +325,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
 
             {
                 isLoading &&
-                <Space direction="vertical" size="large">
+                <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
                     <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
                     {
                         newSelector !== null && newSelector?.url &&
@@ -351,7 +351,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             }
 
             {evaluation && evaluation !== null && evaluationStatus == 'success' && !isByPassEvaluation && (
-                <Space direction="vertical" size="middle">
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CheckCircleOutlined className="success"></CheckCircleOutlined>
                         <span>{t("field.evaluation.result", { value: evaluation.content })}</span>
@@ -361,7 +361,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                         <>
                             <h4>{t('field.evaluation.screenshot')}</h4>
                             <Image
-                                width={300}
+                                width={'100%'}
                                 height={150}
                                 style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
                                 src={evaluation.screenshot}></Image>
@@ -371,7 +371,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             )}
 
             {evaluation && evaluation !== null && evaluationStatus == 'error' && !isByPassEvaluation && (
-                <Space direction="vertical" size="middle">
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
                         <span>{t("field.evaluation.failure", { value: evaluation.content })}</span>

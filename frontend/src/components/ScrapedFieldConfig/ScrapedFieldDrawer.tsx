@@ -68,12 +68,12 @@ export const ScrapedFieldDrawer = ({
       visible={isDrawerOpen}
     >
       <h2>{element.label}</h2>
-      <Space direction="vertical" size="large">
+      <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
         <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onConfigured={onConfigured} onError={onError} />
 
 
         {isConfigured &&
-          <Space direction="vertical" size="middle">
+          <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
             <h2>{t('field.alterators_title')}</h2>
             <DataAlterators />
           </Space>
