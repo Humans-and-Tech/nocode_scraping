@@ -275,14 +275,6 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                 </Space>
             }
 
-
-            {
-                isSelectorPathValid &&
-                <Space direction="horizontal" size="middle">
-                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
-                </Space>
-            }
-
             {
                 isLoading &&
                 <Space direction="vertical" size="large">
@@ -303,7 +295,14 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                 </Space>
             }
 
-            {evaluation && evaluation !== null && evaluationStatus == 'success' && (
+            {
+                isSelectorPathValid && evaluationStatus != 'success' &&
+                <Space direction="horizontal" size="middle">
+                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
+                </Space>
+            }
+
+            {evaluation && evaluation !== null && evaluationStatus == 'success' && !isByPassEvaluation && (
                 <Space direction="vertical" size="middle">
                     <Space direction="horizontal">
                         <CheckCircleOutlined className="success"></CheckCircleOutlined>
@@ -318,7 +317,7 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                 </Space>
             )}
 
-            {evaluation && evaluation !== null && evaluationStatus == 'error' && (
+            {evaluation && evaluation !== null && evaluationStatus == 'error' && !isByPassEvaluation && (
                 <Space direction="vertical" size="middle">
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
