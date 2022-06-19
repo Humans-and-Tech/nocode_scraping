@@ -19,7 +19,8 @@
       "failure": "We could not find this selector in the page, we evaluated it to {{ value }}",
       "evaluating_on": "Evaluating the selector on",
       "link_title": "Selector Evaluation external link",
-      "screenshot": "Screenshot of the page scraped"
+      "screenshot": "Screenshot of the page scraped",
+      "bypass_evaluation": "I am sure of this selector"
     },
     "action": {
       "evaluate_selector": "Evaluate this selector",

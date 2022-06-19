@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Input, Button, Space, Spin, Image } from "antd";
+import { Input, Button, Space, Spin, Image, Switch } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
@@ -52,6 +52,14 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
      * 
      */
     const [newSelector, setNewSelector] = useState<Selector | undefined>(undefined);
+
+    /**
+     * sometimes, for whatever reason, the evaluation fails
+     * but the user is sure of the validity of the selector
+     * 
+     * we offer a feature which enables to bypass the evaluation
+     */
+    const [isByPassEvaluation, setIsByPassEvaluation] = useState<boolean>(false);
 
     /**
      * the result of the CSS Selector evaluation on the URL (evalUrl)
@@ -157,6 +165,11 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
         }
     };
 
+
+    const byPassEvaluation = (checked: boolean): void => {
+        setIsByPassEvaluation(checked);
+    };
+
     /**
      * create a selector if undefined
      * and fallback the selector url to the pageUrl
@@ -201,7 +214,12 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
             onError();
         }
 
-    }, [newSelector, pageUrl, path, evaluationStatus]);
+        // by pass evaluation
+        if (newSelector !== undefined && isByPassEvaluation) {
+            onConfigured(newSelector);
+        }
+
+    }, [newSelector, pageUrl, path, evaluationStatus, isByPassEvaluation]);
 
     return (
 
@@ -306,6 +324,12 @@ export const CSSSelector = (props: CSSSelectorPropsType): JSX.Element => {
                         src={evaluation.screenshot}></Image>
                 </Space>
             )}
+
+            {evaluation && evaluation !== null && evaluationStatus == 'error' &&
+                <Space direction="horizontal" size="middle">
+                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
+                </Space>
+            }
 
         </Space>
 

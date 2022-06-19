@@ -5,3 +5,7 @@
 .error {
     color: var(--gus-red);
 }
+
+h4 {
+    margin: 0;
+}
