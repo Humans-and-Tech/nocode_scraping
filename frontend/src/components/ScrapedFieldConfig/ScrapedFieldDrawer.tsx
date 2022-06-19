@@ -11,10 +11,10 @@ import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationCont
 
 import './Scraping.scoped.css';
 import { CSSSelector } from "./CSSelector";
-import { DataAlterators } from './DataAlterators'
+import { DataAlterators } from '../Alterators/DataAlterators'
 
 
-export const ScrapingField = ({
+export const ScrapedFieldDrawer = ({
   element
 }: {
   element: ScrapingElement;

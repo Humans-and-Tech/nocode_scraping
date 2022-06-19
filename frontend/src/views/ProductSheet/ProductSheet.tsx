@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 
 import { SocketContext } from "../../socket";
 import { ScrapingElement } from "../../interfaces";
-import { ScrapingField } from "../../components/ScrapedFieldConfig/ScrapingField";
+import { ScrapedFieldDrawer } from "../../components/ScrapedFieldConfig/ScrapedFieldDrawer";
 
 import "../../style.css";
 
@@ -59,7 +59,7 @@ const ProductSheet: React.FC = () => {
 
   return (
     <>
-      {element && <ScrapingField element={element} />}
+      {element && <ScrapedFieldDrawer element={element} />}
       <Space
         size={["large", 0]}
         direction="vertical"

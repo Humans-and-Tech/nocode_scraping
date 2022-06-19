@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import isURL from 'validator/lib/isURL';
 
 import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
-import './Scraping.scoped.css';
+import './SpiderConfig.scoped.css';
 
 
 const { TextArea } = Input;

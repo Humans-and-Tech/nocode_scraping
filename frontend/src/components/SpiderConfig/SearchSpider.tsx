@@ -15,7 +15,7 @@ import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../Con
 import { SocketContext } from "../../socket";
 import { getConfig } from '../../socket/events'
 
-import "./Config.scoped.css"
+import "./SpiderConfig.scoped.css"
 
 
 interface SeachSpiderProps {

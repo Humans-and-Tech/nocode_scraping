@@ -8,9 +8,9 @@ import { Socket } from "socket.io-client";
 import { SocketContext } from "../../socket";
 import { ScrapingElement, Selector } from "../../interfaces";
 import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext';
-import { RemoveCharAlterator } from '../Alterators/RemoveCharAlterator';
+import { RemoveCharAlterator } from './RemoveCharAlterator';
 
-import './Scraping.scoped.css';
+import './Alterators.scoped.css';
 
 export const DataAlterators = (): JSX.Element => {
 

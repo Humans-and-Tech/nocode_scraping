@@ -8,7 +8,7 @@ import { Socket } from "socket.io-client";
 import { SocketContext } from "../../socket";
 import { ScrapingElement, Selector } from "../../interfaces";
 import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
-
+import './Alterators.scoped.css';
 
 
 export const RemoveCharAlterator = (): JSX.Element => {
@@ -26,7 +26,10 @@ export const RemoveCharAlterator = (): JSX.Element => {
         <Space direction="vertical" size="middle">
             <h3>{t('alterators')}</h3>
 
-            <Switch onChange={onChange} checked={isChecked} />
+            <Space direction="horizontal" size="middle">
+                <Switch onChange={onChange} checked={isChecked} /><h4>{t('alterator.remove_char.title')}</h4>
+            </Space>
+
 
         </Space>
     );
