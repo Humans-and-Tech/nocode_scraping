@@ -7,14 +7,17 @@ import i18n from '../../tests/i18n';
 
 import { CSSSelector } from './CSSelector'
 
+
 /**
  * an object of type Selector 
  */
 const selector = {
-
+    element: {
+        'name': 'test-element',
+    }
 };
 
-const pageUrl = '';
+const pageUrl = 'http://www.google.com';
 
 
 test('the selector state is initiated when the selector prop is undefined, and its url is populated with the pageUrl', async () => {
@@ -32,6 +35,10 @@ test('the selector state is initiated when the selector prop is undefined, and i
             <CSSSelector selector={selector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
         </I18nextProvider>
     );
+
+    console.log('debug', debug);
+
+    expect(screen.getByTestId('tab-panel').children.length).toBe(3);
 
 });
 

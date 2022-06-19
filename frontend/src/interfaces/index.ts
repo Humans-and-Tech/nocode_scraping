@@ -26,14 +26,17 @@ export interface WebsiteConfig {
 }
 
 export interface ScrapingElement {
+  // the name is just a marker 
+  // of the element to be scraped
+  // for example "price" or "stock"
   name: string | undefined;
   label?: string;
 }
 
 export interface Selector {
-  url?: string;
+  url?: string;     // the url to which this selector applies
   element: ScrapingElement;
-  path?: string;
-  language?: "css" | "xpath";
+  path?: string;    // the css path to select this element
+  language?: "css"; // xpath not supported yet
 }
 
