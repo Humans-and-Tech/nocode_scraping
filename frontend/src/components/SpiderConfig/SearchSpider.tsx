@@ -18,16 +18,16 @@ import { getConfig } from '../../socket/events'
 import "./Config.scoped.css"
 
 
-interface SelectConfigProps {
-    onChange: () => void;
+interface SeachSpiderProps {
+    onLoaded: () => void;
 }
 
 
-export const SelectConfig = (props: SelectConfigProps): JSX.Element => {
+export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
 
     const { t } = useTranslation("onboarding");
 
-    const { onChange } = props;
+    const { onLoaded } = props;
 
     const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
 
@@ -71,7 +71,7 @@ export const SelectConfig = (props: SelectConfigProps): JSX.Element => {
 
         // callback the parent 
         // so that it is warned of the change
-        onChange();
+        onLoaded();
     };
 
 
@@ -80,7 +80,7 @@ export const SelectConfig = (props: SelectConfigProps): JSX.Element => {
             configProvider.setConfig(configProposal);
             setIsProposalAccepted(true);
             setConfigProposal(undefined);
-            onChange();
+            onLoaded();
         }
     }
 

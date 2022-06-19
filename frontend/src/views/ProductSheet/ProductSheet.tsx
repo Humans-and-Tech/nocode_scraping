@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 
 import { SocketContext } from "../../socket";
 import { ScrapingElement } from "../../interfaces";
-import { ScrapingField } from "../../components/Scraping/ScrapingField";
+import { ScrapingField } from "../../components/ScrapedFieldConfig/ScrapingField";
 
 import "../../style.css";
 

@@ -17,7 +17,7 @@ import { PageType, ScrapingConfig } from '../../interfaces'
 import { useTranslation } from "react-i18next";
 
 import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext';
-import { SelectConfig } from '../../components/Config/SelectConfig'
+import { SearchSpider } from '../../components/SpiderConfig/SearchSpider'
 import { SocketContext } from "../../socket";
 import { emit } from '../../socket/events'
 
@@ -170,7 +170,7 @@ const OnBoarding: React.FC = () => {
                 {currentStep == 0 &&
                     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
 
-                        <SelectConfig onChange={onConfigChange} />
+                        <SearchSpider onLoaded={onConfigChange} />
 
                         <h2>{t('configure.proxy_title')}</h2>
                         <em>{t('configure.proxy_subtitle')}</em>

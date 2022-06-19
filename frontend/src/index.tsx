@@ -13,7 +13,7 @@ import ProductSheet from "./views/ProductSheet/ProductSheet";
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScraperLayout, OnBoardingLayout } from './Layout'
 import { ScrapingContext, ConfigProvider } from './ConfigurationContext'
-import { PageURLConfigurator } from './components/Scraping/PageURL';
+import { PageURLConfigurator } from './components/ScrapedFieldConfig/PageURL';
 
 
 

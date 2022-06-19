@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Drawer } from "antd";
+import { Drawer, Space } from "antd";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { Socket } from "socket.io-client";
@@ -27,6 +27,8 @@ export const ScrapingField = ({
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
+  const [isConfigured, setIsConfigured] = useState<boolean>(false);
+
   const socket = useContext<Socket>(SocketContext);
 
   const toggleDrawer = (): void => {
@@ -35,6 +37,7 @@ export const ScrapingField = ({
 
   const onConfigured = (s: Selector): void => {
     setSelector(s);
+    setIsConfigured(true);
   };
 
   /**
@@ -46,6 +49,7 @@ export const ScrapingField = ({
     // or fetch it from the backend
     // setSelector(undefined);
     toggleDrawer();
+    console.log('setIsConfigured(true);', isConfigured);
   }, [element]);
 
   return (
@@ -57,10 +61,17 @@ export const ScrapingField = ({
       visible={isDrawerOpen}
     >
       <h2>{element.label}</h2>
-      <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onConfigured={onConfigured} />
+      <Space direction="vertical" size="large">
+        <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onConfigured={onConfigured} />
 
 
-      {selector && <DataAlterators />}
+        {isConfigured &&
+          <Space direction="vertical" size="middle">
+            <h2>{t('field.adaptors_title')}</h2>
+            <DataAlterators />
+          </Space>
+        }
+      </Space>
     </Drawer>
   );
 };
