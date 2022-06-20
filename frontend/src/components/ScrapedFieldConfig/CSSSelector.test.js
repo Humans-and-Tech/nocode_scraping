@@ -158,7 +158,26 @@ describe('Test the action buttons', () => {
 
     test('the bypass switch appears only when the CSS path is not blank', async () => {
 
+        // see https://stackoverflow.com/questions/52783144/how-do-you-test-for-the-non-existence-of-an-element-using-jest-and-react-testing
+        // queryBy* queries return the first matching node for a query, and return null if no elements match
+        // getBy* throws an error when not finding an elements
+        const { queryByTestId, getByTestId } = render(
+            <SocketContext.Provider value={socket}>
+                <I18nextProvider i18n={i18n}>
+                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                </I18nextProvider>
+            </SocketContext.Provider>
+        );
 
+        // at the beginning the switch button is not there
+        const switchBtn = queryByTestId('bypass_evaluation_switch');
+        expect(switchBtn).toBeNull();
+
+        // simulate a user input 
+        const input = getByTestId('selectorPathInput');
+        fireEvent.change(input, { target: { value: '.a-selector' } });
+
+        expect(switchBtn).toBeInTheDocument();
 
     });
 
