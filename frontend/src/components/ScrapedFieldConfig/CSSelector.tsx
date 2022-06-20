@@ -58,12 +58,12 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
     const [path, setPath] = useState<string>('');
 
     /**
-     * the newSelector is the selector being configured
+     * the newSelector changes state,
      * It is initialized with the selector prop passed by the user
-     * the newSelector will be sent back by the component when calling the onConfigured callback prop
+     * it will be sent back by the component when calling the onConfigured prop
      * 
      * All evaluations that required the selector should use this newSelector state
-     * not the selector !
+     * not the selector prop !
      * 
      */
     const [newSelector, setNewSelector] = useState<Selector | undefined>(undefined);
@@ -227,8 +227,8 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
      */
     useEffect(() => {
 
-        // just initially
-        if (newSelector == undefined) {
+        // when mounting the component initially
+        if (newSelector === undefined) {
 
             if (selector === undefined) {
                 const s = createSelector();
@@ -255,17 +255,19 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             setIsCheckEnabled(true);
         }
 
-        // callback when evaluation is successful
-        if (newSelector !== undefined && evaluationStatus == 'success') {
-            onConfigured(newSelector);
-        } else {
-            onError();
+        // callback when evaluation is not undefined 
+        // meaning, when an evaluation has been done
+        if (newSelector !== undefined) {
+
+            if (evaluationStatus == 'success') {
+                onConfigured(newSelector);
+            } else if (evaluationStatus == 'error') {
+                onError();
+            } else if (isByPassEvaluation) {
+                onConfigured(newSelector);
+            }
         }
 
-        // by pass evaluation
-        if (newSelector !== undefined && isByPassEvaluation) {
-            onConfigured(newSelector);
-        }
 
     }, [newSelector, pageUrl, path, evaluationStatus, isByPassEvaluation]);
 
@@ -276,13 +278,13 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             {(newSelector?.path == undefined || newSelector?.path == '') &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                    <span>{t('field.evaluation.no_selector_path')}</span>
+                    <span data-testid="no_selector_path">{t('field.evaluation.no_selector_path')}</span>
                 </Space>
             }
             {(newSelector?.url == undefined || newSelector?.url == '') &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                    <span>{t('field.evaluation.no_url')}</span>
+                    <span data-testid="no_url">{t('field.evaluation.no_url')}</span>
                 </Space>
             }
             <TextArea
@@ -291,6 +293,11 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 onBlur={onSelectorBlur}
                 onChange={onSelectorChange}
                 value={path}
+                // we need this for testing purposes
+                data-testid="selectorPathInput"
+                data-selector-element-name={newSelector?.element.name}
+                data-selector-path={newSelector?.path}
+                data-selector-url={newSelector?.url}
             />
 
             {
@@ -298,10 +305,10 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                     <Space direction="horizontal" size="middle">
 
                         <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled}>
-                            {t("field.action.evaluate_selector")}
+                            <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
                         </Button>
                         <Button onClick={checkSelectorValidity} disabled={!isCheckEnabled}>
-                            {t("field.action.check_selector_validity")}
+                            <span data-testid="check_validity" >{t("field.action.check_selector_validity")}</span>
                         </Button>
                     </Space>
                 </Space>
@@ -311,7 +318,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 isSelectorPathValid &&
                 <Space direction="horizontal">
                     <CheckCircleOutlined className="success" />
-                    <span>{t("field.css.valid")}</span>
+                    <span data-testid="css_path_valid" >{t("field.css.valid")}</span>
                 </Space>
             }
 
@@ -319,7 +326,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 isSelectorPathValid !== undefined && !isSelectorPathValid &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error" />
-                    <span>{t("field.css.invalid")}</span>
+                    <span data-testid="css_path_invalid" >{t("field.css.invalid")}</span>
                 </Space>
             }
 

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { Button, Layout, Menu } from "antd";
-import { LayoutOutlined } from "@ant-design/icons";
+import React from "react";
+import { Layout, Menu } from "antd";
 import { useTranslation } from "react-i18next";
 
 import "./i18n";
