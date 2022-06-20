@@ -189,6 +189,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
 
         if (s !== undefined) {
             evaluate(socket, s, (response: ScrapingResponse) => {
+                console.log('evaluate', response);
                 setEvaluation(response);
                 if (response.content === null || response.content === undefined) {
                     setEvaluationStatus('error');
@@ -304,10 +305,10 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
 
-                        <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled}>
+                        <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluate_btn" >
                             <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
                         </Button>
-                        <Button onClick={checkSelectorValidity} disabled={!isCheckEnabled}>
+                        <Button onClick={checkSelectorValidity} disabled={!isCheckEnabled} data-testid="check_validity_btn" >
                             <span data-testid="check_validity" >{t("field.action.check_selector_validity")}</span>
                         </Button>
                     </Space>
@@ -353,7 +354,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             {
                 evaluationStatus !== 'success' && path !== undefined && path !== '' &&
                 <Space direction="horizontal" size="middle">
-                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
+                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} data-testid="bypass_evaluation_switch" /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
                 </Space>
             }
 

@@ -21,18 +21,36 @@ import { SocketContext } from '../../socket'
  */
 jest.mock('socket.io-client');
 
+/**
+ * mock the evaluate function
+ * so that it returns a correct ScrapingResponse
+ */
+jest.mock('../../socket/events', () => ({
+    evaluate: (socket, selector, callback) => callback({
+        content: 'youhou'
+    })
+}));
 
-describe('Test CSS Selector macroscopic behaviour', () => {
+const onConfigured = (selector) => {
+    console.log('onConfigured called with param', selector);
+};
 
-    const testSelector = {
-        element: {
-            'name': 'test-element',
-        }
-    };
+const onError = () => {
+    console.log('onError called');
+};
 
-    const undefinedSelector = undefined;
+const testSelector = {
+    element: {
+        'name': 'test-element',
+    }
+};
 
-    const pageUrl = 'http://www.google.com';
+const undefinedSelector = undefined;
+
+const pageUrl = 'http://www.google.com';
+
+
+describe('Test the component initiation', () => {
 
     let socket;
 
@@ -44,14 +62,6 @@ describe('Test CSS Selector macroscopic behaviour', () => {
     afterEach(() => {
         jest.restoreAllMocks();
     });
-
-    const onConfigured = (selector) => {
-        console.log('onConfigured called with param', selector);
-    };
-
-    const onError = () => {
-        console.log('onError called');
-    };
 
 
     test('the component is correctly initiated with an undefined selector', async () => {
@@ -90,6 +100,20 @@ describe('Test CSS Selector macroscopic behaviour', () => {
         expect(input).toHaveAttribute('data-selector-element-name', testSelector.element.name);
     });
 
+});
+
+describe('Test the action buttons', () => {
+
+    let socket;
+
+    beforeEach(() => {
+        socket = new MockedSocket();
+        socketIOClient.mockReturnValue(socket);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
 
     test('evaluation is enabled when the selector url and CSS path are not blank', async () => {
 
@@ -132,19 +156,38 @@ describe('Test CSS Selector macroscopic behaviour', () => {
 
     });
 
-    // Rewire the evaluate function 
-    // see https://medium.com/@qjli/how-to-mock-specific-module-function-in-jest-715e39a391f4#:~:text=Mocking%20a%20function%20generally%20is,functions%20in%20a%20module%20file.
-    // see https://github.com/speedskater/babel-plugin-rewire
-    // see https://jestjs.io/fr/docs/mock-functions
+    test('the bypass switch appears only when the CSS path is not blank', async () => {
+
+
+
+    });
+
+});
+
+describe('Test the callbacks', () => {
+
+    let socket;
+
+    beforeEach(() => {
+        socket = new MockedSocket();
+        socketIOClient.mockReturnValue(socket);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
     test('onConfigured callback is called when the evaluation status is successful', async () => {
 
-        const mockCallback = jest.fn();
-        evaluate = jest.fn().mockReturnValue('mock full name');
+        // a dummy mock
+        // that we'll observe to check the behaviour of 
+        // the inner evaluateSelectorPath function
+        const mockOnConfigured = jest.fn();
 
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={mockCallback} onError={onError} />
+                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={mockOnConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -152,26 +195,97 @@ describe('Test CSS Selector macroscopic behaviour', () => {
         // simulate a user input 
         const input = getByTestId('selectorPathInput');
         fireEvent.change(input, { target: { value: '.a-selector' } });
-        expect(mockCallback.mock.calls.length).toBe(1);
+
+        // simulate click on the evaluate button 
+        const btn = getByTestId('evaluate_btn');
+        fireEvent.click(btn);
+
+        expect(mockOnConfigured.mock.calls.length).toBe(1);
 
     });
 
     test('onConfigured callback is called when the user bypassed the evaluation', async () => {
 
+        // a dummy mock
+        // that we'll observe to check the behaviour of 
+        // the inner evaluateSelectorPath function
+        const mockOnConfigured = jest.fn();
 
+        const { getByTestId } = render(
+            <SocketContext.Provider value={socket}>
+                <I18nextProvider i18n={i18n}>
+                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={mockOnConfigured} onError={onError} />
+                </I18nextProvider>
+            </SocketContext.Provider>
+        );
+
+        // simulate a user input 
+        const input = getByTestId('selectorPathInput');
+        fireEvent.change(input, { target: { value: '.a-selector' } });
+
+        // simulate a bypass of the evaluation
+        const switchBtn = getByTestId('bypass_evaluation_switch');
+        fireEvent.click(switchBtn);
+
+        expect(mockOnConfigured.mock.calls.length).toBe(1);
 
     });
 
     test('onError callback is called when the evaluation status is not succesful', async () => {
 
+        // const spy = jest.spyOn(events, 'evaluate').mockImplementation(() => ({
+        //     evaluate: (socket, selector, callback) => callback({
+        //         // the content being undefined (or null works as well)
+        //         // we expect the onError callback to be called
+        //         content: undefined
+        //     })
+        // }));
 
+        evaluate.mockReturnValueOnce((socket, selector, callback) => callback({
+            // the content being undefined (or null works as well)
+            // we expect the onError callback to be called
+            content: undefined
+        }));
+
+
+        // a dummy mock
+        // that we'll observe to check the behaviour of 
+        // the inner evaluateSelectorPath function
+        const mockOnError = jest.fn();
+
+        const { getByTestId } = render(
+            <SocketContext.Provider value={socket}>
+                <I18nextProvider i18n={i18n}>
+                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={mockOnError} />
+                </I18nextProvider>
+            </SocketContext.Provider>
+        );
+
+        // simulate a user input 
+        const input = getByTestId('selectorPathInput');
+        fireEvent.change(input, { target: { value: '.a-selector' } });
+
+        // simulate click on the evaluate button 
+        const btn = getByTestId('evaluate_btn');
+        fireEvent.click(btn);
+
+        expect(mockOnError.mock.calls.length).toBe(1);
 
     });
 
-    test('the bypass switch appears only when the CSS path is not blank', async () => {
+});
 
+describe('Test the screenshot display', () => {
 
+    let socket;
 
+    beforeEach(() => {
+        socket = new MockedSocket();
+        socketIOClient.mockReturnValue(socket);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     test('the screenshot is displayed only when available', async () => {
@@ -182,58 +296,3 @@ describe('Test CSS Selector macroscopic behaviour', () => {
 
 });
 
-
-
-
-// test('the rendering of the datapanel summary tab', async () => {
-    // through this test, we verify as well the getAttributeValueByPath
-    // and getAttributeShortName functions
-    // by checking the rendered values
-
-    // const { debug } = render(
-    //     <I18nextProvider i18n={i18n}>
-    //         <DataPanel data={verification_data} summary={summary} />
-    //     </I18nextProvider>
-    // );
-
-    // just prints the HTML in the console
-    // comment or uncomment it
-    // debug();
-
-    // the <ul>s container is identified by data-testid="tab-panel"
-    // we could also query by role, with getByRole('tabpanel')
-    // there are 2 <ul> containing <li> children
-    // and one divider <hr/>
-    // which makes 3 children
-    // expect(screen.getByTestId('tab-panel').children.length).toBe(3);
-
-    // // inspect the 1 <ul> and check its content
-    // // there are 3 <li>
-    // const firstUL = screen.getByTestId('tab-panel').firstChild;
-    // expect(firstUL.nodeType == 'UL');
-    // expect(firstUL.children.length).toBe(3);
-
-    // // first child is the organization name
-    // const firstUL_firstLi = firstUL.firstChild;
-    // expect(firstUL_firstLi.nodeType == 'LI');
-    // expect(firstUL_firstLi.textContent).toContain('organization_name');
-    // expect(firstUL_firstLi.textContent).toContain('toto');
-
-    // // and so on for the 2nd and 3rd element
-    // const firstUL_secondLi = firstUL.children[1];
-    // expect(firstUL_secondLi.nodeType == 'LI');
-    // expect(firstUL_secondLi.textContent).toContain('country');
-    // expect(firstUL_secondLi.textContent).toContain('FRA');
-
-    // const firstUL_thirdLi = firstUL.children[2];
-    // expect(firstUL_thirdLi.nodeType == 'LI');
-    // expect(firstUL_thirdLi.textContent).toContain('email');
-    // expect(firstUL_thirdLi.textContent).toContain('test@test.fr');
-
-    // const hr = screen.getByTestId('tab-panel').children[1];
-    // expect(hr.nodeType == 'HR');
-
-    // const secondUL = screen.getByTestId('tab-panel').children[2];
-    // expect(secondUL.nodeType == 'UL');
-
-// });
