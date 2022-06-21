@@ -116,6 +116,10 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         if (p?.url !== undefined && p.url !== '') {
             setIsEvaluationEnabled(true);
         }
+
+        console.log("val", val);
+        console.log("path", path);
+        console.log("evaluationStatus", evaluationStatus);
     };
 
 
@@ -354,7 +358,8 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             {
                 evaluationStatus !== 'success' && path !== undefined && path !== '' &&
                 <Space direction="horizontal" size="middle">
-                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} data-testid="bypass_evaluation_switch" /><h4>{t('field.evaluation.bypass_evaluation')}</h4>
+                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} data-testid="bypass_evaluation_switch" />
+                    <h4>{t('field.evaluation.bypass_evaluation')}</h4>
                 </Space>
             }
 

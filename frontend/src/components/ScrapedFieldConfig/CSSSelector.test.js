@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../tests/i18n';
@@ -175,9 +175,14 @@ describe('Test the action buttons', () => {
 
         // simulate a user input 
         const input = getByTestId('selectorPathInput');
-        fireEvent.change(input, { target: { value: '.a-selector' } });
 
-        expect(switchBtn).toBeInTheDocument();
+        fireEvent.change(input, { target: { value: '.a-selector' } });
+        console.log('act done');
+
+        // refetch the button
+        // and check that it appeared in the document
+        const switchBtn2 = queryByTestId('bypass_evaluation_switch');
+        expect(switchBtn2).toBeInTheDocument();
 
     });
 
@@ -251,14 +256,6 @@ describe('Test the callbacks', () => {
     });
 
     test('onError callback is called when the evaluation status is not succesful', async () => {
-
-        // const spy = jest.spyOn(events, 'evaluate').mockImplementation(() => ({
-        //     evaluate: (socket, selector, callback) => callback({
-        //         // the content being undefined (or null works as well)
-        //         // we expect the onError callback to be called
-        //         content: undefined
-        //     })
-        // }));
 
         evaluate.mockReturnValueOnce((socket, selector, callback) => callback({
             // the content being undefined (or null works as well)
