@@ -3,6 +3,7 @@ import { URL } from 'url';
 import { webkit } from 'playwright-webkit';
 import isURL from 'validator/lib/isURL';
 import { Selector, ScrapingResponse } from '../../interfaces';
+import { time } from 'console';
 
 /**
  * Takes a screenshot of the locator 
@@ -11,7 +12,7 @@ import { Selector, ScrapingResponse } from '../../interfaces';
  * @param selector 
  * @returns a promise of a ScrapingResponse : screenshot + content scraped
  */
-export const getContent = async (selector: Selector): Promise<ScrapingResponse> => {
+export const getContent = async (selector: Selector, cookieSelectorPath?: string): Promise<ScrapingResponse> => {
 
     // prevent from errors that
     // could occur later
@@ -46,11 +47,20 @@ export const getContent = async (selector: Selector): Promise<ScrapingResponse> 
     const screenshotPath = `./${urlObject.hostname}-${baseName}.png`;
 
     try {
-        await page.screenshot({ path: screenshotPath, fullPage: true });
+
+        // eliminate the cookie pop-pup
+        // if the path is provided, because it may disturb the screenshot capture
+        if (cookieSelectorPath !== undefined && cookieSelectorPath !== null && cookieSelectorPath !== '') {
+            console.log('Clicking on the cookie popup with', cookieSelectorPath);
+            await page.click('span.didomi-continue-without-agreeing');
+        }
+
+        await page.locator(selector.path).screenshot({ path: screenshotPath }); //, fullPage: true
         imageAsBase64 = await readFile(screenshotPath, { encoding: 'base64' });
         // remove the screenshot file
         await unlink(screenshotPath);
     } catch (err) {
+        console.error(err);
         imageAsBase64 = '';
     }
 

@@ -4,9 +4,10 @@ import http from 'http';
 import { Socket, Server } from "socket.io";
 
 import { ScrapingElement, Selector, ScrapingConfig, User, ScrapingResponse } from './interfaces';
-import { getContent } from './features/scraping'
-import { validateSelector } from './features/configure/selector'
-import { updateScrapingConfig, getScrapingConfig } from './database'
+import { IEvaluationRequest } from './interfaces/events';
+import { getContent } from './features/scraping';
+import { validateSelector } from './features/configure/selector';
+import { updateScrapingConfig, getScrapingConfig } from './database';
 
 
 const app = express();
@@ -82,11 +83,12 @@ io.on('connection', (socket: Socket) => {
    * fetch the content of a CSS selector node
    *  used by the frontend to evaluate a selector
    */
-  socket.on('get-selector-content', (selector: Selector, callback: (response: ScrapingResponse) => void) => {
-    console.info("get-selector-content", selector);
-    getContent(selector).then((response: ScrapingResponse) => {
+  socket.on('get-selector-content', (request: IEvaluationRequest, callback: (response: ScrapingResponse) => void) => {
+    getContent(request.selector, request.cookie_path).then((response: ScrapingResponse) => {
+      console.log("get-selector-content success: ", response);
       callback(response);
     }).catch((response) => {
+      console.log("get-selector-content failure: ", response);
       callback(response);
     });
 

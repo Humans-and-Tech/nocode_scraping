@@ -16,11 +16,15 @@
       "no_url": "Configure the URL to be scraped to evaluate this selector",
       "result": "We fetched the following data with this selector: {{ value }}",
       "no_selector_path": "Enter a valid  CSS path to evaluate the selector",
-      "failure": "We could not find this selector in the page, we evaluated it to {{ value }}",
+      "failure": "We could not find this selector in the page",
       "evaluating_on": "Evaluating the selector on",
       "link_title": "Selector Evaluation external link",
       "screenshot": "Screenshot of the page scraped",
-      "bypass_evaluation": "Don't evaluate, I am sure of this selector"
+      "screenshot_helper": "You see a blank image ?",
+      "screenshot_helper_link_to_cookie_selector": "Eliminate the cookie pop-up by providing a CSS selector on which to click",
+      "bypass_evaluation": "Don't evaluate, I am sure of this selector",
+      "set_cookie_popup_path": "Click on a cookie pop-up",
+      "input_cookie_popup_placeholder": "Enter a CSS Path to click on a cookie pop-up"
     },
     "action": {
       "evaluate_selector": "Evaluate this selector",

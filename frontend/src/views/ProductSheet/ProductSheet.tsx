@@ -71,21 +71,25 @@ const ProductSheet: React.FC = () => {
 
             <Row>
               <Col>
-                <Tooltip title={t("page.scraping_not_available")} color="orange">
-                  <Breadcrumb className="gus-scraping-element">
-                    <Breadcrumb.Item href="">
-                      <HomeOutlined />
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item href="">
-                      <FolderOpenOutlined />
-                      <span>{t("breadcrumb.category_level_0")}</span>
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item href="">
-                      <FolderOpenOutlined />
-                      <span>{t("breadcrumb.category_level_1")}</span>
-                    </Breadcrumb.Item>
-                  </Breadcrumb>
-                </Tooltip>
+
+                <Breadcrumb className="gus-scraping-element">
+
+                  <Breadcrumb.Item href="">
+                    <HomeOutlined />
+                  </Breadcrumb.Item>
+
+                  <Breadcrumb.Item href="">
+                    <FolderOpenOutlined />
+                    <span>{t("breadcrumb.category_level_0")}</span>
+                  </Breadcrumb.Item>
+
+                  <Breadcrumb.Item href="">
+                    <FolderOpenOutlined />
+                    <span>{t("breadcrumb.category_level_1")}</span>
+                  </Breadcrumb.Item>
+
+                </Breadcrumb>
+
               </Col>
             </Row>
           </Col>
@@ -133,60 +137,59 @@ const ProductSheet: React.FC = () => {
               <Col className="gus-col-breathe">
                 <Row className="gus-row-breathe">
                   <Col className="gus-col-breathe">
-                    <Tooltip
-                      title={t("page.scraping_available")}
-                      color="geekblue"
-                    >
-                      <List
-                        size="large"
-                        header={
-                          <div>
-                            <DollarOutlined />
-                            {t("product.price.header")}
-                          </div>
-                        }
-                        bordered
-                        dataSource={priceElements}
-                        renderItem={(item: ScrapingElement) => (
-                          <List.Item
-                            key={item.name}
-                            className="gus-scraping-element"
-                            onClick={() => {
-                              showConfigurator(item);
-                            }}
-                          >
-                            {item.label}
-                          </List.Item>
-                        )}
-                      />
-                    </Tooltip>
+
+                    <List
+                      size="large"
+                      header={
+                        <div>
+                          <DollarOutlined />
+                          {t("product.price.header")}
+                        </div>
+                      }
+                      bordered
+                      dataSource={priceElements}
+                      renderItem={(item: ScrapingElement) => (
+                        <List.Item
+                          key={item.name}
+                          className="gus-scraping-element"
+                          onClick={() => {
+                            showConfigurator(item);
+                          }}
+                        >
+                          <Tooltip
+                            title={t("page.scraping_available")}
+                            color="geekblue">{item.label}</Tooltip>
+                        </List.Item>
+                      )}
+                    />
+
                     <Divider></Divider>
-                    <Tooltip
-                      title={t("page.scraping_not_available")}
-                      color="orange"
-                    >
-                      <List
-                        size="large"
-                        header={
-                          <div>
-                            <FiPackage />
-                            {t("product.delivery.header")}
-                          </div>
-                        }
-                        bordered
-                        dataSource={[
-                          t("product.delivery.mode"),
-                          t("product.delivery.delay"),
-                          t("product.delivery.price"),
-                          t("product.delivery.currency"),
-                        ]}
-                        renderItem={(item) => (
-                          <List.Item className="gus-scraping-element">
-                            {item}
-                          </List.Item>
-                        )}
-                      />
-                    </Tooltip>
+
+                    <List
+                      size="large"
+                      header={
+                        <div>
+                          <FiPackage />
+                          {t("product.delivery.header")}
+                        </div>
+                      }
+                      bordered
+                      dataSource={[
+                        t("product.delivery.mode"),
+                        t("product.delivery.delay"),
+                        t("product.delivery.price"),
+                        t("product.delivery.currency"),
+                      ]}
+                      renderItem={(item) => (
+                        <List.Item className="gus-scraping-element">
+                          <Tooltip
+                            title={t("page.scraping_not_available")}
+                            color="orange"
+                          >{item}</Tooltip>
+                        </List.Item>
+                      )}
+                    />
+
                   </Col>
                 </Row>
               </Col>

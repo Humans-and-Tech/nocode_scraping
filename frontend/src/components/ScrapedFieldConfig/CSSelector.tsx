@@ -1,9 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Input, Button, Space, Spin, Image, Switch } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { Input, Button, Space, Spin, Image, Switch, Anchor } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
-
 
 import { SocketContext } from "../../socket";
 import { evaluate, validateCssSelector } from '../../socket/events';
@@ -13,6 +12,7 @@ import { ScrapingResponse, Selector } from "../../interfaces";
 import './Scraping.scoped.css';
 
 const { TextArea } = Input;
+const { Link } = Anchor;
 
 const createSelector = (): Selector => {
     return {
@@ -55,7 +55,20 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
 
     const { selector, onConfigured, onError, pageUrl } = props;
 
+    /**
+     * the textare input path
+     * which will populate the selector object 
+     */
     const [path, setPath] = useState<string>('');
+
+    /**
+     * optionnally, the user may want to configure
+     * a CSS selector to click on a cookie pop-up and eliminate it
+     * 
+     * the cookie pop-up is just used to evaluate the selector 
+     */
+    const [isCookiePopupPath, setIsCookiePopupPath] = useState<boolean>(false);
+    const [cookiePopupPath, setCookiePopupPath] = useState<string>('');
 
     /**
      * the newSelector changes state,
@@ -192,7 +205,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             // when calling the evaluateSelectorPath after calling the onChange
             // because onChange calls setPath --> path might not be up-to-date
             s.path = path
-            evaluate(socket, s, (response: ScrapingResponse) => {
+            evaluate(socket, s, cookiePopupPath, (response: ScrapingResponse) => {
                 setEvaluation(response);
                 if (response.content === null || response.content === undefined) {
                     setEvaluationStatus('error');
@@ -202,6 +215,23 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 setIsLoading(false);
             })
         }
+    };
+
+
+    const switchCookiePopupSelector = (): void => {
+        setIsCookiePopupPath(true);
+    };
+
+    const onCookiePopupChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        setCookiePopupPath(e.target.value);
+    };
+
+    const onCookiePopupBlur = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        setCookiePopupPath(e.target.value);
     };
 
 
@@ -295,12 +325,29 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 onBlur={onSelectorBlur}
                 onChange={onSelectorChange}
                 value={path}
-                // we need this for testing purposes
                 data-testid="selectorPathInput"
                 data-selector-element-name={newSelector?.element.name}
                 data-selector-path={newSelector?.path}
                 data-selector-url={newSelector?.url}
             />
+
+            {
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                    <Space direction="horizontal" size="middle">
+                        <Switch onChange={setIsCookiePopupPath} checked={isCookiePopupPath} />
+                        <h4><a id="switch-cookie-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
+                    </Space>
+                    {isCookiePopupPath &&
+                        <TextArea
+                            rows={4}
+                            placeholder={t("field.evaluation.input_cookie_popup_placeholder")}
+                            value={cookiePopupPath}
+                            onBlur={onCookiePopupBlur}
+                            onChange={onCookiePopupChange}
+                        />
+                    }
+                </Space>
+            }
 
             {
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
@@ -371,12 +418,17 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                         <>
                             <h4>{t('field.evaluation.screenshot')}</h4>
                             <Image
-                                width={'100%'}
-                                height={150}
-                                style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
+                                width={200}
                                 src={evaluation.screenshot}
                                 data-testid="screenshot"
                             ></Image>
+                            <Space direction="horizontal">
+                                <QuestionCircleOutlined />
+                                <span>{t('field.evaluation.screenshot_helper')}</span>
+                                <a onClick={switchCookiePopupSelector} href="#switch-cookie-selector" title={t('field.evaluation.screenshot_helper_link_to_cookie_selector')}>
+                                    {t('field.evaluation.screenshot_helper_link_to_cookie_selector')}
+                                </a>
+                            </Space>
                         </>
                     }
                 </Space>
