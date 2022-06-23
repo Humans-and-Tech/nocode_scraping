@@ -1,36 +1,35 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Input, Button, Space, Spin, Image, Switch, Anchor } from "antd";
+import { Input, Button, Space, Spin, Image, Switch } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
-import { SocketContext } from "../../socket";
+import { SocketContext } from '../../socket';
 import { evaluate, validateCssSelector } from '../../socket/events';
-import { ScrapingResponse, Selector } from "../../interfaces";
+import { Data, DataSelector } from "../../interfaces/spider";
+import { ScrapingResponse } from "../../interfaces/events";
 
 
 import './Scraping.scoped.css';
 
-const { TextArea } = Input;
-const { Link } = Anchor;
 
-const createSelector = (): Selector => {
+const { TextArea } = Input;
+
+
+const createSelector = (): DataSelector => {
     return {
-        element: {
-            name: undefined
-        }
+        path: undefined
     }
 };
 
 
 interface ICSSSelectorPropsType {
-    selector: Selector | undefined;
-    onConfigured: (selector: Selector) => void;
+    data: Data;
+    onConfigured: (data: Data) => void;
     onError: () => void;
 
-    // the default page Url if none is passed in the selector
-    // this is a fallback for the selector
-    pageUrl?: string | undefined;
+    // sample of pages to test / validate the selector
+    sampleUrl?: URL | undefined;
 }
 
 
@@ -53,7 +52,12 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
-    const { selector, onConfigured, onError, pageUrl } = props;
+    const socket = useContext<Socket>(SocketContext);
+
+    const { data, onConfigured, onError, sampleUrl } = props;
+
+    // TODO:
+    // select the language(CSS, Xpath, jsonld, js)
 
     /**
      * the textare input path
@@ -79,7 +83,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
      * not the selector prop !
      * 
      */
-    const [newSelector, setNewSelector] = useState<Selector | undefined>(undefined);
+    // const [newSelector, setNewSelector] = useState<DataSelector | undefined>(undefined);
 
     /**
      * sometimes, for whatever reason, the evaluation fails
@@ -107,11 +111,6 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
     const [isCheckEnabled, setIsCheckEnabled] = useState<boolean>(false);
 
     /**
-     * the socket to the backend services
-     */
-    const socket = useContext<Socket>(SocketContext);
-
-    /**
      * triggered when the CSS selector input changes value
      * 
      * @param e : an input event
@@ -126,8 +125,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             setIsCheckEnabled(true);
         }
 
-        const p = newSelector;
-        if (p?.url !== undefined && p.url !== '') {
+        if (sampleUrl !== undefined && sampleUrl.toString() !== '') {
             setIsEvaluationEnabled(true);
         }
     };
@@ -143,19 +141,18 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
 
-        let p = newSelector;
-        if (p === undefined) {
-            p = createSelector();
-        }
-        p.path = path;
-        if (p?.path !== undefined && p.path !== '') {
+        if (path !== undefined && path !== '') {
             setIsCheckEnabled(true);
         }
 
-        if (p?.url !== undefined && p.url !== '') {
+        if (sampleUrl !== undefined && sampleUrl.toString() !== '') {
             setIsEvaluationEnabled(true);
         }
-        setNewSelector(p);
+
+        if (data.selector === undefined) {
+            data.selector = createSelector();
+        }
+        data.selector.path = path;
     };
 
 
@@ -167,9 +164,9 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
      */
     const checkSelectorValidity = (event: React.MouseEvent<HTMLButtonElement>): void => {
 
-        if (newSelector !== undefined) {
+        if (data.selector !== undefined) {
             setIsLoading(true);
-            validateCssSelector(socket, newSelector, (isValid: boolean) => {
+            validateCssSelector(socket, {}, data.selector, (isValid: boolean) => {
                 setIsLoading(false);
                 if (isValid) {
                     setIsSelectorPathValid(true);
@@ -197,15 +194,13 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         // reset the evaluation status !
         setEvaluationStatus(undefined);
 
-        const s = newSelector;
-
-        if (s !== undefined) {
+        if (data.selector !== undefined && sampleUrl !== undefined) {
             // for testing purpose
             // re-assign the path which might not be up-to-date
             // when calling the evaluateSelectorPath after calling the onChange
             // because onChange calls setPath --> path might not be up-to-date
-            s.path = path
-            evaluate(socket, s, cookiePopupPath, (response: ScrapingResponse) => {
+            data.selector.path = path
+            evaluate(socket, {}, data.selector, sampleUrl, cookiePopupPath, (response: ScrapingResponse) => {
                 setEvaluation(response);
                 if (response.content === null || response.content === undefined) {
                     setEvaluationStatus('error');
@@ -262,58 +257,44 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
     useEffect(() => {
 
         // when mounting the component initially
-        if (newSelector === undefined) {
-
-            if (selector === undefined) {
-                const s = createSelector();
-                s.url = pageUrl;
-                setNewSelector(s);
-            } else if (selector !== undefined) {
-                selector.url = pageUrl;
-                setNewSelector(selector);
-            }
-        }
-
-        // reset the pageUrl 
-        // it may change between 2 openings of the drawer
-        if (newSelector !== undefined) {
-            newSelector.url = pageUrl;
+        if (data.selector === undefined) {
+            data.selector = createSelector();
         }
 
         // update the button states
-        if (newSelector?.url !== undefined && newSelector?.url !== '' && newSelector?.path !== undefined && newSelector?.path !== '') {
+        if (sampleUrl !== undefined && sampleUrl.toString() !== '' && data.selector?.path !== undefined && data.selector?.path !== '') {
             setIsEvaluationEnabled(true);
         }
 
-        if (newSelector?.path !== undefined && newSelector?.path !== '') {
+        if (data.selector?.path !== undefined && data.selector?.path !== '') {
             setIsCheckEnabled(true);
         }
 
         // callback when evaluation is not undefined 
         // meaning, when an evaluation has been done
-        if (newSelector !== undefined) {
+        if (data.selector !== undefined) {
 
             if (evaluationStatus == 'success' || isByPassEvaluation) {
-                onConfigured(newSelector);
+                onConfigured(data);
             } else if (evaluationStatus == 'error') {
                 onError();
             }
         }
 
 
-    }, [newSelector, pageUrl, path, evaluationStatus, isByPassEvaluation]);
+    }, [data, sampleUrl, path, evaluationStatus, isByPassEvaluation]);
 
     return (
 
         <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
-            {(newSelector?.path == undefined || newSelector?.path == '') &&
+            {(data.selector?.path == undefined || data.selector?.path == '') &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
                     <span data-testid="no_selector_path">{t('field.evaluation.no_selector_path')}</span>
                 </Space>
             }
-            {(newSelector?.url == undefined || newSelector?.url == '') &&
+            {(sampleUrl == undefined || sampleUrl.toString() == '') &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
                     <span data-testid="no_url">{t('field.evaluation.no_url')}</span>
@@ -326,9 +307,8 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 onChange={onSelectorChange}
                 value={path}
                 data-testid="selectorPathInput"
-                data-selector-element-name={newSelector?.element.name}
-                data-selector-path={newSelector?.path}
-                data-selector-url={newSelector?.url}
+                data-name={data?.name}
+                data-selector-path={data.selector?.path}
             />
 
             {
@@ -384,14 +364,14 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
                     <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
                     {
-                        newSelector !== null && newSelector?.url &&
+                        data.selector !== null && sampleUrl &&
                         <Space direction="vertical" size="small">
                             <span style={{ 'display': 'inline-block' }}>
                                 {t('field.evaluation.evaluating_on')}
                             </span>
                             <span style={{ 'display': 'inline-block' }}>
-                                <a href={newSelector.url} title={t('field.evaluation.link_title')} target="_blank" rel="noreferrer">
-                                    {newSelector.url}
+                                <a href={sampleUrl.toString()} title={t('field.evaluation.link_title')} target="_blank" rel="noreferrer">
+                                    {sampleUrl.toString()}
                                 </a>
                             </span>
                         </Space>

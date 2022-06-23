@@ -12,8 +12,8 @@ import { SocketContext, socket } from "./socket";
 import ProductSheet from "./views/ProductSheet/ProductSheet";
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScraperLayout, OnBoardingLayout } from './Layout'
-import { ScrapingContext, ConfigProvider } from './ConfigurationContext'
-import { PageURLConfigurator } from './components/SpiderConfig/PageURL';
+import { ScrapingContext, SpiderProvider } from './ConfigurationContext'
+import { SampleURL } from './components/Spider/SampleURL';
 
 
 
@@ -38,7 +38,7 @@ root.render(
             path="/onboarding"
             element={
               <OnBoardingLayout>
-                <ScrapingContext.Provider value={ConfigProvider}>
+                <ScrapingContext.Provider value={SpiderProvider}>
                   <OnBoarding />
                 </ScrapingContext.Provider>
               </OnBoardingLayout>
@@ -46,11 +46,11 @@ root.render(
           />
 
           <Route
-            path="/product-sheet"
+            path="/spider/:name/product-sheet"
             element={
 
               <ScraperLayout header={
-                <PageURLConfigurator />
+                <SampleURL />
               }>
                 <ProductSheet />
               </ScraperLayout>

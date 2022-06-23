@@ -1,49 +1,81 @@
 import React from "react";
-import { ScrapingConfig } from "./interfaces";
+import { Socket } from "socket.io-client";
 
-export interface ScrapingConfigProvider {
-    getConfig: () => ScrapingConfig;
-    setConfig: (config: ScrapingConfig | null) => void;
+import { getSpider, saveSpider } from './socket/events'
+import { Spider } from "./interfaces/spider";
+
+
+export interface ISpiderProvider {
+    get: (socket: Socket, name: string, callback: (data: Spider | undefined) => void) => void;
+    upsert: (socket: Socket, spider: Spider, callback: (b: boolean) => void) => void;
+    remove: (socket: Socket, spider: Spider, callback: (b: boolean) => void) => void;
+    create: (socket: Socket, name: string) => Spider;
 }
 
-export const createConfig = (): ScrapingConfig => {
-    return {
-        websiteConfig: {},
-    };
-};
 
-/**
- * the website config is only stored locally
- * it is not savec by the backend 
- * 
- * @returns 
- */
-function useConfig(): ScrapingConfigProvider {
+// TODO: read and write config from backend 
+// not from localStorage
+function useSpider(): ISpiderProvider {
 
-    const getConfig = (): ScrapingConfig => {
-        const stored = localStorage.getItem('config');
-        if (stored !== null) {
-            return JSON.parse(stored);
+    const get = (socket: Socket, name: string, callback: (data: Spider | undefined) => void) => {
+
+        if (name === '') {
+            throw new Error('cannot get a spider with a blank name');
         }
-        // create a void config
-        return createConfig();
+        getSpider(socket, {}, name, (data: Spider | undefined) => {
+            callback(data);
+        });
     };
 
-    const setConfig = (config: ScrapingConfig | null): void => {
-        if (config == null) {
-            localStorage.removeItem('config');
-        } else {
-            localStorage.setItem('config', JSON.stringify(config));
+
+    /**
+     * TODO 
+     * @param socket 
+     * @param _name 
+     * @returns 
+     */
+    const create = (socket: Socket, _name: string): Spider => {
+        return {
+            name: _name
         }
     };
 
-    return { getConfig, setConfig };
+    /**
+     * inserts or updates a spider
+     * 
+     * @param _name
+     * @returns 
+     */
+    const upsert = (socket: Socket, spider: Spider, callback: (b: boolean) => void) => {
+        if (spider.name === '' || spider.name === undefined) {
+            throw new Error('cannot save a spider with a blank name');
+        }
+        saveSpider(socket, {}, spider, (b: boolean) => {
+            callback(b);
+        });
+    };
+
+    /**
+     * TODO
+     * 
+     * @param socket 
+     * @param spider 
+     * @param callback 
+     */
+    const remove = (socket: Socket, spider: Spider, callback: (b: boolean) => void): void => {
+        if (spider.name === '') {
+            throw new Error('cannot remove a spider with a blank name');
+        }
+        // todo
+    };
+
+    return { get, upsert, remove, create };
 }
 
-export const ConfigProvider: ScrapingConfigProvider = useConfig();
+export const SpiderProvider: ISpiderProvider = useSpider();
 
 /**
  * the scraping context will convey
- * the config accross all elements
+ * the spider accross all elements
  */
-export const ScrapingContext = React.createContext<ScrapingConfigProvider>(ConfigProvider);
+export const ScrapingContext = React.createContext<ISpiderProvider>(SpiderProvider);

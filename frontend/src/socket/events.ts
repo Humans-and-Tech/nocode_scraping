@@ -1,7 +1,8 @@
 import { Socket } from "socket.io-client";
 import debounce from "lodash/debounce";
-import { ScrapingConfig, Selector, ScrapingResponse } from "../interfaces"
-import { IEvaluationRequest } from "../interfaces/events";
+
+import { Spider, DataSelector } from "../interfaces/spider";
+import { IScrapingRequest, ScrapingResponse } from "../interfaces/events";
 
 /**
  * debounces a user input before sending the data
@@ -16,7 +17,6 @@ export const emit = (_socket: Socket, event: string, data: unknown) => {
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
         _socket.emit(event, data);
-        console.log("emit", event, data);
     }, 500)();
 };
 
@@ -26,14 +26,14 @@ export const emit = (_socket: Socket, event: string, data: unknown) => {
  * @param event 
  * @param data
  */
-export const getConfig = (_socket: Socket, name: string, callback: (conf: ScrapingConfig | undefined) => void) => {
+export const getSpider = (_socket: Socket, user: unknown, name: string, callback: (data: Spider | undefined) => void) => {
 
     // debounce does not work in anonymous functions
     // there is a trick
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
-        _socket.emit('get-config', name, {}, (conf: ScrapingConfig | undefined) => {
-            callback(conf);
+        _socket.emit('spider:get', {}, name, (data: Spider | undefined) => {
+            callback(data);
         });
     }, 500)();
 };
@@ -42,14 +42,18 @@ export const getConfig = (_socket: Socket, name: string, callback: (conf: Scrapi
 /**
  * 
  * @param _socket 
- * @param p Selector
- * @param callback a void function taking a Selector as param
+ * @param user 
+ * @param spider 
+ * @param callback 
  */
-export const propose = (_socket: Socket, p: Selector, callback: (proposal: Selector) => void) => {
-    _socket.emit('propose-selector', p, (proposal: Selector) => {
-        callback(proposal);
-    });
+export const saveSpider = (_socket: Socket, user: unknown, spider: Spider, callback: (b: boolean) => void) => {
+    debounce(() => {
+        _socket.emit('spider:upsert', {}, spider, (resp: boolean) => {
+            callback(resp);
+        });
+    }, 500)();
 };
+
 
 
 /**
@@ -59,12 +63,13 @@ export const propose = (_socket: Socket, p: Selector, callback: (proposal: Selec
  * @param p a selector containing a URL and path to evaluate a css selector 
  * @param callback a void function containing the content fetched
  */
-export const evaluate = (_socket: Socket, p: Selector, cookiePopupPath: string, callback: (response: ScrapingResponse) => void) => {
-    const evaluateConfig: IEvaluationRequest = {
-        'selector': p,
+export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: URL, cookiePopupPath: string, callback: (response: ScrapingResponse) => void) => {
+    const evaluateConfig: IScrapingRequest = {
+        'selector': s,
+        'url': url,
         'cookie_path': cookiePopupPath
     }
-    _socket.emit('get-selector-content', evaluateConfig, (response: ScrapingResponse) => {
+    _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse) => {
         callback(response);
     });
 };
@@ -79,9 +84,9 @@ export const evaluate = (_socket: Socket, p: Selector, cookiePopupPath: string, 
  * @param p 
  * @param callback 
  */
-export const validateCssSelector = (_socket: Socket, p: Selector, callback: (isValid: boolean) => void) => {
+export const validateCssSelector = (_socket: Socket, user: unknown, p: DataSelector, callback: (isValid: boolean) => void) => {
     debounce(() => {
-        _socket.emit('validate-css-selector', p, (isValid: boolean) => {
+        _socket.emit('scraping:validate-css-selector', p, (isValid: boolean) => {
             callback(isValid);
         });
     }, 1000)();

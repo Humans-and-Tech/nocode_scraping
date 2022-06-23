@@ -7,19 +7,17 @@ import {
     Button,
     Card,
     Divider,
-    Input,
 } from "antd";
 
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { Socket } from "socket.io-client";
 
-import { PageType, ScrapingConfig } from '../../interfaces'
+import { PageType, Spider } from '../../interfaces/spider'
 import { useTranslation } from "react-i18next";
-
-import { ScrapingContext, ScrapingConfigProvider, createConfig } from '../../ConfigurationContext';
-import { SearchSpider } from '../../components/SpiderConfig/SearchSpider'
 import { SocketContext } from "../../socket";
-import { emit } from '../../socket/events'
+import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
+import { SearchSpider } from '../../components/Spider/SearchSpider'
+
 
 import "../../style.css";
 import "./OnBoarding.scoped.css"
@@ -27,81 +25,52 @@ import "./OnBoarding.scoped.css"
 
 const { Step } = Steps;
 const { Meta } = Card;
-const { TextArea } = Input;
 
 
 const OnBoarding: React.FC = () => {
     const { t } = useTranslation("onboarding");
 
-    const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
-
-    const navigate = useNavigate();
-
-    const [config, setConfig] = useState<ScrapingConfig>(createConfig());
-
-    const [currentStep, setCurrentStep] = useState<number>(0);
-
-    const [proxy, setProxy] = useState<string | undefined>('');
-
-    const [pageType, setPageType] = useState<PageType | undefined>(undefined);
+    const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
 
     const socket = useContext<Socket>(SocketContext);
 
+    const navigate = useNavigate();
+
+    const [spiderName, setSpiderName] = useState<string | undefined>(undefined);
+
+    const [currentStep, setCurrentStep] = useState<number>(0);
+
+    const [pageType, setPageType] = useState<PageType | undefined>(undefined);
+
+
+    /**
+     * resets all state elements used in the onboarding
+     */
     const reset = () => {
         setCurrentStep(0);
-        setProxy('');
         setPageType(undefined);
-        setConfig(createConfig());
-        configProvider.setConfig(null);
+        setSpiderName(undefined);
     };
 
-    /**
-     * merges the existing config from the local storage
-     * with the new config options decided in this onboarding
-     * 
-     * does not reset the existing config !
-     */
-    const saveConfig = (config: ScrapingConfig): void => {
-        const oldConfig = configProvider.getConfig();
-
-        if (config.pageType !== undefined) {
-            oldConfig.pageType = config.pageType;
-        }
-        if (config.pageUrl !== undefined) {
-            oldConfig.pageUrl = config.pageUrl;
-        }
-        if (config.websiteConfig.name !== undefined) {
-            oldConfig.websiteConfig.name = config.websiteConfig.name;
-        }
-        if (config.websiteConfig.proxy !== undefined) {
-            oldConfig.websiteConfig.proxy = config.websiteConfig.proxy;
-        }
-        configProvider.setConfig(oldConfig);
-
-        // store the config
-        emit(socket, "save-config", oldConfig);
-    };
 
     /**
-     * check the config validity 
-     * and navigate to the next step
+     * save the spider and go to the next step
      */
     const nextStep = () => {
 
         if (currentStep == 0) {
-            saveConfig(config);
             setCurrentStep(currentStep + 1);
         } else if (currentStep == 1) {
             if (pageType == undefined) {
                 // TODO: notify of the error
             } else {
-                saveConfig(config);
                 setCurrentStep(currentStep + 1);
             }
         } else if (currentStep == 2) {
             // do nothing
-            saveConfig(config);
         }
+
+        saveSpider();
     };
 
     const previousStep = () => {
@@ -110,53 +79,52 @@ const OnBoarding: React.FC = () => {
         }
     };
 
+    const saveSpider = () => {
+        if (spiderName !== undefined && spiderName !== '') {
+            spiderProvider.get(socket, spiderName, (spider: Spider | undefined) => {
+                if (spider === null || spider === undefined) {
+                    spider = spiderProvider.create(socket, spiderName);
+                }
+                spider.pageType = pageType;
+                spiderProvider.upsert(socket, spider, (b: boolean) => {
+                    console.log('upsert successful');
+                });
+            });
+        }
+    };
+
     const chooseProductSheet = () => {
         setPageType(PageType.ProductSheet);
-        config.pageType = PageType.ProductSheet;
-        setConfig(config);
     };
 
     const chooseCategoryPage = () => {
         setPageType(PageType.CategoryPage);
-        config.pageType = PageType.CategoryPage;
-        setConfig(config);
     };
 
 
     const goToScraping = () => {
-        console.log('pageType', pageType);
         if (pageType == PageType.ProductSheet) {
             navigate('/product-sheet');
         } else {
-            console.log('stay here');
+            console.log('stay here for the time being');
         }
     };
 
-
     /**
-     * config changed externally, reload it
+     * the input belongs to the search component
+     * thus if no proposal is selected, we must 
+     * nevertheless keep the user input !
+     * 
      */
-    const onConfigChange = () => {
-        setConfig(configProvider.getConfig());
+    const onSpiderNameChange = (val: string) => {
+        console.log('onSpiderNameChange', val);
+        setSpiderName(val);
     };
 
-    const changeProxy = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setProxy(e.target.value);
-        config.websiteConfig.proxy = e.target.value;
-        setConfig(config);
+    const editSpider = (spider: Spider) => {
+        setSpiderName(spider.name);
+        setPageType(spider.pageType);
     };
-
-    /**
-     * pre-fill the config fields
-     * but never update them in the useEffect
-     * otherwise you'll have weird behaviours
-     * prefer to udpate the config directly when changing the input values
-     */
-    useEffect(() => {
-        const config = configProvider.getConfig();
-        setProxy(config?.websiteConfig?.proxy);
-        setPageType(config?.pageType);
-    }, [configProvider]);
 
     return (
         <>
@@ -170,11 +138,7 @@ const OnBoarding: React.FC = () => {
                 {currentStep == 0 &&
                     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
 
-                        <SearchSpider onLoaded={onConfigChange} />
-
-                        <h2>{t('configure.proxy_title')}</h2>
-                        <em>{t('configure.proxy_subtitle')}</em>
-                        <TextArea onChange={changeProxy} rows={4} value={proxy} placeholder={t('configure.proxy_placeholder')} />
+                        <SearchSpider onLoaded={editSpider} onChange={onSpiderNameChange} />
 
                         <Button type="primary" onClick={nextStep}>
                             {t('action.next_step')}

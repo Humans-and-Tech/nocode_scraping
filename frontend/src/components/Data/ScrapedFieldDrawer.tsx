@@ -4,14 +4,14 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { Socket } from "socket.io-client";
 
-
 import { SocketContext } from "../../socket";
-import { ScrapingElement, Selector } from "../../interfaces";
-import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext'
+import { Data, Spider } from "../../interfaces/spider";
+import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext'
 
-import './Scraping.scoped.css';
 import { CSSSelector } from "./CSSelector";
 import { DataAlterators } from '../Alterators/DataAlterators'
+
+import './Scraping.scoped.css';
 
 
 /**
@@ -21,29 +21,32 @@ import { DataAlterators } from '../Alterators/DataAlterators'
  * @returns 
  */
 export const ScrapedFieldDrawer = ({
-  element
+  data, spider
 }: {
-  element: ScrapingElement;
+  data: Data,
+  spider: Spider
 }): JSX.Element => {
   const { t } = useTranslation("configurator");
 
-  const [selector, setSelector] = useState<Selector | undefined>(undefined);
+  const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
 
-  const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
+  const socket = useContext<Socket>(SocketContext);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   const [isConfigured, setIsConfigured] = useState<boolean>(false);
 
-  const socket = useContext<Socket>(SocketContext);
 
   const toggleDrawer = (): void => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const onConfigured = (s: Selector): void => {
-    setSelector(s);
+  const onConfigured = (data: Data): void => {
     setIsConfigured(true);
+    spider.data?.add(data);
+    spiderProvider.upsert(socket, spider, (b: boolean) => {
+      console.log('upsert successful');
+    });
   };
 
   const onError = (): void => {
@@ -56,7 +59,7 @@ export const ScrapedFieldDrawer = ({
    */
   useEffect(() => {
     toggleDrawer();
-  }, [element]);
+  }, [data]);
 
   return (
     <Drawer
@@ -67,10 +70,12 @@ export const ScrapedFieldDrawer = ({
       onClose={toggleDrawer}
       visible={isDrawerOpen}
     >
-      <h2>{element.label}</h2>
+      <h2>{data.label}</h2>
       <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
-        <CSSSelector selector={selector} pageUrl={configProvider.getConfig()?.pageUrl} onConfigured={onConfigured} onError={onError} />
 
+        {spider.sampleURLs && spider.sampleURLs.length > 0 &&
+          <CSSSelector data={data} sampleUrl={spider.sampleURLs[0]} onConfigured={onConfigured} onError={onError} />
+        }
 
         {isConfigured &&
           <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>

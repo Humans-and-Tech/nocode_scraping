@@ -1,25 +1,24 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
     Space,
     Input,
     Spin,
     Button
 } from "antd";
-
+import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
-import { ScrapingConfig } from '../../interfaces'
-import { useTranslation } from "react-i18next";
-
-import { ScrapingContext, ScrapingConfigProvider } from '../../ConfigurationContext';
 import { SocketContext } from "../../socket";
-import { getConfig } from '../../socket/events'
+import { Spider } from '../../interfaces/spider'
+import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
+
 
 import "./SpiderConfig.scoped.css"
 
 
 interface SeachSpiderProps {
-    onLoaded: () => void;
+    onLoaded: (spider: Spider) => void;
+    onChange: (val: string) => void;
 }
 
 
@@ -27,13 +26,15 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
 
     const { t } = useTranslation("onboarding");
 
-    const { onLoaded } = props;
+    const { onLoaded, onChange } = props;
 
-    const configProvider = useContext<ScrapingConfigProvider>(ScrapingContext);
+    const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
+
+    const socket = useContext<Socket>(SocketContext);
 
     const [isProposalAccepted, setIsProposalAccepted] = useState<boolean | undefined>(undefined);
 
-    const [configProposal, setConfigProposal] = useState<ScrapingConfig | undefined>(undefined);
+    const [spiderProposal, setSpiderProposal] = useState<Spider | undefined>(undefined);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -41,11 +42,10 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
 
     const [nameStatus, setNameStatus] = useState<'' | 'error'>('');
 
-    const socket = useContext<Socket>(SocketContext);
-
     const changeName = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 
         const val = e.target.value;
+
         if (val == '') {
             setNameStatus('error');
         } else {
@@ -53,48 +53,33 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
         }
 
         setIsProposalAccepted(false);
-        setConfigProposal(undefined);
         setIsLoading(true);
         setName(e.target.value);
 
-        const config = configProvider.getConfig();
-        config.websiteConfig.name = val;
-        configProvider.setConfig(config);
+        if (val !== '') {
+            spiderProvider.get(socket, val, (data: Spider | undefined) => {
+                if (data !== null && data !== undefined) {
+                    setSpiderProposal(data);
+                }
+            });
 
-        // load the config if existing
-        getConfig(socket, val, (data: ScrapingConfig | undefined) => {
-            setIsLoading(false);
-            if (data !== undefined) {
-                setConfigProposal(data);
-            }
-        });
+        }
 
-        // callback the parent 
-        // so that it is warned of the change
-        onLoaded();
+        setIsLoading(false);
+
+        // transmit the user input
+        // to the parent component
+        onChange(val);
+
     };
 
-
     const selectProposal = () => {
-        if (configProposal !== undefined) {
-            configProvider.setConfig(configProposal);
+        if (spiderProposal !== undefined) {
             setIsProposalAccepted(true);
-            setConfigProposal(undefined);
-            onLoaded();
+            onLoaded(spiderProposal);
         }
     }
 
-
-    /**
-     * pre-fill the config fields
-     * but never update them in the useEffect
-     * otherwise you'll have weird behaviours
-     * prefer to udpate the config directly when changing the input values
-     */
-    useEffect(() => {
-        const config = configProvider.getConfig();
-        setName(config?.websiteConfig?.name);
-    }, [configProvider]);
 
     return (
 
@@ -102,7 +87,7 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
 
             <h2>
                 {isProposalAccepted
-                    ? t('configure.edit_config_title', { 'name': configProvider.getConfig().websiteConfig.name })
+                    ? t('configure.edit_config_title', { 'name': spiderProposal?.name })
                     : t('configure.name_input_title')
                 }
             </h2>
@@ -120,7 +105,7 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
             }
 
             {
-                configProposal &&
+                spiderProposal &&
                 <Space direction="vertical" size="middle">
                     {t('configure.proposal')}
                     <Button size='large' onClick={selectProposal}>{t('configure.select_proposal')}</Button>

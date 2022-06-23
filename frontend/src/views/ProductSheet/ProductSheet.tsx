@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Row,
   Col,
@@ -17,10 +17,13 @@ import {
 } from "@ant-design/icons";
 import { FiPackage } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import { Socket } from "socket.io-client";
 
+import { Data, Spider } from "../../interfaces/spider";
+import { ISpiderProvider, ScrapingContext } from '../../ConfigurationContext';
+import { ScrapedFieldDrawer } from "../../components/Data/ScrapedFieldDrawer";
 import { SocketContext } from "../../socket";
-import { ScrapingElement } from "../../interfaces";
-import { ScrapedFieldDrawer } from "../../components/ScrapedFieldConfig/ScrapedFieldDrawer";
 
 import "../../style.css";
 
@@ -28,17 +31,23 @@ import "../../style.css";
 const ProductSheet: React.FC = () => {
   const { t } = useTranslation("product_sheet");
 
-  const socket = useContext(SocketContext);
+  const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
 
-  const [element, setElement] = useState<ScrapingElement | undefined>(
+  const socket = useContext<Socket>(SocketContext);
+
+  const [spider, setSpider] = useState<Spider | undefined>(undefined);
+
+  const { name } = useParams();
+
+  const [element, setElement] = useState<Data | undefined>(
     undefined
   );
 
-  const showConfigurator = (element: ScrapingElement): void => {
+  const showConfigurator = (element: Data): void => {
     setElement(element);
   };
 
-  const priceElements: Array<ScrapingElement> = [
+  const priceElements: Array<Data> = [
     {
       name: "price.discount",
       label: t("product.price.discount"),
@@ -57,9 +66,26 @@ const ProductSheet: React.FC = () => {
     },
   ];
 
+  /**
+   * initialize the page url
+   * with the config
+   */
+  useEffect(() => {
+
+    if (name !== undefined) {
+      spiderProvider.get(socket, name, (spider: Spider | undefined) => {
+        if (spider !== null && spider !== undefined) {
+          setSpider(spider);
+        }
+      });
+    }
+
+  }, [spiderProvider, name]);
+
+
   return (
     <>
-      {element && <ScrapedFieldDrawer element={element} />}
+      {element && spider && <ScrapedFieldDrawer data={element} spider={spider} />}
       <Space
         size={["large", 0]}
         direction="vertical"
@@ -148,7 +174,7 @@ const ProductSheet: React.FC = () => {
                       }
                       bordered
                       dataSource={priceElements}
-                      renderItem={(item: ScrapingElement) => (
+                      renderItem={(item: Data) => (
                         <List.Item
                           key={item.name}
                           className="gus-scraping-element"
