@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../tests/i18n';
@@ -11,6 +11,7 @@ import MockedSocket from 'socket.io-mock';
 import { evaluate } from '../../socket/events';
 import { CSSSelector } from './CSSelector'
 import { SocketContext } from '../../socket'
+
 
 /**
  * mock socketio
@@ -26,17 +27,31 @@ jest.mock('socket.io-client');
  * so that it returns a correct ScrapingResponse
  */
 jest.mock('../../socket/events', () => ({
-    evaluate: (socket, selector, callback) => callback({
-        content: 'youhou'
-    })
+    // selector is a selector object
+    evaluate: (socket, selector, callback) => {
+        const pathToContent = {
+            '.a-good-selector': 'yeah baby',
+            '.a-bad-selector': undefined // the content scraped by a bad selector
+        };
+        const pathToScreenshot = {
+            // just for testing, this is a blank image
+            '.a-good-selector': 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',
+            '.a-bad-selector': '' // the content scraped by a bad selector
+        };
+        return callback({
+            content: pathToContent[selector.path],
+            screenshot: pathToScreenshot[selector.path]
+        });
+    }
 }));
 
+
 const onConfigured = (selector) => {
-    console.log('onConfigured called with param', selector);
+    // console.debug('onConfigured called with param', selector);
 };
 
 const onError = () => {
-    console.log('onError called');
+    // console.debug('onError called');
 };
 
 const testSelector = {
@@ -177,7 +192,6 @@ describe('Test the action buttons', () => {
         const input = getByTestId('selectorPathInput');
 
         fireEvent.change(input, { target: { value: '.a-selector' } });
-        console.log('act done');
 
         // refetch the button
         // and check that it appeared in the document
@@ -188,7 +202,7 @@ describe('Test the action buttons', () => {
 
 });
 
-describe('Test the callbacks', () => {
+describe('onConfigured callback is called when evaluation is OK or bypassed', () => {
 
     let socket;
 
@@ -208,6 +222,7 @@ describe('Test the callbacks', () => {
         // the inner evaluateSelectorPath function
         const mockOnConfigured = jest.fn();
 
+
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
@@ -218,7 +233,7 @@ describe('Test the callbacks', () => {
 
         // simulate a user input 
         const input = getByTestId('selectorPathInput');
-        fireEvent.change(input, { target: { value: '.a-selector' } });
+        fireEvent.change(input, { target: { value: '.a-good-selector' } });
 
         // simulate click on the evaluate button 
         const btn = getByTestId('evaluate_btn');
@@ -245,7 +260,7 @@ describe('Test the callbacks', () => {
 
         // simulate a user input 
         const input = getByTestId('selectorPathInput');
-        fireEvent.change(input, { target: { value: '.a-selector' } });
+        fireEvent.change(input, { target: { value: '.a-bypassed-eval' } });
 
         // simulate a bypass of the evaluation
         const switchBtn = getByTestId('bypass_evaluation_switch');
@@ -254,14 +269,24 @@ describe('Test the callbacks', () => {
         expect(mockOnConfigured.mock.calls.length).toBe(1);
 
     });
+});
+
+
+describe('onError callback is called when evaluation is KO', () => {
+
+    let socket;
+
+
+    beforeEach(() => {
+        socket = new MockedSocket();
+        socketIOClient.mockReturnValue(socket);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
 
     test('onError callback is called when the evaluation status is not succesful', async () => {
-
-        evaluate.mockReturnValueOnce((socket, selector, callback) => callback({
-            // the content being undefined (or null works as well)
-            // we expect the onError callback to be called
-            content: undefined
-        }));
 
 
         // a dummy mock
@@ -279,7 +304,7 @@ describe('Test the callbacks', () => {
 
         // simulate a user input 
         const input = getByTestId('selectorPathInput');
-        fireEvent.change(input, { target: { value: '.a-selector' } });
+        fireEvent.change(input, { target: { value: '.a-bad-selector' } });
 
         // simulate click on the evaluate button 
         const btn = getByTestId('evaluate_btn');
@@ -306,7 +331,32 @@ describe('Test the screenshot display', () => {
 
     test('the screenshot is displayed only when available', async () => {
 
+        // simulate the call to a successfull evaluation
 
+        const { getByTestId, queryByTestId } = render(
+            <SocketContext.Provider value={socket}>
+                <I18nextProvider i18n={i18n}>
+                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                </I18nextProvider>
+            </SocketContext.Provider>
+        );
+
+        // simulate a user input 
+        const input = getByTestId('selectorPathInput');
+        fireEvent.change(input, { target: { value: '.a-good-selector' } });
+
+        // at the beginning the screenshot is not there
+        const img = queryByTestId('screenshot');
+        expect(img).toBeNull();
+
+        // simulate click on the evaluate button 
+        const btn = getByTestId('evaluate_btn');
+        fireEvent.click(btn);
+
+        // now the screenshot should be displayed
+        // refetch it and check it's there
+        const img2 = queryByTestId('screenshot');
+        expect(img2).toBeInTheDocument();
 
     });
 

@@ -108,6 +108,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
     ) => {
         const val = e.target.value;
         setPath(val);
+
         if (val !== undefined && val !== '') {
             setIsCheckEnabled(true);
         }
@@ -116,10 +117,6 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         if (p?.url !== undefined && p.url !== '') {
             setIsEvaluationEnabled(true);
         }
-
-        console.log("val", val);
-        console.log("path", path);
-        console.log("evaluationStatus", evaluationStatus);
     };
 
 
@@ -143,7 +140,6 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         }
 
         if (p?.url !== undefined && p.url !== '') {
-            console.log('enabling evaluation');
             setIsEvaluationEnabled(true);
         }
         setNewSelector(p);
@@ -165,7 +161,6 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 if (isValid) {
                     setIsSelectorPathValid(true);
                 } else {
-                    console.log('notify the user, selector is not valid');
                     setIsSelectorPathValid(false);
                 }
             });
@@ -192,8 +187,12 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         const s = newSelector;
 
         if (s !== undefined) {
+            // for testing purpose
+            // re-assign the path which might not be up-to-date
+            // when calling the evaluateSelectorPath after calling the onChange
+            // because onChange calls setPath --> path might not be up-to-date
+            s.path = path
             evaluate(socket, s, (response: ScrapingResponse) => {
-                console.log('evaluate', response);
                 setEvaluation(response);
                 if (response.content === null || response.content === undefined) {
                     setEvaluationStatus('error');
@@ -264,12 +263,10 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         // meaning, when an evaluation has been done
         if (newSelector !== undefined) {
 
-            if (evaluationStatus == 'success') {
+            if (evaluationStatus == 'success' || isByPassEvaluation) {
                 onConfigured(newSelector);
             } else if (evaluationStatus == 'error') {
                 onError();
-            } else if (isByPassEvaluation) {
-                onConfigured(newSelector);
             }
         }
 
@@ -377,7 +374,9 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                                 width={'100%'}
                                 height={150}
                                 style={{ 'objectFit': 'cover', 'objectPosition': 'center top' }}
-                                src={evaluation.screenshot}></Image>
+                                src={evaluation.screenshot}
+                                data-testid="screenshot"
+                            ></Image>
                         </>
                     }
                 </Space>
