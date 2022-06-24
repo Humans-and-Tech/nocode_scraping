@@ -16,8 +16,10 @@
         "proxy_subtitle": "The configuration of the proxy is very depending on the proxy provider and on the scraping system.",
         "proxy_placeholder": "For scrapy for example, the proxy config is usually a JSON",
         "proposal": "We have found an existing spider with this name",
-        "select_proposal": "Select the existing spider",
-        "edit_config_title": "Editing the spider {{ name }}"
+        "proposal_spider": "{{ name }} ({{ type }})",
+        "edit_config_title": "Editing the spider {{ name }}",
+        "no_proposal_found": "No spider with this name could be found",
+        "create_spider": "Go on to create a new spider"
     },
     "page_type": {
         "product_sheet_image": "image of a product sheet",
@@ -38,6 +40,6 @@
     },
     "finished": {
         "start_scraping": "Congrats !",
-        "start_scraping_subtitle": "you can now start scraping data"
+        "start_scraping_subtitle": "Your spider {{ name }} has been create, you can now start scraping data"
     }
 }

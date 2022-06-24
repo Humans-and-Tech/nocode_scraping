@@ -3,7 +3,8 @@ import {
     Space,
     Input,
     Spin,
-    Button
+    Button,
+    Anchor
 } from "antd";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
@@ -15,10 +16,11 @@ import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
 
 import "./SpiderConfig.scoped.css"
 
+const { Link } = Anchor;
+
 
 interface SeachSpiderProps {
     onLoaded: (spider: Spider) => void;
-    onChange: (val: string) => void;
 }
 
 
@@ -26,7 +28,7 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
 
     const { t } = useTranslation("onboarding");
 
-    const { onLoaded, onChange } = props;
+    const { onLoaded } = props;
 
     const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
 
@@ -35,6 +37,8 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
     const [isProposalAccepted, setIsProposalAccepted] = useState<boolean | undefined>(undefined);
 
     const [spiderProposal, setSpiderProposal] = useState<Spider | undefined>(undefined);
+
+    const [isProposalFound, setIsProposalFound] = useState<boolean | undefined>(undefined);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -55,28 +59,36 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
         setIsProposalAccepted(false);
         setIsLoading(true);
         setName(e.target.value);
+        setSpiderProposal(undefined);
+        setIsProposalFound(undefined);
 
         if (val !== '') {
             spiderProvider.get(socket, val, (data: Spider | undefined) => {
+                setIsLoading(false);
                 if (data !== null && data !== undefined) {
+                    setIsProposalFound(true);
                     setSpiderProposal(data);
+                } else {
+                    setIsProposalFound(false);
                 }
             });
-
         }
-
-        setIsLoading(false);
-
-        // transmit the user input
-        // to the parent component
-        onChange(val);
-
     };
 
     const selectProposal = () => {
         if (spiderProposal !== undefined) {
             setIsProposalAccepted(true);
+
+            // transmit the user input
+            // to the parent component
             onLoaded(spiderProposal);
+        }
+    }
+
+    const createNewSpider = () => {
+        if (name !== '' && name !== undefined) {
+            const s = spiderProvider.create(socket, name);
+            onLoaded(s);
         }
     }
 
@@ -105,14 +117,25 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
             }
 
             {
-                spiderProposal &&
+                isProposalFound &&
                 <Space direction="vertical" size="middle">
                     {t('configure.proposal')}
-                    <Button size='large' onClick={selectProposal}>{t('configure.select_proposal')}</Button>
-
+                    <Anchor onClick={selectProposal}>
+                        <Link href="#" title={t('configure.proposal_spider', { name: spiderProposal?.name, type: spiderProposal?.pageType })}></Link>
+                    </Anchor>
                 </Space>
             }
-        </Space>
+
+            {
+                isProposalFound !== undefined && !isProposalFound &&
+                <Space direction="vertical" size="middle">
+                    <span>{t('configure.no_proposal_found')}</span>
+                    <Anchor onClick={createNewSpider}>
+                        <Link href="#" title={t('configure.create_spider')}></Link>
+                    </Anchor>
+                </Space>
+            }
+        </Space >
 
     );
 };

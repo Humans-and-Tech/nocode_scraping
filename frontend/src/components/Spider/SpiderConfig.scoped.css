@@ -1,0 +1,6 @@
+.card-selected {
+    font-size: medium;
+    color: var(--gus-green);
+    display: flex;
+    align-items: center;
+}
