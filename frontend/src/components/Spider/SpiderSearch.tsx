@@ -3,7 +3,6 @@ import {
     Space,
     Input,
     Spin,
-    Button,
     Anchor
 } from "antd";
 import { useTranslation } from "react-i18next";
@@ -24,7 +23,7 @@ interface SeachSpiderProps {
 }
 
 
-export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
+export const SpiderSearch = (props: SeachSpiderProps): JSX.Element => {
 
     const { t } = useTranslation("onboarding");
 
@@ -105,7 +104,7 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
             </h2>
             <em>{t('configure.name_input_subtitle')}</em>
 
-            <Input size="large" status={nameStatus} onChange={changeName} value={name} placeholder={t('configure.name_placeholder')} />
+            <Input size="large" status={nameStatus} onChange={changeName} value={name} placeholder={t('configure.name_placeholder')} data-testid="spiderSearchInput" />
             {nameStatus == 'error' && <em className="error">{t('configure.name_input_invalid')}</em>}
 
             {
@@ -119,7 +118,7 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
             {
                 isProposalFound &&
                 <Space direction="vertical" size="middle">
-                    {t('configure.proposal')}
+                    <span data-testid="spider-select-proposal">{t('configure.proposal')}</span>
                     <Anchor onClick={selectProposal}>
                         <Link href="#" title={t('configure.proposal_spider', { name: spiderProposal?.name, type: spiderProposal?.pageType })}></Link>
                     </Anchor>
@@ -129,7 +128,7 @@ export const SearchSpider = (props: SeachSpiderProps): JSX.Element => {
             {
                 isProposalFound !== undefined && !isProposalFound &&
                 <Space direction="vertical" size="middle">
-                    <span>{t('configure.no_proposal_found')}</span>
+                    <span data-testid="spider-no-proposal-found">{t('configure.no_proposal_found')}</span>
                     <Anchor onClick={createNewSpider}>
                         <Link href="#" title={t('configure.create_spider')}></Link>
                     </Anchor>

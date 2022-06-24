@@ -1,28 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import {
     Space,
     Steps,
     Result,
     Button,
-    Card,
-    Divider,
 } from "antd";
-
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { Socket } from "socket.io-client";
-
-import { PageType, Spider } from '../../interfaces/spider'
+import { PageType, Spider } from '../../interfaces/spider';
 import { useTranslation } from "react-i18next";
-import { SocketContext } from "../../socket";
-import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
-import { SearchSpider } from '../../components/Spider/SpiderSearch'
 
+
+import { SpiderSearch } from '../../components/Spider/SpiderSearch';
+import { SpiderPageType } from "../../components/Spider/SpiderPageType";
 
 import "../../style.css";
 import "./OnBoarding.scoped.css"
-import { SpiderPageType } from "../../components/Spider/SpiderPageType";
-
 
 const { Step } = Steps;
 
@@ -98,7 +90,7 @@ const OnBoarding: React.FC = () => {
                 {currentStep == 0 &&
                     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
 
-                        <SearchSpider onLoaded={onSpiderReceived} />
+                        <SpiderSearch onLoaded={onSpiderReceived} />
 
                         {spider &&
                             <Button type="primary" onClick={nextStep}>
