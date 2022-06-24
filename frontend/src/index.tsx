@@ -13,9 +13,8 @@ import ProductSheet from "./views/ProductSheet/ProductSheet";
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScraperLayout, OnBoardingLayout } from './Layout'
 import { ScrapingContext, SpiderProvider } from './ConfigurationContext'
-import { ConfigSidebar } from './components/Config/ConfigSidebar';
 import { t } from "i18next";
-import { SpiderSampleURL } from "./components/Spider/SpiderSampleURL";
+import { SpiderConfigSummary } from "./components/Config/SpiderConfigSummary";
 
 
 
@@ -51,9 +50,7 @@ root.render(
             element={
 
               <ScraperLayout header={
-                // TODO
-                // Trigger Sidebar only when clicking on 'configure sample URLs'
-                <SpiderSampleURL />
+                <SpiderConfigSummary />
               }>
                 <ProductSheet />
               </ScraperLayout>

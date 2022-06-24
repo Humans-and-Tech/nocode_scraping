@@ -34,30 +34,8 @@ export const ScraperLayout = ({ header, children }: { header: React.ReactNode, c
                 <p>{t("helper.content")}</p>
             </Header>
             <Layout>
-                <Sider theme="light">
-                    <Menu>
-                        <Menu.Item key="menu-change-config" className="gus-item">
-                            <div className="menu-title">
-                                <span>{t("menu.change_config")}</span>
-                            </div>
-                            <div>
-                                <em>{t("menu.change_config_desc")}</em>
-                            </div>
-                        </Menu.Item>
-                        <Menu.Item key="menu-change-layout" className="gus-item">
-                            <div className="menu-title">
-                                <span>{t("menu.change_layout")}</span>
-                            </div>
-                            <div>
-                                <em>{t("menu.change_layout_desc")}</em>
-                            </div>
-                        </Menu.Item>
-                    </Menu>
-                </Sider>
                 <Content className="gus-scraper-layout-content">
                     <Header className="gus-scraper-layout-content-header">
-                        <h2>{t("helper.page_url")}</h2>
-                        <p>{t("helper.page_url_desc")}</p>
                         {header}
                     </Header>
                     {children}

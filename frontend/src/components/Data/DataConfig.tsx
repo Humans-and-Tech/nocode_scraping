@@ -30,14 +30,7 @@ export const DataConfig = ({
 
   const socket = useContext<Socket>(SocketContext);
 
-  // const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-
   const [isConfigured, setIsConfigured] = useState<boolean>(false);
-
-
-  // const toggleDrawer = (): void => {
-  //   setIsDrawerOpen(!isDrawerOpen);
-  // };
 
   const onConfigured = (data: Data): void => {
     setIsConfigured(true);
@@ -51,23 +44,8 @@ export const DataConfig = ({
     setIsConfigured(false);
   };
 
-  /**
-   * the page URL is passed to the selector
-   * so that it can be evaluated
-   */
-  // useEffect(() => {
-  //   toggleDrawer();
-  // }, [data]);
 
   return (
-    // <Drawer
-    //   title={t("field.title")}
-    //   size="large"
-    //   placement="right"
-    //   closable={false}
-    //   onClose={toggleDrawer}
-    //   visible={isDrawerOpen}
-    // >
     <>
       <h2>{data.label}</h2>
       <Space direction="vertical" size="large" style={{ 'width': '100%' }}>

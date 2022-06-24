@@ -45,7 +45,7 @@ interface IDataSelectorConfigPropsType {
  * the onError is called
  * 
  * 
- * @param props IDataSelectorConfigPropsType
+ * @param props IDataSelectorPropsType
  * @returns JSX.Element
  */
 export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Element => {
@@ -167,7 +167,6 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
 
         if (data.selector !== undefined) {
             setIsLoading(true);
-            console.log('validateCssSelector', data.selector);
             validateCssSelector(socket, {}, data.selector, (isValid: boolean) => {
                 setIsLoading(false);
                 if (isValid) {
@@ -377,14 +376,6 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                 </Space>
             }
 
-            {
-                evaluationStatus !== 'success' && path !== undefined && path !== '' &&
-                <Space direction="horizontal" size="middle">
-                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} data-testid="bypass_evaluation_switch" />
-                    <h4>{t('field.evaluation.bypass_evaluation')}</h4>
-                </Space>
-            }
-
             {evaluation && evaluation !== null && evaluationStatus == 'success' && !isByPassEvaluation && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
@@ -412,7 +403,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                 </Space>
             )}
 
-            {evaluation && evaluation !== null && evaluationStatus == 'error' && !isByPassEvaluation && (
+            {evaluation && evaluation !== null && evaluationStatus == 'error' && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
@@ -420,6 +411,15 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                     </Space>
                 </Space>
             )}
+
+            {
+                evaluationStatus !== 'success' && path !== undefined && path !== '' &&
+                <Space direction="horizontal" size="middle">
+                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} data-testid="bypass_evaluation_switch" />
+                    <h4>{t('field.evaluation.bypass_evaluation')}</h4>
+                </Space>
+            }
+
 
         </Space>
 
