@@ -1,7 +1,7 @@
 import React from "react";
 import { Socket } from "socket.io-client";
 
-import { getSpider, saveSpider } from './socket/events'
+import { getSpider, saveSpider } from './socket/spider';
 import { Spider } from "./interfaces/spider";
 
 

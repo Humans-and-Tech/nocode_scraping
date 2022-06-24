@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from '../../socket';
-import { evaluate, validateCssSelector } from '../../socket/events';
+import { evaluate, validateCssSelector } from '../../socket/data';
 import { Data, DataSelector } from "../../interfaces/spider";
 import { ScrapingResponse } from "../../interfaces/events";
 
@@ -149,6 +149,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             setIsEvaluationEnabled(true);
         }
 
+        // should never occur but for TS compilation...
         if (data.selector === undefined) {
             data.selector = createSelector();
         }
@@ -194,18 +195,23 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
         // reset the evaluation status !
         setEvaluationStatus(undefined);
 
-        if (data.selector !== undefined && sampleUrl !== undefined) {
+        if (data.selector?.path !== undefined && data.selector?.path !== '' && sampleUrl !== undefined && sampleUrl.toString() !== '') {
             // for testing purpose
             // re-assign the path which might not be up-to-date
             // when calling the evaluateSelectorPath after calling the onChange
             // because onChange calls setPath --> path might not be up-to-date
             data.selector.path = path
+
             evaluate(socket, {}, data.selector, sampleUrl, cookiePopupPath, (response: ScrapingResponse) => {
                 setEvaluation(response);
                 if (response.content === null || response.content === undefined) {
                     setEvaluationStatus('error');
+                    // notify the parent
+                    onError();
                 } else {
                     setEvaluationStatus('success');
+                    // send the configuration to the parent
+                    onConfigured(data);
                 }
                 setIsLoading(false);
             })
@@ -237,6 +243,9 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
      */
     const byPassEvaluation = (checked: boolean): void => {
         setIsByPassEvaluation(checked);
+
+        // send the configuration to the parent
+        onConfigured(data);
     };
 
     /**
@@ -270,19 +279,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
             setIsCheckEnabled(true);
         }
 
-        // callback when evaluation is not undefined 
-        // meaning, when an evaluation has been done
-        if (data.selector !== undefined) {
-
-            if (evaluationStatus == 'success' || isByPassEvaluation) {
-                onConfigured(data);
-            } else if (evaluationStatus == 'error') {
-                onError();
-            }
-        }
-
-
-    }, [data, sampleUrl, path, evaluationStatus, isByPassEvaluation]);
+    }, [data, sampleUrl]);
 
     return (
 
@@ -308,7 +305,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
                 value={path}
                 data-testid="selectorPathInput"
                 data-name={data?.name}
-                data-selector-path={data.selector?.path}
+                data-selector-path={data.selector?.path || ''}
             />
 
             {

@@ -8,7 +8,7 @@ import socketIOClient from 'socket.io-client';
 import MockedSocket from 'socket.io-mock';
 
 
-import { evaluate } from '../../socket/events';
+import { evaluate } from '../../socket/data';
 import { CSSSelector } from './CSSelector'
 import { SocketContext } from '../../socket'
 
@@ -26,9 +26,11 @@ jest.mock('socket.io-client');
  * mock the evaluate function
  * so that it returns a correct ScrapingResponse
  */
-jest.mock('../../socket/events', () => ({
-    // selector is a selector object
-    evaluate: (socket, selector, callback) => {
+jest.mock('../../socket/data', () => ({
+
+    // callback would be a jest mock
+    // for example a simple jest.fn()
+    evaluate: (socket, { }, selector, url, cookiePopupPath, callback) => {
         const pathToContent = {
             '.a-good-selector': 'yeah baby',
             '.a-bad-selector': undefined // the content scraped by a bad selector
@@ -38,6 +40,8 @@ jest.mock('../../socket/events', () => ({
             '.a-good-selector': 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',
             '.a-bad-selector': '' // the content scraped by a bad selector
         };
+        // mock a ScrapingResponse object
+        // made up of content + screenshot 
         return callback({
             content: pathToContent[selector.path],
             screenshot: pathToScreenshot[selector.path]
@@ -54,18 +58,23 @@ const onError = () => {
     // console.debug('onError called');
 };
 
-const testSelector = {
-    element: {
-        'name': 'test-element',
+const testDataUndefinedSelector = {
+    name: 'test-data',
+};
+
+const testData = {
+    name: 'test-data',
+    selector: {
+        path: '.a-path'
     }
 };
 
 const undefinedSelector = undefined;
 
-const pageUrl = 'http://www.google.com';
+const sampleURL = new URL("https://developer.mozilla.org");
 
 
-describe('Test the component initiation', () => {
+describe('Component initiation', () => {
 
     let socket;
 
@@ -84,7 +93,7 @@ describe('Test the component initiation', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={undefinedSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                    <CSSSelector data={testDataUndefinedSelector} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -93,7 +102,9 @@ describe('Test the component initiation', () => {
         // and check the data-* attributes
         // which hold the states of the component
         const input = getByTestId('selectorPathInput');
-        expect(input).toHaveAttribute('data-selector-url', pageUrl);
+
+        // data-selector-path is initiated with '' when undefined
+        expect(input).toHaveAttribute('data-selector-path', '');
 
     });
 
@@ -102,7 +113,7 @@ describe('Test the component initiation', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -111,13 +122,13 @@ describe('Test the component initiation', () => {
         // and check the data-* attributes
         // which hold the states of the component
         const input = getByTestId('selectorPathInput');
-        expect(input).toHaveAttribute('data-selector-url', pageUrl);
-        expect(input).toHaveAttribute('data-selector-element-name', testSelector.element.name);
+        expect(input).toHaveAttribute('data-selector-path', testData.selector.path);
+        expect(input).toHaveAttribute('data-name', testData.name);
     });
 
 });
 
-describe('Test the action buttons', () => {
+describe('Action buttons', () => {
 
     let socket;
 
@@ -135,7 +146,7 @@ describe('Test the action buttons', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -156,7 +167,7 @@ describe('Test the action buttons', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -179,7 +190,7 @@ describe('Test the action buttons', () => {
         const { queryByTestId, getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -202,7 +213,7 @@ describe('Test the action buttons', () => {
 
 });
 
-describe('onConfigured callback is called when evaluation is OK or bypassed', () => {
+describe('Call to the onConfigured callback', () => {
 
     let socket;
 
@@ -226,7 +237,7 @@ describe('onConfigured callback is called when evaluation is OK or bypassed', ()
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={mockOnConfigured} onError={onError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={mockOnConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -253,7 +264,7 @@ describe('onConfigured callback is called when evaluation is OK or bypassed', ()
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={mockOnConfigured} onError={onError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={mockOnConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -272,7 +283,7 @@ describe('onConfigured callback is called when evaluation is OK or bypassed', ()
 });
 
 
-describe('onError callback is called when evaluation is KO', () => {
+describe('Call to the onError callback', () => {
 
     let socket;
 
@@ -297,7 +308,7 @@ describe('onError callback is called when evaluation is KO', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={mockOnError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={mockOnError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -316,7 +327,7 @@ describe('onError callback is called when evaluation is KO', () => {
 
 });
 
-describe('Test the screenshot display', () => {
+describe('Screenshot display', () => {
 
     let socket;
 
@@ -336,7 +347,7 @@ describe('Test the screenshot display', () => {
         const { getByTestId, queryByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector selector={testSelector} pageUrl={pageUrl} onConfigured={onConfigured} onError={onError} />
+                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
