@@ -17,8 +17,6 @@ import './Data.scoped.css';
 /**
  * Builds a UI to configure a Selector for the given scraping element
  * 
- * @param element: a ScrapingElement 
- * @returns 
  */
 export const DataConfig = ({
   data, spider
@@ -32,14 +30,14 @@ export const DataConfig = ({
 
   const socket = useContext<Socket>(SocketContext);
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  // const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   const [isConfigured, setIsConfigured] = useState<boolean>(false);
 
 
-  const toggleDrawer = (): void => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
+  // const toggleDrawer = (): void => {
+  //   setIsDrawerOpen(!isDrawerOpen);
+  // };
 
   const onConfigured = (data: Data): void => {
     setIsConfigured(true);
@@ -57,19 +55,20 @@ export const DataConfig = ({
    * the page URL is passed to the selector
    * so that it can be evaluated
    */
-  useEffect(() => {
-    toggleDrawer();
-  }, [data]);
+  // useEffect(() => {
+  //   toggleDrawer();
+  // }, [data]);
 
   return (
-    <Drawer
-      title={t("field.title")}
-      size="large"
-      placement="right"
-      closable={false}
-      onClose={toggleDrawer}
-      visible={isDrawerOpen}
-    >
+    // <Drawer
+    //   title={t("field.title")}
+    //   size="large"
+    //   placement="right"
+    //   closable={false}
+    //   onClose={toggleDrawer}
+    //   visible={isDrawerOpen}
+    // >
+    <>
       <h2>{data.label}</h2>
       <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
 
@@ -85,7 +84,8 @@ export const DataConfig = ({
           </Space>
         }
       </Space>
-    </Drawer>
+    </>
+
   );
 };
 

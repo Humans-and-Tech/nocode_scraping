@@ -13,7 +13,9 @@ import ProductSheet from "./views/ProductSheet/ProductSheet";
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScraperLayout, OnBoardingLayout } from './Layout'
 import { ScrapingContext, SpiderProvider } from './ConfigurationContext'
-import { SampleURL } from './components/Spider/SampleURL';
+import { ConfigSidebar } from './components/Config/ConfigSidebar';
+import { t } from "i18next";
+import { SpiderSampleURL } from "./components/Spider/SpiderSampleURL";
 
 
 
@@ -21,7 +23,6 @@ const rootElement = document.getElementById("root");
 // to prevent TS compilation error
 if (!rootElement) throw new Error("Failed to find the root element");
 const root = createRoot(rootElement);
-
 
 
 /**
@@ -50,7 +51,9 @@ root.render(
             element={
 
               <ScraperLayout header={
-                <SampleURL />
+                // TODO
+                // Trigger Sidebar only when clicking on 'configure sample URLs'
+                <SpiderSampleURL />
               }>
                 <ProductSheet />
               </ScraperLayout>

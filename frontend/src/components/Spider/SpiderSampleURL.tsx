@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { Input, Space } from "antd";
+import { Input, Space, Anchor } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
@@ -8,15 +8,28 @@ import isURL from 'validator/lib/isURL';
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from "../../socket";
+import { ConfigSidebar } from "../../components/Config/ConfigSidebar";
 import { Spider } from '../../interfaces/spider'
 import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext'
 import './SpiderConfig.scoped.css';
+import { t } from "i18next";
 
 
 const { TextArea } = Input;
 
+const { Link } = Anchor;
 
-export const SampleURL = (): JSX.Element => {
+enum DisplayMode {
+    VIEW = "view",
+    EDIT = "edit"
+}
+
+/**
+ * manages the sampleUrl prop of a spider
+ * 
+ * @returns 
+ */
+export const SpiderSampleURL = (): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
@@ -27,9 +40,16 @@ export const SampleURL = (): JSX.Element => {
     const socket = useContext<Socket>(SocketContext);
 
     const [spider, setSpider] = useState<Spider | undefined>(undefined);
-
     const [url, setUrl] = useState<URL | undefined>(undefined);
     const [status, setStatus] = useState<'error' | 'sucess' | undefined>(undefined);
+    const [mode, setMode] = useState<DisplayMode>(DisplayMode.VIEW);
+
+
+    const changeDisplayMode = (): void => (
+        (mode == DisplayMode.VIEW)
+            ? setMode(DisplayMode.EDIT)
+            : setMode(DisplayMode.VIEW)
+    );
 
     const changeUrl = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
 
@@ -52,39 +72,27 @@ export const SampleURL = (): JSX.Element => {
         }
     };
 
-
-    /**
-     * initialize the page url
-     * with the config
-     */
-    useEffect(() => {
-
-        if (name !== undefined) {
-            spiderProvider.get(socket, name, (data: Spider | undefined) => {
-                if (data !== null && data !== undefined) {
-                    setSpider(data);
-                }
-            });
-
-        }
-
-    }, [spiderProvider, name]);
+    const onConfigured = (p: Spider) => {
+        setSpider(p);
+    };
 
     return (
         <>
-            <TextArea rows={2} onChange={changeUrl} value={url?.toString()}></TextArea>
-            <em>
-                {
-                    status == 'error' &&
-                    <Space direction="horizontal" align="start" className="error"><CloseCircleOutlined /><span>{t('page_url.error')}</span></Space>
-                }
-                {
-                    status && status !== 'error' &&
-                    <Space direction="horizontal" align="start" className="success"><CheckCircleOutlined /><span>{t('page_url.success')}</span></Space>
-                }
-            </em>
+            {
+                (mode == DisplayMode.VIEW)
+                    ?
+                    <Space direction="vertical" size="middle">
+                        <span data-testid="sample-url-view-mode">{t('there are x sample urls')}{spider?.sampleURLs?.length}</span>
+                        <Anchor onClick={changeDisplayMode}>
+                            <Link href="#" title={t('toto')}></Link>
+                        </Anchor>
+                    </Space>
+                    :
+                    <ConfigSidebar onSpiderConfigured={onConfigured}>
+                        {t('edit sample urls')}
+                    </ConfigSidebar>
+            }
         </>
-
     );
 };
 

@@ -112,7 +112,6 @@ const OnBoarding: React.FC = () => {
                                 {t('action.next_step')}
                             </Button>
                         </Space>
-
                     </>
                 }
 

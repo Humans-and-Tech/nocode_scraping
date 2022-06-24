@@ -26,6 +26,7 @@ import { DataConfig } from "../../components/Data/DataConfig";
 import { SocketContext } from "../../socket";
 
 import "../../style.css";
+import { ConfigSidebar } from "../../components/Config/ConfigSidebar";
 
 
 const ProductSheet: React.FC = () => {
@@ -45,6 +46,7 @@ const ProductSheet: React.FC = () => {
 
   const showConfigurator = (element: Data): void => {
     setElement(element);
+
   };
 
   const priceElements: Array<Data> = [
@@ -85,7 +87,13 @@ const ProductSheet: React.FC = () => {
 
   return (
     <>
-      {element && spider && <DataConfig data={element} spider={spider} />}
+      {/* {element && spider && <DataConfig data={element} spider={spider} />} */}
+      {
+        element && spider &&
+        <ConfigSidebar>
+          <DataConfig data={element} spider={spider} />
+        </ConfigSidebar>
+      }
       <Space
         size={["large", 0]}
         direction="vertical"
