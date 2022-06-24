@@ -15,7 +15,7 @@ module.exports = () => {
      * @param selector 
      * @returns a promise of a ScrapingResponse : screenshot + content scraped
      */
-    const getContent = async (req: IScrapingRequest, cookieSelectorPath?: string): Promise<ScrapingResponse> => {
+    const getContent = async (req: IScrapingRequest, callback: (resp: ScrapingResponse) => void) => {
 
         if (req.selector === undefined || req.selector.path === undefined) {
             return Promise.reject({
@@ -24,6 +24,8 @@ module.exports = () => {
                 message: 'no path provided'
             });
         }
+
+        console.log("getContent called with params", req,)
 
         const browser = await webkit.launch();
         const context = await browser.newContext();
@@ -50,12 +52,12 @@ module.exports = () => {
 
             // eliminate the cookie pop-pup
             // if the path is provided, because it may disturb the screenshot capture
-            if (cookieSelectorPath !== undefined && cookieSelectorPath !== null && cookieSelectorPath !== '') {
-                console.log('Clicking on the cookie popup with', cookieSelectorPath);
+            if (req.cookie_path !== '') {
+                console.log('Clicking on the cookie popup with', req.cookie_path);
                 await page.click('span.didomi-continue-without-agreeing');
             }
 
-            await page.locator(req.selector.path).screenshot({ path: screenshotPath }); //, fullPage: true
+            await page.locator(req.selector.path).screenshot({ path: screenshotPath });
             imageAsBase64 = await readFile(screenshotPath, { encoding: 'base64' });
             // remove the screenshot file
             await unlink(screenshotPath);
@@ -67,12 +69,12 @@ module.exports = () => {
 
         try {
             const content = await page.locator(req.selector.path).textContent();
-            return Promise.resolve({
+            callback({
                 screenshot: `data:image/gif;base64,${imageAsBase64}`,
                 content: content
             });
         } catch (error) {
-            return Promise.reject({
+            callback({
                 screenshot: '',
                 content: null,
                 message: error
@@ -86,7 +88,7 @@ module.exports = () => {
      * @param selector 
      * @returns true|false
      */
-    const validateSelector = async (selector: DataSelector): Promise<boolean | null> => {
+    const validateSelector = async (selector: DataSelector, callback: (resp: boolean) => void) => {
 
         /**
          * create a blank rule {} 
@@ -94,8 +96,7 @@ module.exports = () => {
          * because the lib validates the rules; not only a selector
          */
         const result = await cssValidator.validateText(`${selector.path} {}`);
-        console.info(`validateSelector ${selector.path}`, result);
-        return Promise.resolve(result.valid);
+        return callback(result.valid);
     };
 
     return {

@@ -9,7 +9,7 @@ import MockedSocket from 'socket.io-mock';
 
 
 import { evaluate } from '../../socket/data';
-import { CSSSelector } from './CSSelector'
+import { DataSelectorConfig } from './DataSelectorConfig'
 import { SocketContext } from '../../socket'
 
 
@@ -93,7 +93,7 @@ describe('Component initiation', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testDataUndefinedSelector} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
+                    <DataSelectorConfig data={testDataUndefinedSelector} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -113,7 +113,7 @@ describe('Component initiation', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -146,7 +146,7 @@ describe('Action buttons', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -167,7 +167,7 @@ describe('Action buttons', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -190,7 +190,7 @@ describe('Action buttons', () => {
         const { queryByTestId, getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -237,7 +237,7 @@ describe('Call to the onConfigured callback', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={mockOnConfigured} onError={onError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={mockOnConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -264,7 +264,7 @@ describe('Call to the onConfigured callback', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={mockOnConfigured} onError={onError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={mockOnConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -308,7 +308,7 @@ describe('Call to the onError callback', () => {
         const { getByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={mockOnError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={mockOnError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );
@@ -347,7 +347,7 @@ describe('Screenshot display', () => {
         const { getByTestId, queryByTestId } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
-                    <CSSSelector data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
+                    <DataSelectorConfig data={testData} sampleUrl={sampleURL} onConfigured={onConfigured} onError={onError} />
                 </I18nextProvider>
             </SocketContext.Provider>
         );

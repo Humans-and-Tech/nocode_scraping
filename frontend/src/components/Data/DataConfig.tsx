@@ -8,10 +8,10 @@ import { SocketContext } from "../../socket";
 import { Data, Spider } from "../../interfaces/spider";
 import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext'
 
-import { CSSSelector } from "./CSSelector";
+import { DataSelectorConfig } from "./DataSelectorConfig";
 import { DataAlterators } from '../Alterators/DataAlterators'
 
-import './Scraping.scoped.css';
+import './Data.scoped.css';
 
 
 /**
@@ -20,7 +20,7 @@ import './Scraping.scoped.css';
  * @param element: a ScrapingElement 
  * @returns 
  */
-export const ScrapedFieldDrawer = ({
+export const DataConfig = ({
   data, spider
 }: {
   data: Data,
@@ -73,8 +73,9 @@ export const ScrapedFieldDrawer = ({
       <h2>{data.label}</h2>
       <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
 
-        {spider.sampleURLs && spider.sampleURLs.length > 0 &&
-          <CSSSelector data={data} sampleUrl={spider.sampleURLs[0]} onConfigured={onConfigured} onError={onError} />
+        {
+          //spider.sampleURLs && spider.sampleURLs.length > 0 &&
+          <DataSelectorConfig data={data} sampleUrl={new URL('https://www.manomano.fr/p/lot-de-2-mats-de-fixation-pour-voile-dombrage-h220-cm-poteaux-et-bases-acier-30197103')} onConfigured={onConfigured} onError={onError} />
         }
 
         {isConfigured &&

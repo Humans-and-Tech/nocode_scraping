@@ -22,7 +22,7 @@ import { Socket } from "socket.io-client";
 
 import { Data, Spider } from "../../interfaces/spider";
 import { ISpiderProvider, ScrapingContext } from '../../ConfigurationContext';
-import { ScrapedFieldDrawer } from "../../components/Data/ScrapedFieldDrawer";
+import { DataConfig } from "../../components/Data/DataConfig";
 import { SocketContext } from "../../socket";
 
 import "../../style.css";
@@ -85,7 +85,7 @@ const ProductSheet: React.FC = () => {
 
   return (
     <>
-      {element && spider && <ScrapedFieldDrawer data={element} spider={spider} />}
+      {element && spider && <DataConfig data={element} spider={spider} />}
       <Space
         size={["large", 0]}
         direction="vertical"

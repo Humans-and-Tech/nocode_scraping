@@ -10,7 +10,7 @@ import { Data, DataSelector } from "../../interfaces/spider";
 import { ScrapingResponse } from "../../interfaces/events";
 
 
-import './Scraping.scoped.css';
+import './Data.scoped.css';
 
 
 const { TextArea } = Input;
@@ -23,7 +23,7 @@ const createSelector = (): DataSelector => {
 };
 
 
-interface ICSSSelectorPropsType {
+interface IDataSelectorConfigPropsType {
     data: Data;
     onConfigured: (data: Data) => void;
     onError: () => void;
@@ -45,10 +45,10 @@ interface ICSSSelectorPropsType {
  * the onError is called
  * 
  * 
- * @param props ICSSSelectorPropsType
+ * @param props IDataSelectorConfigPropsType
  * @returns JSX.Element
  */
-export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
+export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
@@ -167,6 +167,7 @@ export const CSSSelector = (props: ICSSSelectorPropsType): JSX.Element => {
 
         if (data.selector !== undefined) {
             setIsLoading(true);
+            console.log('validateCssSelector', data.selector);
             validateCssSelector(socket, {}, data.selector, (isValid: boolean) => {
                 setIsLoading(false);
                 if (isValid) {
