@@ -52,7 +52,7 @@ export const DataConfig = ({
 
         {
           //spider.sampleURLs && spider.sampleURLs.length > 0 &&
-          <DataSelectorConfig data={data} sampleUrl={new URL('https://www.manomano.fr/p/lot-de-2-mats-de-fixation-pour-voile-dombrage-h220-cm-poteaux-et-bases-acier-30197103')} onConfigured={onConfigured} onError={onError} />
+          <DataSelectorConfig data={data} sampleUrl={new URL('https://www.manomano.fr/p/salon-de-jardin-en-imitation-resine-tressee-ensemble-de-4-meubles-livre-avec-accoudoirs-coussins-de-dossier-et-verre-32868538?model_id=32849419')} onConfigured={onConfigured} onError={onError} />
         }
 
         {isConfigured &&

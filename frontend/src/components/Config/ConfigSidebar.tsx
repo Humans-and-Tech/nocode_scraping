@@ -1,41 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import { Drawer } from "antd";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
-import { useLocation } from 'react-router-dom';
 
-import { Spider } from '../../interfaces/spider'
 import './Config.scoped.css';
+
+
+interface IConfigSidebarProps {
+    children: JSX.Element,
+    isVisible: boolean;
+    onClose: () => void;
+}
 
 
 /**
  * Provides access to the Spider Config from a Page layout
  * 
+ * the opening / closure of the sidebar is triggered externally
+ * by the isVisible function
+ * 
  */
-export const ConfigSidebar = ({ children, onSpiderConfigured }: { children: JSX.Element, onSpiderConfigured?: (p: Spider) => void }): JSX.Element => {
+export const ConfigSidebar = ({ children, isVisible, onClose }: IConfigSidebarProps): JSX.Element => {
 
     const { t } = useTranslation("configurator");
-
-    const location = useLocation();
-
-    const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-
-    // const [currentLocation, setCurrentLocation] = useState<string | undefined>(undefined);
-
-    const toggleDrawer = (): void => {
-        setIsDrawerOpen(!isDrawerOpen);
-    };
-
-
-    /**
-     * the page URL is passed to the selector
-     * so that it can be evaluated
-     */
-    useEffect(() => {
-        console.log('location', location);
-        toggleDrawer();
-
-    }, [location]);
 
     return (
         <Drawer
@@ -43,8 +29,8 @@ export const ConfigSidebar = ({ children, onSpiderConfigured }: { children: JSX.
             size="large"
             placement="right"
             closable={false}
-            onClose={toggleDrawer}
-            visible={isDrawerOpen}
+            onClose={onClose}
+            visible={isVisible}
         >
             {children}
 

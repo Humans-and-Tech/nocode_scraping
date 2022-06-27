@@ -88,9 +88,10 @@ export const SpiderSampleURL = (): JSX.Element => {
                         </Anchor>
                     </Space>
                     :
-                    <ConfigSidebar onSpiderConfigured={onConfigured}>
-                        {t('edit sample urls')}
-                    </ConfigSidebar>
+                    // <ConfigSidebar >
+                    //     {t('edit sample urls')}
+                    // </ConfigSidebar>
+                    <>{t('todo')}</>
             }
         </>
     );

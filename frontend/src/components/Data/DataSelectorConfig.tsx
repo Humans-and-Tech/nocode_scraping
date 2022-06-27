@@ -7,7 +7,7 @@ import { Socket } from "socket.io-client";
 import { SocketContext } from '../../socket';
 import { evaluate, validateCssSelector } from '../../socket/data';
 import { Data, DataSelector } from "../../interfaces/spider";
-import { ScrapingResponse } from "../../interfaces/events";
+import { ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
 
 
 import './Data.scoped.css';
@@ -21,7 +21,6 @@ const createSelector = (): DataSelector => {
         path: undefined
     }
 };
-
 
 interface IDataSelectorConfigPropsType {
     data: Data;
@@ -99,7 +98,17 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
      */
     const [evaluation, setEvaluation] = useState<ScrapingResponse | undefined>(undefined);
 
+    /**
+     * the evaluationStatus reports the fact that the selector "works" or not
+     */
     const [evaluationStatus, setEvaluationStatus] = useState<'error' | 'success' | undefined>(undefined);
+
+    /**
+     * sometimes shit happen on the backend side
+     * we should be able to catch errors from the backend
+     * and do something with it
+     */
+    const [isBackendError, setIsBackendError] = useState<boolean>(false);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSelectorPathValid, setIsSelectorPathValid] = useState<boolean | undefined>(undefined);
@@ -138,7 +147,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
      * @param e an input event
      */
     const onSelectorBlur = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+        // e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
 
         if (path !== undefined && path !== '') {
@@ -163,7 +172,9 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
      * 
      * @param event a mouse click
      */
-    const checkSelectorValidity = (event: React.MouseEvent<HTMLButtonElement>): void => {
+    const checkSelectorValidity = (
+        // event: React.MouseEvent<HTMLButtonElement>
+    ): void => {
 
         if (data.selector !== undefined) {
             setIsLoading(true);
@@ -195,6 +206,12 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
         // reset the evaluation status !
         setEvaluationStatus(undefined);
 
+        // reset backend error
+        setIsBackendError(false);
+
+        // reset evaluation
+        setEvaluation(undefined);
+
         if (data.selector?.path !== undefined && data.selector?.path !== '' && sampleUrl !== undefined && sampleUrl.toString() !== '') {
             // for testing purpose
             // re-assign the path which might not be up-to-date
@@ -202,17 +219,37 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
             // because onChange calls setPath --> path might not be up-to-date
             data.selector.path = path
 
-            evaluate(socket, {}, data.selector, sampleUrl, cookiePopupPath, (response: ScrapingResponse) => {
-                setEvaluation(response);
-                if (response.content === null || response.content === undefined) {
-                    setEvaluationStatus('error');
-                    // notify the parent
-                    onError();
-                } else {
+            // don't pass the cookiePopupPath if the switch button is not activated
+            const _cookiePpp = (isCookiePopupPath ? cookiePopupPath : '');
+
+            evaluate(socket, {}, data.selector, sampleUrl, _cookiePpp, (response: ScrapingResponse) => {
+
+                // check the response status
+                if (response.status == ScrapingStatus.SUCCESS) {
+
+                    setEvaluation(response);
+
                     setEvaluationStatus('success');
                     // send the configuration to the parent
                     onConfigured(data);
+
+                } else if (response.status == ScrapingStatus.NO_CONTENT) {
+
+                    setEvaluation(response);
+
+                    // this is a functional error
+                    // meaning that the selector returns nothing
+                    setEvaluationStatus('error');
+                    // notify the parent
+                    onError();
+
+                } else {
+                    // there has been a technical error
+                    // on the backend side
+                    // notify the user by a special message
+                    setIsBackendError(true);
                 }
+
                 setIsLoading(false);
             })
         }
@@ -297,6 +334,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                     <span data-testid="no_url">{t('field.evaluation.no_url')}</span>
                 </Space>
             }
+            <span>{t('field.selector.intro')}</span>
             <TextArea
                 rows={4}
                 placeholder={t("field.selector.input_placeholder")}
@@ -315,13 +353,16 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                         <h4><a id="switch-cookie-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
                     </Space>
                     {isCookiePopupPath &&
-                        <TextArea
-                            rows={4}
-                            placeholder={t("field.evaluation.input_cookie_popup_placeholder")}
-                            value={cookiePopupPath}
-                            onBlur={onCookiePopupBlur}
-                            onChange={onCookiePopupChange}
-                        />
+                        <>
+                            <span>{t('field.evaluation.cookie_popup_path_intro')}</span>
+                            <TextArea
+                                rows={4}
+                                placeholder={t("field.evaluation.input_cookie_popup_placeholder")}
+                                value={cookiePopupPath}
+                                onBlur={onCookiePopupBlur}
+                                onChange={onCookiePopupChange}
+                            />
+                        </>
                     }
                 </Space>
             }
@@ -408,6 +449,15 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
                         <span>{t("field.evaluation.failure", { value: evaluation.content })}</span>
+                    </Space>
+                </Space>
+            )}
+
+            {isBackendError && (
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                    <Space direction="horizontal">
+                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                        <span>{t("field.evaluation.backend_error")}</span>
                     </Space>
                 </Space>
             )}

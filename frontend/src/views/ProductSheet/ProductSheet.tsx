@@ -38,16 +38,22 @@ const ProductSheet: React.FC = () => {
 
   const [spider, setSpider] = useState<Spider | undefined>(undefined);
 
+  const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
+
   const { name } = useParams();
 
   const [element, setElement] = useState<Data | undefined>(
     undefined
   );
 
-  const showConfigurator = (element: Data): void => {
+  const showSideBar = (element: Data): void => {
     setElement(element);
-
+    setIsSideBarOpen(true);
   };
+
+  const closeSideBar = (): void => {
+    setIsSideBarOpen(false);
+  }
 
   const priceElements: Array<Data> = [
     {
@@ -67,6 +73,7 @@ const ProductSheet: React.FC = () => {
       label: t("product.price.currency"),
     },
   ];
+
 
   /**
    * initialize the page url
@@ -90,7 +97,7 @@ const ProductSheet: React.FC = () => {
       {/* {element && spider && <DataConfig data={element} spider={spider} />} */}
       {
         element && spider &&
-        <ConfigSidebar>
+        <ConfigSidebar isVisible={isSideBarOpen} onClose={closeSideBar}>
           <DataConfig data={element} spider={spider} />
         </ConfigSidebar>
       }
@@ -187,7 +194,7 @@ const ProductSheet: React.FC = () => {
                           key={item.name}
                           className="gus-scraping-element"
                           onClick={() => {
-                            showConfigurator(item);
+                            showSideBar(item);
                           }}
                         >
                           <Tooltip

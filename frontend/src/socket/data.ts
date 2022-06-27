@@ -14,6 +14,7 @@ export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: U
         'url': url,
         'cookie_path': cookiePopupPath
     }
+    console.log('evaluate for url', url);
     _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse) => {
         callback(response);
     });

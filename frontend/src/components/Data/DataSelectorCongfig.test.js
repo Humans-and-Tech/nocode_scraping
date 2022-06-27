@@ -162,6 +162,18 @@ describe('Action buttons', () => {
 
     });
 
+    test('the cookie popup path is passed when the sitch button is activated', async () => {
+
+
+
+    });
+
+    test('the cookie popup path is not passed when the sitch button is deactivated, even if the path is set', async () => {
+
+
+
+    });
+
     test('CSS validity check is enabled when the CSS path is not blank', async () => {
 
         const { getByTestId } = render(
@@ -213,6 +225,7 @@ describe('Action buttons', () => {
 
 });
 
+
 describe('Call to the onConfigured callback', () => {
 
     let socket;
@@ -226,6 +239,9 @@ describe('Call to the onConfigured callback', () => {
         jest.restoreAllMocks();
     });
 
+    // TODO
+    // what means successful ?
+    // assert ScrapingStatus.SUCCESS
     test('onConfigured callback is called when the evaluation status is successful', async () => {
 
         // a dummy mock
@@ -280,6 +296,7 @@ describe('Call to the onConfigured callback', () => {
         expect(mockOnConfigured.mock.calls.length).toBe(1);
 
     });
+
 });
 
 
@@ -297,6 +314,8 @@ describe('Call to the onError callback', () => {
         jest.restoreAllMocks();
     });
 
+    // TODO
+    // assert ScrapingStatus.NO_CONTENT
     test('onError callback is called when the evaluation status is not succesful', async () => {
 
 
@@ -322,6 +341,31 @@ describe('Call to the onError callback', () => {
         fireEvent.click(btn);
 
         expect(mockOnError.mock.calls.length).toBe(1);
+
+    });
+
+});
+
+describe('Behaviour in case of backend technical error', () => {
+
+    let socket;
+
+
+    beforeEach(() => {
+        socket = new MockedSocket();
+        socketIOClient.mockReturnValue(socket);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    // TODO
+    // assert ScrapingStatus.ERROR
+    test('', async () => {
+
+
+
 
     });
 
