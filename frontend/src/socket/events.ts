@@ -1,8 +1,7 @@
 import { Socket } from "socket.io-client";
 import debounce from "lodash/debounce";
 
-import { Spider, DataSelector } from "../interfaces/spider";
-import { IScrapingRequest, ScrapingResponse } from "../interfaces/events";
+
 
 /**
  * debounces a user input before sending the data
