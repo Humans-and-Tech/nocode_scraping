@@ -3,7 +3,8 @@ import { DataSelector } from './spider'
 export enum ScrapingStatus {
     SUCCESS = 'success',
     NO_CONTENT = 'no_content', // there is no error, but no content could be scraped 
-    ERROR = 'error'
+    ERROR = 'error',
+    NO_POPUP = "no_popup"       // the cookie popup was not found
 }
 
 export interface IScrapingRequest {
