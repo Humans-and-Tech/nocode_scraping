@@ -9,53 +9,17 @@ import { DataSelector } from '../interfaces/spider';
 import { ScrapingResponse, IScrapingRequest, ScrapingStatus, ScrapingError } from '../interfaces/scraping';
 
 
-const clickPopup = async (page: playwright.Page, selector: DataSelector): Promise<void> => {
-
-    if (selector.path !== undefined) {
-
-        // eliminate the cookie pop-pup
-        // if the path is provided, because it may disturb the screenshot capture
-        try {
-            const isSelectorValid = await validateSelector(selector);
-            if (!isSelectorValid) {
-                return Promise.reject(`invalid selector ${selector} provided`);
-            }
-        } catch (err) {
-            return Promise.reject(`invalid selector, ${err}`);
-        }
-
-        // an error when clicking on the cookie pop up
-        // should have no impact on the selection of the data
-        // the cookie pop up selector may not be good
-        // or the pop-up may not appear
-        try {
-
-            await page.click(selector.path);
-            await page.waitForTimeout(500);
-
-        } catch (cookiePpErr) {
-
-            if (cookiePpErr instanceof playwright.errors.TimeoutError) {
-
-                return Promise.reject(`the selector ${selector.path} could not be found`);
-
-            } else {
-
-                return Promise.reject(`error ${cookiePpErr} when clicking on ${selector.path}`);
-            }
-        }
-    }
-};
-
-
 /**
+ * validates a selector path, based on its language
  * 
- * @param selector 
- * @returns true|false
+ * If not provided, the default language is 'css'
+ * 
+ * @param selector (DataSelector)
+ * @returns a promise of a boolean 
  */
 export const validateSelector = async (selector: DataSelector): Promise<boolean> => {
 
-    if (selector.language !== 'css') {
+    if (selector.language !== 'css' && selector.language !== undefined) {
         return Promise.reject(`Unsupported language ${selector.language}, only CSS is currently supported`);
     }
 
@@ -78,10 +42,15 @@ export const validateSelector = async (selector: DataSelector): Promise<boolean>
  */
 export const getContent = async (req: IScrapingRequest): Promise<ScrapingResponse> => {
 
+    // should never occur in reality
+    // but required for TS compilation 
     if (req.selector === undefined || req.selector.path === undefined) {
         return Promise.reject({
             message: 'no selector provided',
-            status: ScrapingStatus.ERROR
+            status: ScrapingStatus.ERROR,
+            selector: {
+                path: undefined
+            }
         } as ScrapingError);
     }
 
@@ -91,14 +60,36 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         if (!isSelectorValid) {
             return Promise.reject({
                 message: `invalid selector ${req.selector} provided`,
-                status: ScrapingStatus.ERROR
+                status: ScrapingStatus.ERROR,
+                selector: req.selector
             } as ScrapingError);
         }
     } catch (err) {
         return Promise.reject({
             message: `invalid selector, ${err}`,
-            status: ScrapingStatus.ERROR
+            status: ScrapingStatus.ERROR,
+            selector: req.selector
         } as ScrapingError);
+    }
+
+    if (req.popupSelector !== undefined) {
+        try {
+
+            const isSelectorValid = await validateSelector(req.popupSelector);
+            if (!isSelectorValid) {
+                return Promise.reject({
+                    message: `invalid selector ${req.popupSelector.path} provided`,
+                    status: ScrapingStatus.ERROR,
+                    selector: req.popupSelector
+                } as ScrapingError);
+            }
+        } catch (err) {
+            return Promise.reject({
+                message: `invalid selector, ${err}`,
+                status: ScrapingStatus.ERROR,
+                selector: req.popupSelector
+            } as ScrapingError);
+        }
     }
 
 
@@ -147,7 +138,8 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         } catch (error) {
             return Promise.reject({
                 message: error,
-                status: ScrapingStatus.ERROR
+                status: ScrapingStatus.ERROR,
+                selector: req.selector
             } as ScrapingError)
         }
 
@@ -157,14 +149,24 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         await page.waitForTimeout(500);
 
         // close popup if requested
-        if (req.popupClosureSelector !== undefined) {
+        if (req.popupSelector !== undefined && req.popupSelector.path !== undefined) {
             try {
-                await clickPopup(page, req.popupClosureSelector);
+                await page.click(req.popupSelector.path);
+                await page.waitForTimeout(500);
             } catch (err) {
-                return Promise.reject({
-                    message: err,
-                    status: ScrapingStatus.NO_POPUP
-                } as ScrapingError)
+                if (err instanceof playwright.errors.TimeoutError) {
+                    return Promise.reject({
+                        message: `the selector ${req.popupSelector.path} could not be found`,
+                        status: ScrapingStatus.NO_POPUP,
+                        selector: req.popupSelector
+                    } as ScrapingError);
+                } else {
+                    return Promise.reject({
+                        message: `error ${err} when scraping ${req.selector.path}`,
+                        status: ScrapingStatus.ERROR,
+                        selector: req.popupSelector
+                    } as ScrapingError);
+                }
             }
         }
 
@@ -192,7 +194,8 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         } else {
             return Promise.reject({
                 message: `no content found for selector ${req.selector.path}`,
-                status: ScrapingStatus.NO_CONTENT
+                status: ScrapingStatus.NO_CONTENT,
+                selector: req.selector
             } as ScrapingError);
         }
 
@@ -202,7 +205,8 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
 
             return Promise.reject({
                 message: `the selector ${req.selector.path} could not be found`,
-                status: ScrapingStatus.NO_CONTENT
+                status: ScrapingStatus.NO_CONTENT,
+                selector: req.selector
             } as ScrapingError);
 
         } else {
@@ -223,8 +227,9 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
             }
 
             return Promise.reject({
-                message: `error ${error} when clicking on ${req.selector.path}`,
-                status: ScrapingStatus.ERROR
+                message: `error ${error} when scraping ${req.selector.path}`,
+                status: ScrapingStatus.ERROR,
+                selector: req.selector
             } as ScrapingError);
         }
 

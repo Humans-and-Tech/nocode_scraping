@@ -1,4 +1,4 @@
-import { DataSelector } from './spider';
+import { Data, DataSelector } from './spider';
 
 export enum ScrapingStatus {
     SUCCESS = 'success',
@@ -10,7 +10,7 @@ export enum ScrapingStatus {
 export interface IScrapingRequest {
     selector: DataSelector;
     url: URL;
-    cookie_path?: string;
+    popupSelector?: DataSelector;
 }
 
 
@@ -19,5 +19,6 @@ export interface ScrapingResponse {
     content: string | null;
     message?: unknown;
     status: ScrapingStatus;
+    selector: DataSelector;
 }
 

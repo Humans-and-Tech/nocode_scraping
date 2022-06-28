@@ -1,8 +1,8 @@
 
 import { DocumentData, DocumentSnapshot } from '@google-cloud/firestore';
 
-import { Spider } from '../../interfaces/spider';
-import { firestore, upsert, isFireStoreError } from '../../database'
+import { Spider } from '../interfaces/spider';
+import { firestore, upsert, isFireStoreError } from '../database';
 
 
 module.exports = () => {

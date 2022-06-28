@@ -16,8 +16,8 @@ const io = new Server(server, {
   }
 });
 
-const { scrapeContent, isSelectorValid } = require("./socket/scraping")(io);
-const { getSpider, updateSpider } = require("./socket/spiders")(io);
+const { scrapeContent, isSelectorValid } = require('./socket/scraping')(io);
+const { getSpider, updateSpider } = require("./socket/spider")(io);
 
 
 /**

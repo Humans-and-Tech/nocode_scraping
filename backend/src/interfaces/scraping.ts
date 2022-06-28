@@ -12,12 +12,14 @@ export interface ScrapingResponse {
     content?: string;
     message?: string;
     status: ScrapingStatus;
+    selector?: DataSelector;
 }
 
 
 export interface ScrapingError extends ScrapingResponse {
     message: string;
     status: ScrapingStatus.ERROR | ScrapingStatus.NO_CONTENT | ScrapingStatus.NO_POPUP;
+    selector: DataSelector
 }
 
 export interface IScrapingRequest {
@@ -25,10 +27,10 @@ export interface IScrapingRequest {
     // although sent as type URL
     // the URL arrives stringified
     url: string;
-    // a CSS path to close a popup
+    // a selector to close a popup
     // before scraping a content
     // in particular cookie pop-ups are a pain 
     // and disturb when taking screenshots
-    popupClosureSelector?: DataSelector;
+    popupSelector?: DataSelector;
     useCache?: boolean;
 }

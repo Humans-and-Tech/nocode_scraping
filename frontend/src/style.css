@@ -8,10 +8,18 @@
   --gus-red: red;
   --gus-green: green;
   --gus-broken-white: beige;
+  --gus-code: #f7af3d;
+
 }
 
 p {
   line-height: normal;
+}
+
+code {
+  background-color: var(--gus-code);
+  padding: 0.2em;
+  font-size: small;
 }
 
 li[role="menuitem"].gus-item {

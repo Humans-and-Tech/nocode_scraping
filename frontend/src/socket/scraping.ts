@@ -8,14 +8,14 @@ import { IScrapingRequest, ScrapingResponse } from "../interfaces/events";
  * fetches the content of the css selector and provides it back to the callback function
  * 
  */
-export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: URL, cookiePopupPath: string | undefined, callback: (response: ScrapingResponse) => void) => {
+export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse) => void) => {
     const evaluateConfig: IScrapingRequest = {
         'selector': s,
         'url': url,
-        'cookie_path': cookiePopupPath
+        'popupSelector': popupSelector
     }
-    console.log('evaluate for url', url);
     _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse) => {
+        console.log('evaluate', response);
         callback(response);
     });
 };

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from '../../socket';
-import { evaluate, validateCssSelector } from '../../socket/data';
+import { evaluate, validateCssSelector } from '../../socket/scraping';
 import { Data, DataSelector } from "../../interfaces/spider";
 import { ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
 
@@ -101,7 +101,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
     /**
      * the evaluationStatus reports the fact that the selector "works" or not
      */
-    const [evaluationStatus, setEvaluationStatus] = useState<'error' | 'success' | undefined>(undefined);
+    const [evaluationStatus, setEvaluationStatus] = useState<ScrapingStatus | undefined>(undefined);
 
     /**
      * sometimes shit happen on the backend side
@@ -220,26 +220,21 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
             data.selector.path = path
 
             // don't pass the cookiePopupPath if the switch button is not activated
-            const _cookiePpp = (isCookiePopupPath ? cookiePopupPath : '');
+            const _cookiePpSelector = (isCookiePopupPath ? { path: cookiePopupPath } : undefined);
 
-            evaluate(socket, {}, data.selector, sampleUrl, _cookiePpp, (response: ScrapingResponse) => {
+            evaluate(socket, {}, data.selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse) => {
+
+                setEvaluationStatus(response.status);
+                setEvaluation(response);
 
                 // check the response status
                 if (response.status == ScrapingStatus.SUCCESS) {
 
-                    setEvaluation(response);
-
-                    setEvaluationStatus('success');
                     // send the configuration to the parent
                     onConfigured(data);
 
-                } else if (response.status == ScrapingStatus.NO_CONTENT) {
+                } else if (response.status == ScrapingStatus.NO_POPUP || response.status == ScrapingStatus.NO_CONTENT) {
 
-                    setEvaluation(response);
-
-                    // this is a functional error
-                    // meaning that the selector returns nothing
-                    setEvaluationStatus('error');
                     // notify the parent
                     onError();
 
@@ -417,7 +412,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                 </Space>
             }
 
-            {evaluation && evaluation !== null && evaluationStatus == 'success' && !isByPassEvaluation && (
+            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.SUCCESS && !isByPassEvaluation && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CheckCircleOutlined className="success"></CheckCircleOutlined>
@@ -444,11 +439,42 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                 </Space>
             )}
 
-            {evaluation && evaluation !== null && evaluationStatus == 'error' && (
+            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.NO_CONTENT && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        <span>{t("field.evaluation.failure", { value: evaluation.content })}</span>
+                        {
+                            evaluation.selector !== undefined
+                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_content', { selector: evaluation.selector.path }) }}></span>
+                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
+                        }
+
+                    </Space>
+                </Space>
+            )}
+            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.ERROR && (
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                    <Space direction="horizontal">
+                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                        {
+                            evaluation.selector !== undefined
+                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.failure', { selector: evaluation.selector.path }) }}></span>
+                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
+                        }
+
+                    </Space>
+                </Space>
+            )}
+            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.NO_POPUP && (
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                    <Space direction="horizontal">
+                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                        {
+                            evaluation.selector !== undefined
+                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_popup', { selector: evaluation.selector.path }) }}></span>
+                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
+                        }
+
                     </Space>
                 </Space>
             )}
@@ -463,7 +489,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
             )}
 
             {
-                evaluationStatus !== 'success' && path !== undefined && path !== '' &&
+                evaluationStatus !== ScrapingStatus.SUCCESS && path !== undefined && path !== '' &&
                 <Space direction="horizontal" size="middle">
                     <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} data-testid="bypass_evaluation_switch" />
                     <h4>{t('field.evaluation.bypass_evaluation')}</h4>
