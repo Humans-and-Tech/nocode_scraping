@@ -32,5 +32,5 @@ export const validateCssSelector = (_socket: Socket, user: unknown, p: DataSelec
         _socket.emit('scraping:validate-css-selector', p, (isValid: boolean) => {
             callback(isValid);
         });
-    }, 500)();
+    }, 1000)();
 };

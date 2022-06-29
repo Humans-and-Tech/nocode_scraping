@@ -1,19 +1,18 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Input, Button, Space, Spin, Image, Switch } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { Space, Spin, Switch, Button } from "antd";
+import { CloseCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from '../../socket';
-import { evaluate, validateCssSelector } from '../../socket/scraping';
+import { evaluate } from '../../socket/scraping';
 import { Data, DataSelector } from "../../interfaces/spider";
 import { ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
+import { SelectorInput } from './SelectorInput'
 
 
 import './Data.scoped.css';
-
-
-const { TextArea } = Input;
+import { SelectorEvaluation } from "./SelectorEvaluation";
 
 
 const createSelector = (): DataSelector => {
@@ -55,42 +54,14 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
 
     const { data, onConfigured, onError, sampleUrl } = props;
 
-    // TODO:
-    // select the language(CSS, Xpath, jsonld, js)
-
-    /**
-     * the textare input path
-     * which will populate the selector object 
-     */
-    const [path, setPath] = useState<string>('');
-
     /**
      * optionnally, the user may want to configure
      * a CSS selector to click on a cookie pop-up and eliminate it
      * 
      * the cookie pop-up is just used to evaluate the selector 
      */
-    const [isCookiePopupPath, setIsCookiePopupPath] = useState<boolean>(false);
-    const [cookiePopupPath, setCookiePopupPath] = useState<string>('');
-
-    /**
-     * the newSelector changes state,
-     * It is initialized with the selector prop passed by the user
-     * it will be sent back by the component when calling the onConfigured prop
-     * 
-     * All evaluations that required the selector should use this newSelector state
-     * not the selector prop !
-     * 
-     */
-    // const [newSelector, setNewSelector] = useState<DataSelector | undefined>(undefined);
-
-    /**
-     * sometimes, for whatever reason, the evaluation fails
-     * but the user is sure of the validity of the selector
-     * 
-     * we offer a feature which enables to bypass the evaluation
-     */
-    const [isByPassEvaluation, setIsByPassEvaluation] = useState<boolean>(false);
+    const [isPopup, setIsPopup] = useState<boolean>(false);
+    const [popupSelector, setPopupSelector] = useState<DataSelector | undefined>(undefined);
 
     /**
      * the result of the CSS Selector evaluation on the URL (evalUrl)
@@ -101,7 +72,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
     /**
      * the evaluationStatus reports the fact that the selector "works" or not
      */
-    const [evaluationStatus, setEvaluationStatus] = useState<ScrapingStatus | undefined>(undefined);
+    // const [evaluationStatus, setEvaluationStatus] = useState<ScrapingStatus | undefined>(undefined);
 
     /**
      * sometimes shit happen on the backend side
@@ -111,82 +82,27 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
     const [isBackendError, setIsBackendError] = useState<boolean>(false);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isSelectorPathValid, setIsSelectorPathValid] = useState<boolean | undefined>(undefined);
 
     /**
      * action buttons enabled or not
      */
     const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
-    const [isCheckEnabled, setIsCheckEnabled] = useState<boolean>(false);
 
-    /**
-     * triggered when the CSS selector input changes value
-     * 
-     * @param e : an input event
-     */
-    const onSelectorChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        const val = e.target.value;
-        setPath(val);
 
-        if (val !== undefined && val !== '') {
-            setIsCheckEnabled(true);
-        }
+    const onDataSelectorChange = (s: DataSelector) => {
+        data.selector = s;
 
-        if (sampleUrl !== undefined && sampleUrl.toString() !== '') {
+        console.log("data.selector", s);
+
+        if (s.path !== undefined && s.path !== "" && sampleUrl !== undefined && sampleUrl.toString() !== '') {
             setIsEvaluationEnabled(true);
+        } else {
+            setIsEvaluationEnabled(false);
         }
     };
 
-
-    /**
-     * triggered when the CSS selector input is blurred
-     * (looses focus)
-     * 
-     * @param e an input event
-     */
-    const onSelectorBlur = (
-        // e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-
-        if (path !== undefined && path !== '') {
-            setIsCheckEnabled(true);
-        }
-
-        if (sampleUrl !== undefined && sampleUrl.toString() !== '') {
-            setIsEvaluationEnabled(true);
-        }
-
-        // should never occur but for TS compilation...
-        if (data.selector === undefined) {
-            data.selector = createSelector();
-        }
-        data.selector.path = path;
-    };
-
-
-    /**
-     * calls the backend to validate that the CSS selector
-     * is valid 
-     * 
-     * @param event a mouse click
-     */
-    const checkSelectorValidity = (
-        // event: React.MouseEvent<HTMLButtonElement>
-    ): void => {
-
-        if (data.selector !== undefined) {
-            setIsLoading(true);
-            validateCssSelector(socket, {}, data.selector, (isValid: boolean) => {
-                setIsLoading(false);
-                if (isValid) {
-                    setIsSelectorPathValid(true);
-                } else {
-                    setIsSelectorPathValid(false);
-                }
-            });
-        }
+    const onPopupSelectorChange = (s: DataSelector) => {
+        setPopupSelector(s);
     };
 
 
@@ -204,7 +120,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
         setIsLoading(true);
 
         // reset the evaluation status !
-        setEvaluationStatus(undefined);
+        // setEvaluationStatus(undefined);
 
         // reset backend error
         setIsBackendError(false);
@@ -212,19 +128,21 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
         // reset evaluation
         setEvaluation(undefined);
 
+        console.log("evaluating with", data.selector?.path);
+
         if (data.selector?.path !== undefined && data.selector?.path !== '' && sampleUrl !== undefined && sampleUrl.toString() !== '') {
             // for testing purpose
             // re-assign the path which might not be up-to-date
             // when calling the evaluateSelectorPath after calling the onChange
             // because onChange calls setPath --> path might not be up-to-date
-            data.selector.path = path
+            // data.selector.path = path
 
             // don't pass the cookiePopupPath if the switch button is not activated
-            const _cookiePpSelector = (isCookiePopupPath ? { path: cookiePopupPath } : undefined);
+            const _cookiePpSelector = (isPopup ? popupSelector : undefined);
 
             evaluate(socket, {}, data.selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse) => {
 
-                setEvaluationStatus(response.status);
+                // setEvaluationStatus(response.status);
                 setEvaluation(response);
 
                 // check the response status
@@ -252,33 +170,9 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
 
 
     const switchCookiePopupSelector = (): void => {
-        setIsCookiePopupPath(true);
+        setIsPopup(!isPopup);
     };
 
-    const onCookiePopupChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        setCookiePopupPath(e.target.value);
-    };
-
-    const onCookiePopupBlur = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        setCookiePopupPath(e.target.value);
-    };
-
-
-    /**
-     * triggered when the user clicks on the select switch
-     * 
-     * @param checked a boolean
-     */
-    const byPassEvaluation = (checked: boolean): void => {
-        setIsByPassEvaluation(checked);
-
-        // send the configuration to the parent
-        onConfigured(data);
-    };
 
     /**
      * initializes "newSelector" state if undefined
@@ -302,13 +196,13 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
             data.selector = createSelector();
         }
 
+        if (popupSelector === undefined) {
+            setPopupSelector(createSelector());
+        }
+
         // update the button states
         if (sampleUrl !== undefined && sampleUrl.toString() !== '' && data.selector?.path !== undefined && data.selector?.path !== '') {
             setIsEvaluationEnabled(true);
-        }
-
-        if (data.selector?.path !== undefined && data.selector?.path !== '') {
-            setIsCheckEnabled(true);
         }
 
     }, [data, sampleUrl]);
@@ -317,80 +211,35 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
 
         <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
-            {(data.selector?.path == undefined || data.selector?.path == '') &&
-                <Space direction="horizontal">
-                    <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                    <span data-testid="no_selector_path">{t('field.evaluation.no_selector_path')}</span>
-                </Space>
-            }
             {(sampleUrl == undefined || sampleUrl.toString() == '') &&
                 <Space direction="horizontal">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
                     <span data-testid="no_url">{t('field.evaluation.no_url')}</span>
                 </Space>
             }
+
             <span>{t('field.selector.intro')}</span>
-            <TextArea
-                rows={4}
-                placeholder={t("field.selector.input_placeholder")}
-                onBlur={onSelectorBlur}
-                onChange={onSelectorChange}
-                value={path}
-                data-testid="selectorPathInput"
-                data-name={data?.name}
-                data-selector-path={data.selector?.path || ''}
-            />
+            {
+                data.selector &&
+                <SelectorInput selector={data.selector} onChange={onDataSelectorChange} />
+            }
 
             {
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
-                        <Switch onChange={setIsCookiePopupPath} checked={isCookiePopupPath} />
+                        <Switch onChange={setIsPopup} checked={isPopup} />
                         <h4><a id="switch-cookie-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
                     </Space>
-                    {isCookiePopupPath &&
+                    {
+                        isPopup && popupSelector &&
                         <>
-                            <span>{t('field.evaluation.cookie_popup_path_intro')}</span>
-                            <TextArea
-                                rows={4}
-                                placeholder={t("field.evaluation.input_cookie_popup_placeholder")}
-                                value={cookiePopupPath}
-                                onBlur={onCookiePopupBlur}
-                                onChange={onCookiePopupChange}
-                            />
+                            <span>{t('field.selector.intro')}</span>
+                            <SelectorInput selector={popupSelector} onChange={onPopupSelectorChange} />
                         </>
                     }
                 </Space>
             }
 
-            {
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal" size="middle">
-
-                        <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluate_btn" >
-                            <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
-                        </Button>
-                        <Button onClick={checkSelectorValidity} disabled={!isCheckEnabled} data-testid="check_validity_btn" >
-                            <span data-testid="check_validity" >{t("field.action.check_selector_validity")}</span>
-                        </Button>
-                    </Space>
-                </Space>
-            }
-
-            {
-                isSelectorPathValid &&
-                <Space direction="horizontal">
-                    <CheckCircleOutlined className="success" />
-                    <span data-testid="css_path_valid" >{t("field.css.valid")}</span>
-                </Space>
-            }
-
-            {
-                isSelectorPathValid !== undefined && !isSelectorPathValid &&
-                <Space direction="horizontal">
-                    <CloseCircleOutlined className="error" />
-                    <span data-testid="css_path_invalid" >{t("field.css.invalid")}</span>
-                </Space>
-            }
 
             {
                 isLoading &&
@@ -412,72 +261,32 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                 </Space>
             }
 
-            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.SUCCESS && !isByPassEvaluation && (
+            {!isLoading &&
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal">
-                        <CheckCircleOutlined className="success"></CheckCircleOutlined>
-                        <span>{t("field.evaluation.result", { value: evaluation.content })}</span>
-                    </Space>
-                    {
-                        evaluation.screenshot !== undefined && evaluation.screenshot != '' &&
-                        <>
-                            <h4>{t('field.evaluation.screenshot')}</h4>
-                            <Image
-                                width={200}
-                                src={evaluation.screenshot}
-                                data-testid="screenshot"
-                            ></Image>
-                            <Space direction="horizontal">
-                                <QuestionCircleOutlined />
-                                <span>{t('field.evaluation.screenshot_helper')}</span>
-                                <a onClick={switchCookiePopupSelector} href="#switch-cookie-selector" title={t('field.evaluation.screenshot_helper_link_to_cookie_selector')}>
-                                    {t('field.evaluation.screenshot_helper_link_to_cookie_selector')}
-                                </a>
-                            </Space>
-                        </>
-                    }
-                </Space>
-            )}
-
-            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.NO_CONTENT && (
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal">
-                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        {
-                            evaluation.selector !== undefined
-                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_content', { selector: evaluation.selector.path }) }}></span>
-                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
-                        }
-
+                    <Space direction="horizontal" size="middle">
+                        <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluate_btn" >
+                            <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
+                        </Button>
                     </Space>
                 </Space>
-            )}
-            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.ERROR && (
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal">
-                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        {
-                            evaluation.selector !== undefined
-                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.failure', { selector: evaluation.selector.path }) }}></span>
-                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
-                        }
+            }
 
-                    </Space>
-                </Space>
-            )}
-            {evaluation && evaluation !== null && evaluationStatus == ScrapingStatus.NO_POPUP && (
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal">
-                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        {
-                            evaluation.selector !== undefined
-                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_popup', { selector: evaluation.selector.path }) }}></span>
-                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
-                        }
+            {
+                evaluation &&
+                <SelectorEvaluation evaluation={evaluation} />
+            }
 
-                    </Space>
+            {
+                evaluation &&
+                <Space direction="horizontal">
+                    <QuestionCircleOutlined />
+                    <span>{t('field.evaluation.screenshot_helper')}</span>
+                    <a onClick={switchCookiePopupSelector} href="#switch-cookie-selector" title={t('field.evaluation.screenshot_helper_link_to_cookie_selector')}>
+                        {t('field.evaluation.screenshot_helper_link_to_cookie_selector')}
+                    </a>
                 </Space>
-            )}
+            }
+
 
             {isBackendError && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
@@ -487,14 +296,6 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                     </Space>
                 </Space>
             )}
-
-            {
-                evaluationStatus !== ScrapingStatus.SUCCESS && path !== undefined && path !== '' &&
-                <Space direction="horizontal" size="middle">
-                    <Switch onChange={byPassEvaluation} checked={isByPassEvaluation} data-testid="bypass_evaluation_switch" />
-                    <h4>{t('field.evaluation.bypass_evaluation')}</h4>
-                </Space>
-            }
 
 
         </Space>

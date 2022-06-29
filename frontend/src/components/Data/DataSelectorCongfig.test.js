@@ -8,7 +8,7 @@ import socketIOClient from 'socket.io-client';
 import MockedSocket from 'socket.io-mock';
 
 
-import { evaluate } from '../../socket/data';
+import { evaluate } from '../../socket/scraping';
 import { DataSelectorConfig } from './DataSelectorConfig'
 import { SocketContext } from '../../socket'
 
@@ -26,7 +26,7 @@ jest.mock('socket.io-client');
  * mock the evaluate function
  * so that it returns a correct ScrapingResponse
  */
-jest.mock('../../socket/data', () => ({
+jest.mock('../../socket/scraping', () => ({
 
     // callback would be a jest mock
     // for example a simple jest.fn()

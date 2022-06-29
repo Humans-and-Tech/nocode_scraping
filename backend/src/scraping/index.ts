@@ -44,9 +44,9 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
 
     // should never occur in reality
     // but required for TS compilation 
-    if (req.selector === undefined || req.selector.path === undefined) {
+    if (req === undefined || req.selector === undefined || req.selector.path === undefined) {
         return Promise.reject({
-            message: 'no selector provided',
+            message: 'invalid call',
             status: ScrapingStatus.ERROR,
             selector: {
                 path: undefined
@@ -74,7 +74,6 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
 
     if (req.popupSelector !== undefined) {
         try {
-
             const isSelectorValid = await validateSelector(req.popupSelector);
             if (!isSelectorValid) {
                 return Promise.reject({
@@ -121,13 +120,13 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
 
         try {
 
-            console.log('load content with cache key', key);
             cachedHtml = await cache.get(key);
 
             if (cachedHtml !== undefined) {
+                console.log('Using cached content for key', key);
                 await page.setContent(cachedHtml);
             } else {
-
+                console.log('Downloading content from the web for key', key);
                 await page.goto(_url.toString());
                 cachedHtml = await page.content();
 
@@ -185,6 +184,7 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         imageAsBase64 = await readFile(screenshotPath, { encoding: 'base64' });
         // remove the screenshot file
         await unlink(screenshotPath);
+
         if (content !== null) {
             return Promise.resolve({
                 screenshot: `data:image/gif;base64,${imageAsBase64}`,

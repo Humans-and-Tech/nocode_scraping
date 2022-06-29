@@ -3298,13 +3298,6 @@ playwright-core@1.22.2:
   resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.22.2.tgz#ed2963d79d71c2a18d5a6fd25b60b9f0a344661a"
   integrity sha512-w/hc/Ld0RM4pmsNeE6aL/fPNWw8BWit2tg+TfqJ3+p59c6s3B6C8mXvXrIPmfQEobkcFDc+4KirNzOQ+uBSP1Q==
 
-playwright-webkit@^1.22.2:
-  version "1.22.2"
-  resolved "https://registry.yarnpkg.com/playwright-webkit/-/playwright-webkit-1.22.2.tgz#827ce870322e9e5f97c1f195032aaeab0a78ede0"
-  integrity sha512-WjgKJa6uHzj0g/B0cHjPuM9fdyGLjmGKYkYnepbyl9wtpkLzy7man01nyZ2ujigxhR0ux+u4Ix+jaCMKSdZReQ==
-  dependencies:
-    playwright-core "1.22.2"
-
 prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
