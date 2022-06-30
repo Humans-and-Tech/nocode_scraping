@@ -26,7 +26,7 @@ import { DataConfig } from "../../components/Data/DataConfig";
 import { SocketContext } from "../../socket";
 
 import "../../style.css";
-import { ConfigSidebar } from "../../components/Config/ConfigSidebar";
+import { ConfigSidebar } from "../../components/Layout/ConfigSidebar";
 
 
 const ProductSheet: React.FC = () => {

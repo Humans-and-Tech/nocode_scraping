@@ -11,10 +11,9 @@ import "./i18n";
 import { SocketContext, socket } from "./socket";
 import ProductSheet from "./views/ProductSheet/ProductSheet";
 import OnBoarding from './views/OnBoarding/OnBoarding';
-import { ScraperLayout, OnBoardingLayout } from './Layout'
+import { ScraperLayout, OnBoardingLayout } from './components/Layout/Layout'
 import { ScrapingContext, SpiderProvider } from './ConfigurationContext'
-import { t } from "i18next";
-import { SpiderConfigSummary } from "./components/Config/SpiderConfigSummary";
+import { SpiderConfigSummary } from "./components/Spider/SpiderConfigSummary";
 
 
 

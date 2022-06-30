@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useLocation } from 'react-router-dom';
 
 import { Spider } from '../../interfaces/spider'
-import './Config.scoped.css';
+import './SpiderConfig.scoped.css';
 
 
 /**

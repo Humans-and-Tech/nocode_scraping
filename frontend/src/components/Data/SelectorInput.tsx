@@ -6,7 +6,7 @@ import { Socket } from "socket.io-client";
 
 import { SocketContext } from '../../socket';
 import { validateCssSelector } from '../../socket/scraping';
-import { DataSelector } from "../../interfaces/spider";
+import { Data, DataSelector, SelectorStatus } from "../../interfaces/spider";
 
 
 import './Data.scoped.css';
@@ -15,11 +15,11 @@ import './Data.scoped.css';
 const { TextArea } = Input;
 
 
-const createSelector = (): DataSelector => {
-    return {
-        path: undefined
-    }
-};
+// const createSelector = (): DataSelector => {
+//     return {
+//         path: undefined
+//     }
+// };
 
 interface ISelectorInputPropsType {
     selector: DataSelector;
@@ -53,6 +53,25 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSelectorPathValid, setIsSelectorPathValid] = useState<boolean | undefined>(undefined);
 
+
+    const validateSelector = (s: DataSelector) => {
+        setIsLoading(true);
+        setIsBackendError(false);
+        validateCssSelector(socket, {}, selector, (isValid: boolean) => {
+            setIsLoading(false);
+
+            // TODO: manage backend errors
+            // setIsBackendError(true);
+            if (isValid) {
+                setIsSelectorPathValid(true);
+                selector.status = SelectorStatus.VALID;
+            } else {
+                setIsSelectorPathValid(false);
+                selector.status = SelectorStatus.INVALID;
+            }
+        });
+    };
+
     /**
      * triggered when the CSS selector input changes value
      * 
@@ -62,31 +81,17 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const val = e.target.value;
-        selector.path = val;
         setPath(val);
 
         console.log("selector.path", selector.path);
 
         if (selector !== undefined) {
-
-            setIsLoading(true);
-            setIsBackendError(false);
-
-            validateCssSelector(socket, {}, selector, (isValid: boolean) => {
-                setIsLoading(false);
-
-                // TODO: manage backend errors
-                // setIsBackendError(true);
-                if (isValid) {
-                    setIsSelectorPathValid(true);
-                } else {
-                    setIsSelectorPathValid(false);
-                }
-            });
+            selector.path = val;
+            validateSelector(selector);
         }
 
         // call the parant onChange
-        onChange(selector)
+        onChange(selector);
     };
 
 
@@ -101,14 +106,19 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     ) => {
         // call the parant onChange
         const val = e.target.value;
-        selector.path = val;
         setPath(val);
+        if (selector !== undefined) {
+            selector.path = val;
+            validateSelector(selector);
+        }
         onChange(selector);
     };
 
 
     return (
 
+        // TODO
+        // border color depending on selector status
         <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
             {(selector?.path == undefined || selector?.path == '') &&

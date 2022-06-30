@@ -8,7 +8,7 @@ import isURL from 'validator/lib/isURL';
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from "../../socket";
-import { ConfigSidebar } from "../../components/Config/ConfigSidebar";
+
 import { Spider } from '../../interfaces/spider'
 import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext'
 import './SpiderConfig.scoped.css';

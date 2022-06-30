@@ -3,10 +3,11 @@ import { Space, Spin, Switch, Button } from "antd";
 import { CloseCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
+import isURL from "validator/lib/isURL";
 
 import { SocketContext } from '../../socket';
 import { evaluate } from '../../socket/scraping';
-import { Data, DataSelector } from "../../interfaces/spider";
+import { Data, DataSelector, SelectorStatus } from "../../interfaces/spider";
 import { ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
 import { SelectorInput } from './SelectorInput'
 
@@ -21,7 +22,7 @@ const createSelector = (): DataSelector => {
     }
 };
 
-interface IDataSelectorConfigPropsType {
+interface ISelectorConfigPropsType {
     data: Data;
     onConfigured: (data: Data) => void;
     onError: () => void;
@@ -46,7 +47,7 @@ interface IDataSelectorConfigPropsType {
  * @param props IDataSelectorPropsType
  * @returns JSX.Element
  */
-export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Element => {
+export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
@@ -70,11 +71,6 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
     const [evaluation, setEvaluation] = useState<ScrapingResponse | undefined>(undefined);
 
     /**
-     * the evaluationStatus reports the fact that the selector "works" or not
-     */
-    // const [evaluationStatus, setEvaluationStatus] = useState<ScrapingStatus | undefined>(undefined);
-
-    /**
      * sometimes shit happen on the backend side
      * we should be able to catch errors from the backend
      * and do something with it
@@ -88,21 +84,25 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
      */
     const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
 
-
-    const onDataSelectorChange = (s: DataSelector) => {
-        data.selector = s;
-
-        console.log("data.selector", s);
-
-        if (s.path !== undefined && s.path !== "" && sampleUrl !== undefined && sampleUrl.toString() !== '') {
+    const toggleEvaluation = (s: DataSelector) => {
+        if (s.status === SelectorStatus.VALID && sampleUrl !== undefined && isURL(sampleUrl.toString())) {
             setIsEvaluationEnabled(true);
         } else {
             setIsEvaluationEnabled(false);
+            // TODO: message to the user
         }
+    };
+
+
+    const onDataSelectorChange = (s: DataSelector) => {
+        data.selector = s;
+        toggleEvaluation(s);
+
     };
 
     const onPopupSelectorChange = (s: DataSelector) => {
         setPopupSelector(s);
+        toggleEvaluation(s);
     };
 
 
@@ -142,7 +142,6 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
 
             evaluate(socket, {}, data.selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse) => {
 
-                // setEvaluationStatus(response.status);
                 setEvaluation(response);
 
                 // check the response status
@@ -151,9 +150,13 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                     // send the configuration to the parent
                     onConfigured(data);
 
-                } else if (response.status == ScrapingStatus.NO_POPUP || response.status == ScrapingStatus.NO_CONTENT) {
+                } else if (response.status == ScrapingStatus.NO_POPUP) {
 
-                    // notify the parent
+                    // message to the user
+                    onError();
+
+                } else if (response.status == ScrapingStatus.NO_CONTENT) {
+                    // message to the user
                     onError();
 
                 } else {
@@ -226,10 +229,12 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
 
             {
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal" size="middle">
-                        <Switch onChange={setIsPopup} checked={isPopup} />
-                        <h4><a id="switch-cookie-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
-                    </Space>
+                    {
+                        <Space direction="horizontal" size="middle">
+                            <Switch onChange={setIsPopup} checked={isPopup} />
+                            <h4><a id="switch-cookie-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
+                        </Space>
+                    }
                     {
                         isPopup && popupSelector &&
                         <>
@@ -239,7 +244,6 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                     }
                 </Space>
             }
-
 
             {
                 isLoading &&
@@ -261,7 +265,8 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                 </Space>
             }
 
-            {!isLoading &&
+            {
+                !isLoading &&
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
                         <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluate_btn" >
@@ -277,7 +282,7 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
             }
 
             {
-                evaluation &&
+                evaluation && !isPopup &&
                 <Space direction="horizontal">
                     <QuestionCircleOutlined />
                     <span>{t('field.evaluation.screenshot_helper')}</span>
@@ -287,16 +292,15 @@ export const DataSelectorConfig = (props: IDataSelectorConfigPropsType): JSX.Ele
                 </Space>
             }
 
-
-            {isBackendError && (
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal">
-                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        <span>{t("field.evaluation.backend_error")}</span>
+            {
+                isBackendError && (
+                    <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                        <Space direction="horizontal">
+                            <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                            <span>{t("field.evaluation.backend_error")}</span>
+                        </Space>
                     </Space>
-                </Space>
-            )}
-
+                )}
 
         </Space>
 
