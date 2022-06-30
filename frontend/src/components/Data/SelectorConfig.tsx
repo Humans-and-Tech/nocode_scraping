@@ -152,7 +152,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                     // send the configuration to the parent
                     onConfigured(data);
 
-                } else if (response.status == ScrapingStatus.NO_POPUP) {
+                } else if (response.status == ScrapingStatus.ELEMENT_NOT_FOUND) {
 
                     // message to the user
                     onError();

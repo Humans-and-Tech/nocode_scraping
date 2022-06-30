@@ -12,7 +12,8 @@ export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: U
     const evaluateConfig: IScrapingRequest = {
         'selector': s,
         'url': url,
-        'popupSelector': popupSelector
+        'clickBefore': [popupSelector],
+        'useCache': true
     }
     _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse) => {
         console.log('evaluate', response);

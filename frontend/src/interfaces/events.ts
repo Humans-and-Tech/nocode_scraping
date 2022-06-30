@@ -4,13 +4,17 @@ export enum ScrapingStatus {
     SUCCESS = 'success',
     NO_CONTENT = 'no_content', // there is no error, but no content could be scraped 
     ERROR = 'error',
-    NO_POPUP = "no_popup"       // the cookie popup was not found
+    ELEMENT_NOT_FOUND = "element_not_found" // the cookie popup was not found
 }
 
 export interface IScrapingRequest {
     selector: DataSelector;
     url: URL;
-    popupSelector?: DataSelector;
+    // optional elements on which to click
+    // before scraping the content
+    // ex: cookie popup...
+    clickBefore?: Array<DataSelector | undefined>;
+    useCache?: boolean
 }
 
 

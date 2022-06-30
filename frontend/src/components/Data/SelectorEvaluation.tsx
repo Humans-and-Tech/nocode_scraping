@@ -50,7 +50,7 @@ export const SelectorEvaluation = (props: ISelectorEvalPropsType): JSX.Element =
                     </Space>
                 </Space>
             )}
-            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.NO_POPUP && (
+            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.ELEMENT_NOT_FOUND && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
