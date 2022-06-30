@@ -1,0 +1,9 @@
+input.success,
+textarea.success {
+    border-color: var(--gus-green);
+}
+
+input.error,
+textarea.error {
+    border-color: var(--gus-red);
+}

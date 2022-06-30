@@ -42,6 +42,14 @@ export const SelectorEvaluation = (props: ISelectorEvalPropsType): JSX.Element =
                     }
                 </Space>
             )}
+            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.NO_CONTENT && (
+                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                    <Space direction="horizontal">
+                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                        <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_content', { selector: evaluation.selector.path }) }}></span>
+                    </Space>
+                </Space>
+            )}
             {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.NO_POPUP && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
@@ -62,19 +70,6 @@ export const SelectorEvaluation = (props: ISelectorEvalPropsType): JSX.Element =
                         {
                             evaluation.selector !== undefined
                                 ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.failure', { selector: evaluation.selector.path }) }}></span>
-                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
-                        }
-
-                    </Space>
-                </Space>
-            )}
-            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.NO_POPUP && (
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal">
-                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        {
-                            evaluation.selector !== undefined
-                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_popup', { selector: evaluation.selector.path }) }}></span>
                                 : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
                         }
 

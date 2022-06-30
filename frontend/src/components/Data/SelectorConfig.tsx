@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Space, Spin, Switch, Button } from "antd";
+import { Space, Spin, Switch, Button, Tooltip } from "antd";
 import { CloseCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
@@ -69,6 +69,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      * scraped by the backend
      */
     const [evaluation, setEvaluation] = useState<ScrapingResponse | undefined>(undefined);
+    const [evaluationHelperMessage, setEvaluationHelperMessage] = useState<string>('');
 
     /**
      * sometimes shit happen on the backend side
@@ -87,9 +88,10 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
     const toggleEvaluation = (s: DataSelector) => {
         if (s.status === SelectorStatus.VALID && sampleUrl !== undefined && isURL(sampleUrl.toString())) {
             setIsEvaluationEnabled(true);
+            setEvaluationHelperMessage(t('click to view the content scraped'));
         } else {
             setIsEvaluationEnabled(false);
-            // TODO: message to the user
+            setEvaluationHelperMessage(t(`the selector ${s.path} is not valid`));
         }
     };
 
@@ -221,10 +223,12 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 </Space>
             }
 
-            <span>{t('field.selector.intro')}</span>
             {
                 data.selector &&
-                <SelectorInput selector={data.selector} onChange={onDataSelectorChange} />
+                <>
+                    <span>{t('field.selector.intro')}</span>
+                    <SelectorInput selector={data.selector} onChange={onDataSelectorChange} />
+                </>
             }
 
             {
@@ -238,7 +242,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                     {
                         isPopup && popupSelector &&
                         <>
-                            <span>{t('field.selector.intro')}</span>
+                            <span>{t('field.popup_selector.intro')}</span>
                             <SelectorInput selector={popupSelector} onChange={onPopupSelectorChange} />
                         </>
                     }
@@ -269,9 +273,11 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 !isLoading &&
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
-                        <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluate_btn" >
-                            <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
-                        </Button>
+                        <Tooltip title={evaluationHelperMessage}>
+                            <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluate_btn" >
+                                <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
+                            </Button>
+                        </Tooltip>
                     </Space>
                 </Space>
             }

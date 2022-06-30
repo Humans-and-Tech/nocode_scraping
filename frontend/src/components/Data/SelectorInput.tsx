@@ -9,17 +9,11 @@ import { validateCssSelector } from '../../socket/scraping';
 import { Data, DataSelector, SelectorStatus } from "../../interfaces/spider";
 
 
-import './Data.scoped.css';
+import './SelectorInput.scoped.css';
 
 
 const { TextArea } = Input;
 
-
-// const createSelector = (): DataSelector => {
-//     return {
-//         path: undefined
-//     }
-// };
 
 interface ISelectorInputPropsType {
     selector: DataSelector;
@@ -50,24 +44,24 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
      */
     const [isBackendError, setIsBackendError] = useState<boolean>(false);
 
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isSelectorPathValid, setIsSelectorPathValid] = useState<boolean | undefined>(undefined);
+    const [inputClass, setInputClass] = useState<string>('');
 
 
     const validateSelector = (s: DataSelector) => {
-        setIsLoading(true);
+
         setIsBackendError(false);
         validateCssSelector(socket, {}, selector, (isValid: boolean) => {
-            setIsLoading(false);
 
             // TODO: manage backend errors
             // setIsBackendError(true);
             if (isValid) {
-                setIsSelectorPathValid(true);
+                setInputClass('success');
                 selector.status = SelectorStatus.VALID;
+                onChange(selector);
             } else {
-                setIsSelectorPathValid(false);
+                setInputClass('error');
                 selector.status = SelectorStatus.INVALID;
+                onChange(selector);
             }
         });
     };
@@ -83,15 +77,10 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
         const val = e.target.value;
         setPath(val);
 
-        console.log("selector.path", selector.path);
-
         if (selector !== undefined) {
             selector.path = val;
             validateSelector(selector);
         }
-
-        // call the parant onChange
-        onChange(selector);
     };
 
 
@@ -117,18 +106,8 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
 
     return (
 
-        // TODO
-        // border color depending on selector status
         <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
-            {(selector?.path == undefined || selector?.path == '') &&
-                <Space direction="horizontal">
-                    <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                    <span data-testid="no_selector_path">{t('field.evaluation.no_selector_path')}</span>
-                </Space>
-            }
-
-            <span>{t('field.selector.intro')}</span>
             <TextArea
                 rows={4}
                 placeholder={t("field.selector.input_placeholder")}
@@ -137,37 +116,8 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
                 value={path}
                 data-testid="selectorPathInput"
                 selector-path={selector.path}
+                className={inputClass}
             />
-
-            {
-                isLoading &&
-                <>
-                    <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
-                    <Space direction="vertical" size="small">
-                        <span style={{ 'display': 'inline-block' }}>
-                            {t('field.evaluation.checking_validity')}
-                        </span>
-                    </Space>
-                </>
-            }
-
-            {
-
-                <Space direction="horizontal">
-                    {
-                        isSelectorPathValid
-                            ? <>
-                                <CheckCircleOutlined className="success" />
-                                <span data-testid="css_path_valid" >{t("field.css.valid")}</span>
-                            </>
-                            : <>
-                                <CloseCircleOutlined className="error" />
-                                <span data-testid="css_path_invalid" >{t("field.css.invalid")}</span>
-                            </>
-                    }
-
-                </Space>
-            }
 
             {isBackendError && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
