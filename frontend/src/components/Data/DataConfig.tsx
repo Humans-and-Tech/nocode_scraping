@@ -38,39 +38,90 @@ export const DataConfig = ({
 
   const [isConfigured, setIsConfigured] = useState<boolean>(false);
 
-  const onConfigured = (data: Data): void => {
-    setIsConfigured(true);
-    spider.data?.add(data);
-    spiderProvider.upsert(socket, spider, (b: boolean) => {
-      console.log('upsert successful with data', data);
+  const [tmpData, setTmpData] = useState<Data | undefined>(undefined);
+
+  // const [tmpSpider, setTmpSpider] = useState<Spider | undefined>(undefined);
+
+  const upsertSpider = (_spider: Spider) => {
+
+    spiderProvider.upsert(socket, _spider, (b: boolean, err: Error | undefined) => {
+      if (b) {
+        console.info('upsert successful for spider', _spider);
+      } else {
+        console.error('upsert failed', err);
+      }
     });
+
+  };
+
+  const saveSpiderData = (_data: Data) => {
+    let isFound = false;
+    spider.data?.forEach((d: Data) => {
+      if (d.name == _data.name) {
+        isFound = true;
+        d = _data;
+        console.log('found data', d);
+      }
+    });
+
+    if (!isFound) {
+      if (spider.data === undefined) {
+        spider.data = [];
+      }
+      spider.data.push(_data);
+      console.log('Added data', spider?.data);
+    }
+    console.log('saveSpiderData', spider);
+    upsertSpider(spider);
+  };
+
+  const onConfigured = (_data: Data): void => {
+    setIsConfigured(true);
+    saveSpiderData(_data);
+    setTmpData(_data);
   };
 
   const onError = (): void => {
     setIsConfigured(false);
+    setTmpData(undefined);
+  };
+
+
+  const onDataChange = (_data: Data): void => {
+    console.log('onDataChange', _data)
+    setTmpData(_data);
+    saveSpiderData(_data);
   };
 
   const onTabChange = (key: string) => {
     console.log(key);
   };
 
-  const evaluate = <Button>Test this data</Button>;
+  const saveConfig = () => {
+    console.log('saveConfig requested', tmpData);
+    if (tmpData !== undefined) {
+      saveSpiderData(tmpData)
+    }
+  };
+
+  const saveBtn = <Button onClick={saveConfig}>{t('field.action.save_data_configuration')}</Button>;
 
   // useEffect(() => {
-  //   console.log('data config for', data);
-  // }, [data]);
-
+  // if (tmpSpider === undefined) {
+  //   setTmpSpider(spider);
+  // }
+  // }, [data, spider]);
 
   return (
 
-    <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={evaluate}>
+    <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>
       <TabPane tab={t('tab.selector_config')} key="1">
         <h2>{data.label}</h2>
         <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
 
           {
             //spider.sampleURLs && spider.sampleURLs.length > 0 &&
-            <SelectorConfig data={data} sampleUrl={new URL('https://www.manomano.fr/p/salon-de-jardin-en-imitation-resine-tressee-ensemble-de-4-meubles-livre-avec-accoudoirs-coussins-de-dossier-et-verre-32868538?model_id=32849419')} onConfigured={onConfigured} onError={onError} />
+            <SelectorConfig data={data} sampleUrl={new URL('https://www.manomano.fr/p/salon-de-jardin-en-imitation-resine-tressee-ensemble-de-4-meubles-livre-avec-accoudoirs-coussins-de-dossier-et-verre-32868538?model_id=32849419')} onConfigured={onConfigured} onError={onError} onChange={onDataChange} />
           }
 
           {isConfigured &&

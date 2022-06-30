@@ -19,26 +19,26 @@ module.exports = () => {
      * @param callback 
      * @returns 
      */
-    const scrapeContent = async (req: IScrapingRequest, callback: (resp: ScrapingResponse) => void) => {
+    const scrapeContent = async (req: IScrapingRequest, callback: (resp: ScrapingResponse | undefined, error: ScrapingError | undefined) => void) => {
 
         try {
 
             const response = await getContent(req);
-            console.log('scrapeContent', response);
-            callback(response);
+            callback(response, undefined);
 
         } catch (error) {
 
             if (isScrapingError(error)) {
-                callback({
+                callback(undefined, {
                     message: error.message,
                     status: error.status,
                     selector: error.selector
                 });
             } else {
-                callback({
+                callback(undefined, {
                     message: JSON.stringify(error),
                     status: ScrapingStatus.ERROR,
+                    selector: req.selector
                 });
             }
         }

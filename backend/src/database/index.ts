@@ -32,8 +32,9 @@ export async function upsert(organization: Organization, data: any, document: an
     try {
         // values cannot be undefined
         // thus replace undefined by JSON.stringify({})
+        console.log("upsert", data);
         await document.update(data);
-        return Promise.resolve(false);
+        return Promise.resolve(true);
     } catch (error: unknown) {
 
         if (isFireStoreError(error) && error.code === 5) {

@@ -8,7 +8,7 @@ import isURL from "validator/lib/isURL";
 import { SocketContext } from '../../socket';
 import { evaluate } from '../../socket/scraping';
 import { Data, DataSelector, SelectorStatus } from "../../interfaces/spider";
-import { ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
+import { ScrapingError, ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
 import { SelectorInput } from './SelectorInput'
 
 
@@ -26,6 +26,7 @@ interface ISelectorConfigPropsType {
     data: Data;
     onConfigured: (data: Data) => void;
     onError: () => void;
+    onChange: (d: Data) => void;
 
     // sample of pages to test / validate the selector
     sampleUrl?: URL | undefined;
@@ -53,7 +54,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const socket = useContext<Socket>(SocketContext);
 
-    const { data, onConfigured, onError, sampleUrl } = props;
+    const { data, onConfigured, onError, sampleUrl, onChange } = props;
 
     const [selector, setSelector] = useState<DataSelector | undefined>(undefined);
 
@@ -102,11 +103,16 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         setSelector(s);
         toggleEvaluation(s);
 
+        data.selector = s;
+        onChange(data)
     };
 
     const onPopupSelectorChange = (s: DataSelector) => {
         setPopupSelector(s);
         toggleEvaluation(s);
+
+        data.selector = s;
+        onChange(data)
     };
 
 
@@ -142,23 +148,23 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             // don't pass the cookiePopupPath if the switch button is not activated
             const _cookiePpSelector = (isPopup ? popupSelector : undefined);
 
-            evaluate(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse) => {
+            evaluate(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => {
 
                 setEvaluation(response);
 
                 // check the response status
-                if (response.status == ScrapingStatus.SUCCESS) {
+                if (response && response.status == ScrapingStatus.SUCCESS) {
 
                     // send the configuration to the parent
                     data.selector = selector;
                     onConfigured(data);
 
-                } else if (response.status == ScrapingStatus.ELEMENT_NOT_FOUND) {
+                } else if (response && response.status == ScrapingStatus.ELEMENT_NOT_FOUND) {
 
                     // message to the user
                     onError();
 
-                } else if (response.status == ScrapingStatus.NO_CONTENT) {
+                } else if (response && response.status == ScrapingStatus.NO_CONTENT) {
                     // message to the user
                     onError();
 
@@ -166,6 +172,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                     // there has been a technical error
                     // on the backend side
                     // notify the user by a special message
+                    console.error(error);
                     setIsBackendError(true);
                 }
 

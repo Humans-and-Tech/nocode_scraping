@@ -34,7 +34,7 @@
     },
     "action": {
       "evaluate_selector": "Evaluate this selector",
-      "check_selector_validity": "Check validity"
+      "save_data_configuration": "Save"
     },
     "css": {
       "valid": "This selector is valid",

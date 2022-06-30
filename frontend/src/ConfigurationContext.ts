@@ -6,9 +6,9 @@ import { Spider } from "./interfaces/spider";
 
 
 export interface ISpiderProvider {
-    get: (socket: Socket, name: string, callback: (data: Spider | undefined) => void) => void;
-    upsert: (socket: Socket, spider: Spider, callback: (b: boolean) => void) => void;
-    remove: (socket: Socket, spider: Spider, callback: (b: boolean) => void) => void;
+    get: (socket: Socket, name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => void;
+    upsert: (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
+    remove: (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
     create: (socket: Socket, name: string) => Spider;
 }
 
@@ -17,13 +17,13 @@ export interface ISpiderProvider {
 // not from localStorage
 function useSpider(): ISpiderProvider {
 
-    const get = (socket: Socket, name: string, callback: (data: Spider | undefined) => void) => {
+    const get = (socket: Socket, name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
 
         if (name === '') {
             throw new Error('cannot get a spider with a blank name');
         }
-        getSpider(socket, {}, name, (data: Spider | undefined) => {
-            callback(data);
+        getSpider(socket, {}, name, (data: Spider | undefined, error: Error | undefined) => {
+            callback(data, error);
         });
     };
 
@@ -46,12 +46,13 @@ function useSpider(): ISpiderProvider {
      * @param _name
      * @returns 
      */
-    const upsert = (socket: Socket, spider: Spider, callback: (b: boolean) => void) => {
+    const upsert = (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => {
         if (spider.name === '' || spider.name === undefined) {
             throw new Error('cannot save a spider with a blank name');
         }
-        saveSpider(socket, {}, spider, (b: boolean) => {
-            callback(b);
+        saveSpider(socket, {}, spider, (b: boolean, error: Error | undefined) => {
+            console.log("saveSpider", b, error);
+            callback(b, error);
         });
     };
 
@@ -62,7 +63,7 @@ function useSpider(): ISpiderProvider {
      * @param spider 
      * @param callback 
      */
-    const remove = (socket: Socket, spider: Spider, callback: (b: boolean) => void): void => {
+    const remove = (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void): void => {
         if (spider.name === '') {
             throw new Error('cannot remove a spider with a blank name');
         }

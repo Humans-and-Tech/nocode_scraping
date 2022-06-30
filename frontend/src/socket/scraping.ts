@@ -2,22 +2,26 @@ import { Socket } from "socket.io-client";
 import debounce from "lodash/debounce";
 
 import { DataSelector } from "../interfaces/spider";
-import { IScrapingRequest, ScrapingResponse } from "../interfaces/events";
+import { IScrapingRequest, ScrapingError, ScrapingResponse } from "../interfaces/events";
 
 /**
  * fetches the content of the css selector and provides it back to the callback function
  * 
  */
-export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse) => void) => {
+export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => void) => {
     const evaluateConfig: IScrapingRequest = {
         'selector': s,
         'url': url,
         'clickBefore': [popupSelector],
         'useCache': true
     }
-    _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse) => {
+    _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse, error: ScrapingError) => {
         console.log('evaluate', response);
-        callback(response);
+        if (error !== undefined) {
+            callback(undefined, error);
+        } else {
+            callback(response, undefined);
+        }
     });
 };
 

@@ -58,11 +58,11 @@ export interface Website {
 export interface Spider {
     name: string;
     website?: Website;
-    data?: Set<Data>;
-    pipelines?: Set<Pipeline>;
-    urlSet?: Set<URL>;
+    data?: Array<Data>;
+    pipelines?: Array<Pipeline>;
+    urlSet?: Array<URL>;
     pageType?: PageType;
-    items?: Set<Item>;
+    items?: Array<Item>;
     settings?: Settings; // will be typed later
     headers?: unknown;
     cookies?: unknown;

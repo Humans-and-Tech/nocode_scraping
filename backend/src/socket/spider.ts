@@ -13,19 +13,19 @@ module.exports = () => {
      * @param data 
      * @returns true if the document is created, false if updated
      */
-    const updateSpider = async function (user: unknown, spider: Spider, callback: (resp: boolean) => void) {
+    const updateSpider = async function (user: unknown, spider: Spider, callback: (resp: boolean, error: Error | undefined) => void) {
 
         const organizationName = 'test';
 
-        const configCollection: DocumentData = firestore.collection(`organizations`);
-        const document = configCollection.doc(`${organizationName}/spiders/${spider.name}`);
-
         try {
-            const b: boolean = await upsert({}, spider, document)
-            callback(true);
-        } catch (error: unknown) {
-            console.log(error);
-            callback(false);
+            const configCollection: DocumentData = firestore.collection(`organizations`);
+            const document = configCollection.doc(`${organizationName}/spiders/${spider.name}`);
+            const b: boolean = await upsert({}, spider, document);
+            console.log('updateSpider', b);
+            callback(b, undefined);
+        } catch (error) {
+            console.error('updateSpider', error);
+            callback(false, error as Error);
         }
     }
 
@@ -36,7 +36,7 @@ module.exports = () => {
      * @param name 
      * @returns the document if it is found else null
      */
-    const getSpider = async function (user: unknown, name: string, callback: (resp: Spider | undefined) => void) {
+    const getSpider = async function (user: unknown, name: string, callback: (resp: Spider | undefined, error: Error | undefined) => void) {
 
         if (name === '') {
             return Promise.reject("spider name cannot be blank");
@@ -50,16 +50,16 @@ module.exports = () => {
 
         try {
             const snap: DocumentSnapshot<Spider> = await document.get();
-            callback(snap.data());
+            callback(snap.data(), undefined);
 
-        } catch (error: unknown) {
+        } catch (error) {
 
             if (isFireStoreError(error) && error.code === 5) {
                 // this is a document not found error
             } else {
                 console.error('Unhandled error', error);
             }
-            callback(undefined);
+            callback(undefined, error as Error);
         }
 
     }

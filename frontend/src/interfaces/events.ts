@@ -26,3 +26,9 @@ export interface ScrapingResponse {
     selector: DataSelector;
 }
 
+export interface ScrapingError extends ScrapingResponse {
+    message: string;
+    status: ScrapingStatus.ERROR | ScrapingStatus.NO_CONTENT | ScrapingStatus.ELEMENT_NOT_FOUND;
+    selector: DataSelector
+}
+
