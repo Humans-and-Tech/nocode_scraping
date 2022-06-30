@@ -88,10 +88,10 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
     const toggleEvaluation = (s: DataSelector) => {
         if (s.status === SelectorStatus.VALID && sampleUrl !== undefined && isURL(sampleUrl.toString())) {
             setIsEvaluationEnabled(true);
-            setEvaluationHelperMessage(t('click to view the content scraped'));
+            setEvaluationHelperMessage(t('field.evaluation.enabled'));
         } else {
             setIsEvaluationEnabled(false);
-            setEvaluationHelperMessage(t(`the selector ${s.path} is not valid`));
+            setEvaluationHelperMessage(t(`field.evaluation.disabled`, { value: s.path }));
         }
     };
 
