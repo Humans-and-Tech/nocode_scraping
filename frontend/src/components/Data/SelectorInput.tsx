@@ -103,6 +103,12 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
         onChange(selector);
     };
 
+    useEffect(() => {
+
+        console.log('SelectorInput initiated');
+
+    }, [selector])
+
 
     return (
 

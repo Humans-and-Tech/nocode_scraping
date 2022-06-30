@@ -55,6 +55,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const { data, onConfigured, onError, sampleUrl } = props;
 
+    const [selector, setSelector] = useState<DataSelector | undefined>(undefined);
+
     /**
      * optionnally, the user may want to configure
      * a CSS selector to click on a cookie pop-up and eliminate it
@@ -97,7 +99,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
 
     const onDataSelectorChange = (s: DataSelector) => {
-        data.selector = s;
+        setSelector(s);
         toggleEvaluation(s);
 
     };
@@ -130,9 +132,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         // reset evaluation
         setEvaluation(undefined);
 
-        console.log("evaluating with", data.selector?.path);
-
-        if (data.selector?.path !== undefined && data.selector?.path !== '' && sampleUrl !== undefined && sampleUrl.toString() !== '') {
+        if (selector?.path !== undefined && selector?.path !== '' && sampleUrl !== undefined && sampleUrl.toString() !== '') {
             // for testing purpose
             // re-assign the path which might not be up-to-date
             // when calling the evaluateSelectorPath after calling the onChange
@@ -142,7 +142,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             // don't pass the cookiePopupPath if the switch button is not activated
             const _cookiePpSelector = (isPopup ? popupSelector : undefined);
 
-            evaluate(socket, {}, data.selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse) => {
+            evaluate(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse) => {
 
                 setEvaluation(response);
 
@@ -150,6 +150,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 if (response.status == ScrapingStatus.SUCCESS) {
 
                     // send the configuration to the parent
+                    data.selector = selector;
                     onConfigured(data);
 
                 } else if (response.status == ScrapingStatus.ELEMENT_NOT_FOUND) {
@@ -180,25 +181,14 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
 
     /**
-     * initializes "newSelector" state if undefined
-     * and populates it with the pageUrl passed as a prop
-     * 
-     * sets the booleans isEvaluationEnabled and isCheckEnabled to true
-     * when the url passed in the props is not blank and when
-     * the path state coming from the user input is not blank
-     * 
-     * finally, calls back the onError and onConfigured
-     * when everything is fine from this component standpoint
-     * (user forces the bypass, or selector is really validated by the component)
-     * 
-     * calls back the onConfigured
-     * when the evaluation is successful
+     * initializes the selector and popup selector if undefined
+     *
      */
     useEffect(() => {
 
         // when mounting the component initially
-        if (data.selector === undefined) {
-            data.selector = createSelector();
+        if (selector === undefined) {
+            setSelector(createSelector());
         }
 
         if (popupSelector === undefined) {
@@ -206,11 +196,11 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         }
 
         // update the button states
-        if (sampleUrl !== undefined && sampleUrl.toString() !== '' && data.selector?.path !== undefined && data.selector?.path !== '') {
+        if (sampleUrl !== undefined && selector?.path !== undefined) {
             setIsEvaluationEnabled(true);
         }
 
-    }, [data, sampleUrl]);
+    }, [selector, popupSelector, sampleUrl]);
 
     return (
 
@@ -223,11 +213,16 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 </Space>
             }
 
+            {<>
+                <span>{t('data selector')}</span>
+                <span>{JSON.stringify(selector)}</span>
+            </>}
+
             {
-                data.selector &&
+                selector &&
                 <>
                     <span>{t('field.selector.intro')}</span>
-                    <SelectorInput selector={data.selector} onChange={onDataSelectorChange} />
+                    <SelectorInput selector={selector} onChange={onDataSelectorChange} />
                 </>
             }
 
@@ -254,7 +249,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
                     <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
                     {
-                        data.selector !== null && sampleUrl &&
+                        selector !== null && sampleUrl &&
                         <Space direction="vertical" size="small">
                             <span style={{ 'display': 'inline-block' }}>
                                 {t('field.evaluation.evaluating_on')}
@@ -306,9 +301,10 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                             <span>{t("field.evaluation.backend_error")}</span>
                         </Space>
                     </Space>
-                )}
+                )
+            }
 
-        </Space>
+        </Space >
 
     );
 };

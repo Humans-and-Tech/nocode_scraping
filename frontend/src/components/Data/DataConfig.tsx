@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Tabs, Space, Button } from "antd";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
@@ -42,7 +42,7 @@ export const DataConfig = ({
     setIsConfigured(true);
     spider.data?.add(data);
     spiderProvider.upsert(socket, spider, (b: boolean) => {
-      console.log('upsert successful');
+      console.log('upsert successful with data', data);
     });
   };
 
@@ -55,6 +55,10 @@ export const DataConfig = ({
   };
 
   const evaluate = <Button>Test this data</Button>;
+
+  // useEffect(() => {
+  //   console.log('data config for', data);
+  // }, [data]);
 
 
   return (

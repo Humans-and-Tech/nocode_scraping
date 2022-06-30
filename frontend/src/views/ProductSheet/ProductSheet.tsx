@@ -42,17 +42,18 @@ const ProductSheet: React.FC = () => {
 
   const { name } = useParams();
 
-  const [element, setElement] = useState<Data | undefined>(
+  const [data, setData] = useState<Data | undefined>(
     undefined
   );
 
   const showSideBar = (element: Data): void => {
-    setElement(element);
+    setData(element);
     setIsSideBarOpen(true);
   };
 
   const closeSideBar = (): void => {
     setIsSideBarOpen(false);
+    // notify the user if the config isn't saved
   }
 
   const priceElements: Array<Data> = [
@@ -96,9 +97,9 @@ const ProductSheet: React.FC = () => {
     <>
       {/* {element && spider && <DataConfig data={element} spider={spider} />} */}
       {
-        element && spider &&
+        data && spider &&
         <ConfigSidebar isVisible={isSideBarOpen} onClose={closeSideBar}>
-          <DataConfig data={element} spider={spider} />
+          <DataConfig data={data} spider={spider} />
         </ConfigSidebar>
       }
       <Space
