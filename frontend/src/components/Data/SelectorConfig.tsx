@@ -187,13 +187,18 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
 
     /**
-     * initializes the selector and popup selector if undefined
+     * Loads the selector with the data selector if existing
+     * otherwise creates a blank selector object
+     * 
+     * Initializes as well a popup selector 
      *
      */
     useEffect(() => {
+        console.log('loading selector config for ', selector)
 
-        // when mounting the component initially
-        if (selector === undefined) {
+        if (data.selector) {
+            setSelector(data.selector);
+        } else {
             setSelector(createSelector());
         }
 
@@ -206,7 +211,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             setIsEvaluationEnabled(true);
         }
 
-    }, [selector, popupSelector, sampleUrl]);
+    }, [sampleUrl, data]);
 
     return (
 

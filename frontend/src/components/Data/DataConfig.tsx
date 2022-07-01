@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Tabs, Space, Button } from "antd";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
@@ -100,6 +100,10 @@ export const DataConfig = ({
   };
 
   const saveBtn = <Button onClick={saveConfig}>{t('field.action.save_data_configuration')}</Button>;
+
+  useEffect(() => {
+    console.log("loaded data config for", data.name);
+  }, [data]);
 
   return (
 

@@ -25,9 +25,9 @@ import { ISpiderProvider, ScrapingContext } from '../../ConfigurationContext';
 import { DataConfig } from "../../components/Data/DataConfig";
 import { SocketContext } from "../../socket";
 
-import "../../style.css";
 import { ConfigSidebar } from "../../components/Layout/ConfigSidebar";
 
+import "../../style.css";
 
 const ProductSheet: React.FC = () => {
   const { t } = useTranslation("product_sheet");
@@ -46,8 +46,30 @@ const ProductSheet: React.FC = () => {
     undefined
   );
 
+  /**
+   * displays the config sidebar for the selected data
+   * and loads the spider's data configuration if it exists
+   * 
+   * the data is retrieved by its name attribute
+   * 
+   * @param element 
+   */
   const showSideBar = (element: Data): void => {
-    setData(element);
+
+    // load the spider data for this element
+    let dataIndex = -1;
+    spider?.data?.forEach((d: Data, index: number) => {
+      if (d.name === element.name) {
+        setData(d);
+        dataIndex = index;
+      }
+    });
+
+    // if not retrieved, initiate a new data config
+    if (dataIndex === -1) {
+      setData(element);
+    }
+
     setIsSideBarOpen(true);
   };
 

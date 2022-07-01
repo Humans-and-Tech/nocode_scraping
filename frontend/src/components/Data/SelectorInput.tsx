@@ -104,6 +104,20 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     };
 
 
+    /**
+     * initializes the selector path if provided by the selector prop
+     */
+    useEffect(() => {
+        console.log("selector.path", selector.path)
+        if (selector.path) {
+            setPath(selector.path);
+        } else {
+            console.log("undefined selector path");
+            setPath('');
+        }
+    }, [selector.path]);
+
+
     return (
 
         <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
