@@ -51,7 +51,6 @@ function useSpider(): ISpiderProvider {
             throw new Error('cannot save a spider with a blank name');
         }
         saveSpider(socket, {}, spider, (b: boolean, error: Error | undefined) => {
-            console.log("saveSpider", b, error);
             callback(b, error);
         });
     };

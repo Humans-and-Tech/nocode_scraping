@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Input, Space, Spin } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { Input, Space } from "antd";
+import { CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from '../../socket';
 import { validateCssSelector } from '../../socket/scraping';
-import { Data, DataSelector, SelectorStatus } from "../../interfaces/spider";
+import { DataSelector, SelectorStatus } from "../../interfaces/spider";
 
 
 import './SelectorInput.scoped.css';
@@ -50,18 +50,18 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     const validateSelector = (s: DataSelector) => {
 
         setIsBackendError(false);
-        validateCssSelector(socket, {}, selector, (isValid: boolean) => {
+        validateCssSelector(socket, {}, s, (isValid: boolean) => {
 
             // TODO: manage backend errors
             // setIsBackendError(true);
             if (isValid) {
                 setInputClass('success');
-                selector.status = SelectorStatus.VALID;
-                onChange(selector);
+                s.status = SelectorStatus.VALID;
+                onChange(s);
             } else {
                 setInputClass('error');
-                selector.status = SelectorStatus.INVALID;
-                onChange(selector);
+                s.status = SelectorStatus.INVALID;
+                onChange(s);
             }
         });
     };
