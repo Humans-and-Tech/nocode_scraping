@@ -16,12 +16,7 @@ export const getContent = (_socket: Socket, user: unknown, s: DataSelector, url:
         'useCache': true
     }
     _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse, error: ScrapingError) => {
-        console.log('evaluate', response);
-        if (error !== undefined) {
-            callback(undefined, error);
-        } else {
-            callback(response, undefined);
-        }
+        callback(response, error);
     });
 };
 

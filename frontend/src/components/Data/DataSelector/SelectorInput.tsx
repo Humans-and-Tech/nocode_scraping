@@ -4,9 +4,9 @@ import { CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
-import { SocketContext } from '../../socket';
-import { validateCssSelector } from '../../socket/scraping';
-import { DataSelector, SelectorStatus } from "../../interfaces/spider";
+import { SocketContext } from '../../../socket';
+import { validateCssSelector } from '../../../socket/scraping';
+import { DataSelector, SelectorStatus } from "../../../interfaces/spider";
 
 
 import './SelectorInput.scoped.css';

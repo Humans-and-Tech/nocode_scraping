@@ -32,3 +32,5 @@ export interface ScrapingError extends ScrapingResponse {
     selector: DataSelector
 }
 
+
+

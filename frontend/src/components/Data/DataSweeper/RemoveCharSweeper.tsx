@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import './Alterators.scoped.css';
 
 
-export const RemoveCharAlterator = (): JSX.Element => {
+export const RemoveCharSweeper = (): JSX.Element => {
 
     const { t } = useTranslation("alterators");
 

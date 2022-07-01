@@ -7,8 +7,8 @@ import { SocketContext } from "../../socket";
 import { Data, Spider } from "../../interfaces/spider";
 import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext'
 
-import { SelectorConfig } from "./SelectorConfig";
-import { DataAlterators } from '../Alterators/DataAlterators'
+import { SelectorConfig } from "./DataSelector/SelectorConfig";
+// import { DataAlterators } from '../Alterators/DataAlterators'
 
 import './Data.scoped.css';
 
@@ -43,11 +43,11 @@ export const DataConfig = ({
   const upsertSpider = (_spider: Spider) => {
 
     spiderProvider.upsert(socket, _spider, (b: boolean, err: Error | undefined) => {
-      if (b) {
-        console.info('upsert successful for spider', _spider);
-      } else {
-        console.error('upsert failed', err);
-      }
+      // if (b) {
+      //   console.info('upsert successful for spider', _spider);
+      // } else {
+      //   console.error('upsert failed', err);
+      // }
     });
 
   };
@@ -101,10 +101,6 @@ export const DataConfig = ({
 
   const saveBtn = <Button onClick={saveConfig}>{t('field.action.save_data_configuration')}</Button>;
 
-  useEffect(() => {
-    console.log("loaded data config for", data.name);
-  }, [data]);
-
   return (
 
     <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>
@@ -117,12 +113,12 @@ export const DataConfig = ({
             <SelectorConfig data={data} sampleUrl={new URL('https://www.manomano.fr/p/salon-de-jardin-en-imitation-resine-tressee-ensemble-de-4-meubles-livre-avec-accoudoirs-coussins-de-dossier-et-verre-32868538?model_id=32849419')} onConfigured={onConfigured} onError={onError} onChange={onDataChange} />
           }
 
-          {isConfigured &&
+          {/* {isConfigured &&
             <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
               <h2>{t('field.alterators_title')}</h2>
               <DataAlterators />
             </Space>
-          }
+          } */}
         </Space>
       </TabPane>
       <TabPane tab={t('tab.sweepers_config')} key="2">
@@ -135,5 +131,4 @@ export const DataConfig = ({
 
   );
 };
-
 

@@ -5,14 +5,14 @@ import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 import isURL from "validator/lib/isURL";
 
-import { SocketContext } from '../../socket';
-import { getContent } from '../../socket/scraping';
-import { Data, DataSelector, SelectorStatus } from "../../interfaces/spider";
-import { ScrapingError, ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
+import { SocketContext } from '../../../socket';
+import { getContent } from '../../../socket/scraping';
+import { Data, DataSelector, SelectorStatus } from "../../../interfaces/spider";
+import { ScrapingError, ScrapingResponse, ScrapingStatus } from "../../../interfaces/events";
 import { SelectorInput } from './SelectorInput'
-import { PreviewContent } from "./PreviewContent";
+import { PreviewContent } from "../PreviewContent";
 
-import './Data.scoped.css';
+import '../Data.scoped.css';
 
 
 const createSelector = (): DataSelector => {
@@ -149,22 +149,24 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => {
 
-                setEvaluation(response);
-
+                console.log('getContent', response, error);
                 // check the response status
                 if (response && response.status == ScrapingStatus.SUCCESS) {
 
                     // send the configuration to the parent
+                    setEvaluation(response);
                     data.selector = selector;
                     onConfigured(data);
 
-                } else if (response && response.status == ScrapingStatus.ELEMENT_NOT_FOUND) {
+                } else if (error && error.status == ScrapingStatus.ELEMENT_NOT_FOUND) {
 
                     // message to the user
+                    setEvaluation(error);
                     onError();
 
-                } else if (response && response.status == ScrapingStatus.NO_CONTENT) {
+                } else if (error && error.status == ScrapingStatus.NO_CONTENT) {
                     // message to the user
+                    setEvaluation(error);
                     onError();
 
                 } else {
@@ -176,7 +178,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 }
 
                 setIsLoading(false);
-            })
+            });
         }
     };
 
@@ -194,7 +196,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      *
      */
     useEffect(() => {
-        console.log('loading selector config for ', selector)
 
         if (data.selector) {
             setSelector(data.selector);

@@ -1,6 +1,6 @@
 import React from "react";
 import { Space } from "antd";
-import { RemoveCharAlterator } from './RemoveCharAlterator';
+import { RemoveCharSweeper } from './RemoveCharSweeper';
 
 import './Alterators.scoped.css';
 
@@ -16,7 +16,7 @@ export const DataAlterators = (): JSX.Element => {
     return (
         <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
-            <RemoveCharAlterator />
+            <RemoveCharSweeper />
 
         </Space>
     );

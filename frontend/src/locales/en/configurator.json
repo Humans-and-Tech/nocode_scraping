@@ -8,6 +8,7 @@
   "field": {
     "title": "Configure the scraping",
     "selector": {
+      "intro": "Define the CSS path the select the content",
       "proposal": "Analyzing the website, we propose the following selector for this element : {{ value }}",
       "input_placeholder": "Enter a selector for this element",
       "scrape_element": "Try to scrape this element"

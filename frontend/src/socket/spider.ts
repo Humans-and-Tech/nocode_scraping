@@ -32,7 +32,6 @@ export const getSpider = (_socket: Socket, user: unknown, name: string, callback
 export const saveSpider = (_socket: Socket, user: unknown, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => {
     debounce(() => {
         _socket.emit('spider:upsert', {}, spider, (resp: boolean, error: Error | undefined) => {
-            console.log('spider:upsert', resp, error);
             callback(resp, error);
         });
     }, 500)();
