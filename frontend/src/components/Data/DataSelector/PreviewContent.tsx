@@ -3,7 +3,7 @@ import { Space, Image } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
-import { ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
+import { ScrapingResponse, ScrapingStatus } from "../../../interfaces/events";
 
 
 import './Data.scoped.css';

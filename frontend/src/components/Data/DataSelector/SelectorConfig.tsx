@@ -10,7 +10,7 @@ import { getContent } from '../../../socket/scraping';
 import { Data, DataSelector, SelectorStatus } from "../../../interfaces/spider";
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from "../../../interfaces/events";
 import { SelectorInput } from './SelectorInput'
-import { PreviewContent } from "../PreviewContent";
+import { PreviewContent } from "./PreviewContent";
 
 import '../Data.scoped.css';
 
