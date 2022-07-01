@@ -6,14 +6,13 @@ import { Socket } from "socket.io-client";
 import isURL from "validator/lib/isURL";
 
 import { SocketContext } from '../../socket';
-import { evaluate } from '../../socket/scraping';
+import { getContent } from '../../socket/scraping';
 import { Data, DataSelector, SelectorStatus } from "../../interfaces/spider";
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
 import { SelectorInput } from './SelectorInput'
-
+import { PreviewContent } from "./PreviewContent";
 
 import './Data.scoped.css';
-import { SelectorEvaluation } from "./SelectorEvaluation";
 
 
 const createSelector = (): DataSelector => {
@@ -148,7 +147,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             // don't pass the cookiePopupPath if the switch button is not activated
             const _cookiePpSelector = (isPopup ? popupSelector : undefined);
 
-            evaluate(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => {
+            getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => {
 
                 setEvaluation(response);
 
@@ -172,7 +171,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                     // there has been a technical error
                     // on the backend side
                     // notify the user by a special message
-                    console.error(error);
+                    console.log(error)
                     setIsBackendError(true);
                 }
 
@@ -219,12 +218,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                     <span data-testid="no_url">{t('field.evaluation.no_url')}</span>
                 </Space>
             }
-
-            {<>
-                <span>{t('data selector')}</span>
-                <span>{JSON.stringify(selector)}</span>
-            </>}
-
             {
                 selector &&
                 <>
@@ -232,7 +225,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                     <SelectorInput selector={selector} onChange={onDataSelectorChange} />
                 </>
             }
-
             {
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     {
@@ -286,7 +278,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             {
                 evaluation &&
-                <SelectorEvaluation evaluation={evaluation} />
+                <PreviewContent content={evaluation} />
             }
 
             {

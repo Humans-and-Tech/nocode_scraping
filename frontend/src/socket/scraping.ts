@@ -8,7 +8,7 @@ import { IScrapingRequest, ScrapingError, ScrapingResponse } from "../interfaces
  * fetches the content of the css selector and provides it back to the callback function
  * 
  */
-export const evaluate = (_socket: Socket, user: unknown, s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => void) => {
+export const getContent = (_socket: Socket, user: unknown, s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => void) => {
     const evaluateConfig: IScrapingRequest = {
         'selector': s,
         'url': url,

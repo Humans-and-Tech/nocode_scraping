@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { Tabs, Space, Button } from "antd";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
@@ -40,8 +40,6 @@ export const DataConfig = ({
 
   const [tmpData, setTmpData] = useState<Data | undefined>(undefined);
 
-  // const [tmpSpider, setTmpSpider] = useState<Spider | undefined>(undefined);
-
   const upsertSpider = (_spider: Spider) => {
 
     spiderProvider.upsert(socket, _spider, (b: boolean, err: Error | undefined) => {
@@ -55,23 +53,22 @@ export const DataConfig = ({
   };
 
   const saveSpiderData = (_data: Data) => {
-    let isFound = false;
-    spider.data?.forEach((d: Data) => {
+    let existingDataIndex = -1;
+    spider.data?.forEach((d: Data, index: number) => {
       if (d.name == _data.name) {
-        isFound = true;
+        existingDataIndex = index;
         d = _data;
-        console.log('found data', d);
       }
     });
 
-    if (!isFound) {
-      if (spider.data === undefined) {
-        spider.data = [];
-      }
-      spider.data.push(_data);
-      console.log('Added data', spider?.data);
+    if (spider.data === undefined) {
+      spider.data = [];
     }
-    console.log('saveSpiderData', spider);
+    if (existingDataIndex == -1) {
+      spider.data.push(_data);
+    } else {
+      spider.data[existingDataIndex] = _data
+    }
     upsertSpider(spider);
   };
 
@@ -88,7 +85,6 @@ export const DataConfig = ({
 
 
   const onDataChange = (_data: Data): void => {
-    console.log('onDataChange', _data)
     setTmpData(_data);
     saveSpiderData(_data);
   };
@@ -98,19 +94,12 @@ export const DataConfig = ({
   };
 
   const saveConfig = () => {
-    console.log('saveConfig requested', tmpData);
     if (tmpData !== undefined) {
       saveSpiderData(tmpData)
     }
   };
 
   const saveBtn = <Button onClick={saveConfig}>{t('field.action.save_data_configuration')}</Button>;
-
-  // useEffect(() => {
-  // if (tmpSpider === undefined) {
-  //   setTmpSpider(spider);
-  // }
-  // }, [data, spider]);
 
   return (
 

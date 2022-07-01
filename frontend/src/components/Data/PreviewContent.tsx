@@ -9,32 +9,32 @@ import { ScrapingResponse, ScrapingStatus } from "../../interfaces/events";
 import './Data.scoped.css';
 
 interface ISelectorEvalPropsType {
-    evaluation: ScrapingResponse | undefined;
+    content: ScrapingResponse | undefined;
 }
 
 
-export const SelectorEvaluation = (props: ISelectorEvalPropsType): JSX.Element => {
+export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
-    const { evaluation } = props;
+    const { content } = props;
 
 
     return (
         <>
-            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.SUCCESS && (
+            {content && content.status == ScrapingStatus.SUCCESS && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CheckCircleOutlined className="success"></CheckCircleOutlined>
-                        <span>{t("field.evaluation.result", { value: evaluation.content })}</span>
+                        <span>{t("field.evaluation.result", { value: content.content })}</span>
                     </Space>
                     {
-                        evaluation.screenshot !== undefined && evaluation.screenshot != '' &&
+                        content.screenshot !== undefined && content.screenshot != '' &&
                         <>
                             <h4>{t('field.evaluation.screenshot')}</h4>
                             <Image
                                 width={200}
-                                src={evaluation.screenshot}
+                                src={content.screenshot}
                                 data-testid="screenshot"
                             ></Image>
 
@@ -42,35 +42,35 @@ export const SelectorEvaluation = (props: ISelectorEvalPropsType): JSX.Element =
                     }
                 </Space>
             )}
-            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.NO_CONTENT && (
+            {content && content.status == ScrapingStatus.NO_CONTENT && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_content', { selector: evaluation.selector.path }) }}></span>
+                        <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_content', { selector: content.selector.path }) }}></span>
                     </Space>
                 </Space>
             )}
-            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.ELEMENT_NOT_FOUND && (
+            {content && content.status == ScrapingStatus.ELEMENT_NOT_FOUND && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
                         {
-                            evaluation.selector !== undefined
-                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_popup', { selector: evaluation.selector.path }) }}></span>
-                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
+                            content.selector !== undefined
+                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.no_popup', { selector: content.selector.path }) }}></span>
+                                : <span>{t("field.evaluation.failure_unknown", { message: content.message })}</span>
                         }
 
                     </Space>
                 </Space>
             )}
-            {evaluation && evaluation !== null && evaluation.status == ScrapingStatus.ERROR && (
+            {content && content.status == ScrapingStatus.ERROR && (
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
                         {
-                            evaluation.selector !== undefined
-                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.failure', { selector: evaluation.selector.path }) }}></span>
-                                : <span>{t("field.evaluation.failure_unknown", { message: evaluation.message })}</span>
+                            content.selector !== undefined
+                                ? <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.failure', { selector: content.selector.path }) }}></span>
+                                : <span>{t("field.evaluation.failure_unknown", { message: content.message })}</span>
                         }
 
                     </Space>
