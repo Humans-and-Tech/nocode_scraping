@@ -28,8 +28,13 @@ export const validateSelector = async (selector: DataSelector): Promise<boolean>
      * to validate the CSS selector
      * because the lib validates the rules; not only a selector
      */
-    const result = await cssValidator.validateText(`${selector.path} {}`);
-    return Promise.resolve(result.valid);
+    try {
+        const result = await cssValidator.validateText(`${selector.path} {}`);
+        return Promise.resolve(result.valid);
+    } catch (err) {
+        return Promise.reject(err);
+    }
+
 };
 
 

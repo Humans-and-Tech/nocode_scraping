@@ -50,15 +50,21 @@ module.exports = () => {
      * @param selector 
      * @returns true|false
      */
-    const isSelectorValid = async (selector: DataSelector, callback: (resp: boolean) => void) => {
+    const isSelectorValid = async (selector: DataSelector, callback: (resp: boolean, error: Error | undefined) => void) => {
 
         /**
          * create a blank rule {} 
          * to validate the CSS selector
          * because the lib validates the rules; not only a selector
          */
-        const result = await validateSelector(selector);
-        return callback(result);
+        try {
+
+            const result = await validateSelector(selector);
+            return callback(result, undefined);
+
+        } catch (error) {
+            callback(false, error as Error);
+        }
     };
 
     return {

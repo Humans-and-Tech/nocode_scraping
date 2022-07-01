@@ -27,8 +27,6 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
 
     const { selector, onChange } = props;
 
-    // TODO:
-    // select the language(CSS, Xpath, jsonld, js)
     const socket = useContext<Socket>(SocketContext);
 
     /**
@@ -50,18 +48,24 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     const validateSelector = (s: DataSelector) => {
 
         setIsBackendError(false);
-        validateCssSelector(socket, {}, s, (isValid: boolean) => {
+        validateCssSelector(socket, {}, s, (isValid: boolean, err: Error | undefined) => {
 
-            // TODO: manage backend errors
-            // setIsBackendError(true);
-            if (isValid) {
-                setInputClass('success');
-                s.status = SelectorStatus.VALID;
-                onChange(s);
-            } else {
+            if (err) {
+                setIsBackendError(true);
                 setInputClass('error');
                 s.status = SelectorStatus.INVALID;
-                onChange(s);
+            } else {
+
+                if (isValid) {
+                    setInputClass('success');
+                    s.status = SelectorStatus.VALID;
+                    onChange(s);
+                } else {
+                    setInputClass('error');
+                    s.status = SelectorStatus.INVALID;
+                    onChange(s);
+                }
+
             }
         });
     };
@@ -76,31 +80,10 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     ) => {
         const val = e.target.value;
         setPath(val);
-
         if (selector !== undefined) {
             selector.path = val;
             validateSelector(selector);
         }
-    };
-
-
-    /**
-     * triggered when the CSS selector input is blurred
-     * (looses focus)
-     * 
-     * @param e an input event
-     */
-    const onSelectorBlur = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        // call the parant onChange
-        const val = e.target.value;
-        setPath(val);
-        if (selector !== undefined) {
-            selector.path = val;
-            validateSelector(selector);
-        }
-        onChange(selector);
     };
 
 
@@ -108,14 +91,12 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
      * initializes the selector path if provided by the selector prop
      */
     useEffect(() => {
-        console.log("selector.path", selector.path)
         if (selector.path) {
             setPath(selector.path);
         } else {
-            console.log("undefined selector path");
             setPath('');
         }
-    }, [selector.path]);
+    }, [selector]);
 
 
     return (
@@ -125,11 +106,10 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
             <TextArea
                 rows={4}
                 placeholder={t("field.selector.input_placeholder")}
-                onBlur={onSelectorBlur}
+                onBlur={onSelectorChange}
                 onChange={onSelectorChange}
                 value={path}
                 data-testid="selectorPathInput"
-                selector-path={selector.path}
                 className={inputClass}
             />
 
@@ -137,7 +117,7 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">
                         <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        <span>{t("field.evaluation.backend_error")}</span>
+                        <span data-testid="backend_error">{t("field.evaluation.backend_error")}</span>
                     </Space>
                 </Space>
             )}
