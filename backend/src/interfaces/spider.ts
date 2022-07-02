@@ -1,8 +1,12 @@
-
+export enum SelectorStatus {
+    VALID = 'valid',
+    INVALID = 'invalid'
+}
 
 export interface DataSelector {
     path: string | undefined;
     language?: 'css' | 'xpath' | 'jsonld' | 'js';
+    status?: SelectorStatus;
 }
 
 export interface Data {

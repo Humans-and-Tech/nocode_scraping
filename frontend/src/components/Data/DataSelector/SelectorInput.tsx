@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, Fragment } from "react";
 import { Input, Space } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -7,10 +7,9 @@ import { Socket } from "socket.io-client";
 import { SocketContext } from '../../../socket';
 import { validateCssSelector } from '../../../socket/scraping';
 import { DataSelector, SelectorStatus } from "../../../interfaces/spider";
-
+import { DataSelectorValidityResponse, GenericResponseStatus } from "../../../interfaces/events";
 
 import './SelectorInput.scoped.css';
-
 
 const { TextArea } = Input;
 
@@ -45,10 +44,14 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     const [inputClass, setInputClass] = useState<string>('');
 
 
+    /**
+     * TODO: useCallback
+     * @param s 
+     */
     const validateSelector = (s: DataSelector) => {
 
         setIsBackendError(false);
-        validateCssSelector(socket, {}, s, (isValid: boolean, err: Error | undefined) => {
+        validateCssSelector(socket, {}, s, (resp: DataSelectorValidityResponse | undefined, err: Error | undefined) => {
 
             if (err) {
                 setIsBackendError(true);
@@ -56,7 +59,7 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
                 s.status = SelectorStatus.INVALID;
             } else {
 
-                if (isValid) {
+                if (resp?.status === GenericResponseStatus.SUCCESS) {
                     setInputClass('success');
                     s.status = SelectorStatus.VALID;
                     onChange(s);
@@ -100,30 +103,30 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
 
 
     return (
+        <>
+            <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
-        <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                <TextArea
+                    rows={4}
+                    placeholder={t("field.selector.input_placeholder")}
+                    onBlur={onSelectorChange}
+                    onChange={onSelectorChange}
+                    value={path}
+                    data-testid="selectorPathInput"
+                    className={inputClass}
+                />
 
-            <TextArea
-                rows={4}
-                placeholder={t("field.selector.input_placeholder")}
-                onBlur={onSelectorChange}
-                onChange={onSelectorChange}
-                value={path}
-                data-testid="selectorPathInput"
-                className={inputClass}
-            />
-
-            {isBackendError && (
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-                    <Space direction="horizontal">
-                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
-                        <span data-testid="backend_error">{t("field.evaluation.backend_error")}</span>
+                {isBackendError && (
+                    <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                        <Space direction="horizontal">
+                            <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                            <span data-testid="backend_error">{t("field.evaluation.backend_error")}</span>
+                        </Space>
                     </Space>
-                </Space>
-            )}
+                )}
 
-        </Space>
-
+            </Space>
+        </>
     );
 };
 

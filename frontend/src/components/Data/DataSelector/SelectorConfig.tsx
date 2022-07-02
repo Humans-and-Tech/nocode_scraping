@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Space, Spin, Switch, Button, Tooltip } from "antd";
 import { CloseCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -56,6 +56,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
     const { data, onConfigured, onError, sampleUrl, onChange } = props;
 
     const [selector, setSelector] = useState<DataSelector | undefined>(undefined);
+
+    const dataName = useRef('');
 
     /**
      * optionnally, the user may want to configure
@@ -118,6 +120,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
     /**
      * evaluates the CSS selector path
      * 
+     * 
      * @param event 
      */
     const evaluateSelectorPath = (
@@ -126,6 +129,9 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
         event.preventDefault();
 
+        // reset evaluation
+        setEvaluation(undefined);
+
         setIsLoading(true);
 
         // reset the evaluation status !
@@ -133,9 +139,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
         // reset backend error
         setIsBackendError(false);
-
-        // reset evaluation
-        setEvaluation(undefined);
 
         if (selector?.path !== undefined && selector?.path !== '' && sampleUrl !== undefined && sampleUrl.toString() !== '') {
             // for testing purpose
@@ -172,7 +175,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                     // there has been a technical error
                     // on the backend side
                     // notify the user by a special message
-                    console.log(error)
+                    console.error("Error calling the backend", error);
                     setIsBackendError(true);
                 }
 
@@ -188,6 +191,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
 
     /**
+     * triggered only when the data name or sampleUrl change !
+     * 
      * Loads the selector with the data selector if existing
      * otherwise creates a blank selector object
      * 
@@ -196,23 +201,33 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      */
     useEffect(() => {
 
-        if (data.selector) {
-            setSelector(data.selector);
-        } else {
-            setSelector(createSelector());
-        }
+        // reset only the component state when data name changes
+        // because data is a complet ovject, its inner value change
+        if (dataName.current !== data.name) {
 
-        if (popupSelector === undefined) {
-            setPopupSelector(createSelector());
-        }
+            dataName.current = data.name;
 
-        // reset the preview component
-        // when changing data 
-        setEvaluation(undefined);
+            if (data.selector) {
+                setSelector(data.selector);
+            } else {
+                setSelector(createSelector());
+            }
 
-        // enable eventually a new evaluation 
-        if (sampleUrl !== undefined && selector?.path !== undefined) {
-            setIsEvaluationEnabled(true);
+            if (popupSelector === undefined) {
+                setPopupSelector(createSelector());
+            }
+
+            console.log("setEvaluation", undefined);
+
+            // reset the preview component
+            // when data change 
+            setIsEvaluationEnabled(false);
+            setEvaluation(undefined);
+
+            // enable eventually a new evaluation 
+            if (sampleUrl !== undefined && data.selector?.path !== undefined) {
+                setIsEvaluationEnabled(true);
+            }
         }
 
     }, [sampleUrl, data]);

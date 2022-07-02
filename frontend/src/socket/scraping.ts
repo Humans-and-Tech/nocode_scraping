@@ -2,7 +2,7 @@ import { Socket } from "socket.io-client";
 import debounce from "lodash/debounce";
 
 import { DataSelector } from "../interfaces/spider";
-import { IScrapingRequest, ScrapingError, ScrapingResponse } from "../interfaces/events";
+import { IScrapingRequest, ScrapingError, ScrapingResponse, DataSelectorValidityResponse } from "../interfaces/events";
 
 /**
  * fetches the content of the css selector and provides it back to the callback function
@@ -27,14 +27,10 @@ export const getContent = (_socket: Socket, user: unknown, s: DataSelector, url:
  * so don't emit a socket message for the backend each time
  * 
  */
-export const validateCssSelector = (_socket: Socket, user: unknown, p: DataSelector, callback: (isValid: boolean, err: Error | undefined) => void) => {
+export const validateCssSelector = (_socket: Socket, user: unknown, p: DataSelector, callback: (resp: DataSelectorValidityResponse | undefined, error: Error | undefined) => void) => {
     debounce(() => {
-        _socket.emit('scraping:validate-css-selector', p, (b: boolean, error: Error) => {
-            if (error) {
-                callback(false, error);
-            } else {
-                callback(b, undefined);
-            }
+        _socket.emit('scraping:validate-css-selector', p, (resp: DataSelectorValidityResponse, error: Error) => {
+            callback(resp, error);
         });
     }, 1000)();
 };

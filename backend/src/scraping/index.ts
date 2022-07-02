@@ -5,19 +5,23 @@ import { createHash } from 'crypto';
 import * as playwright from 'playwright-chromium';
 import cssValidator from 'w3c-css-validator';
 
-import { DataSelector } from '../interfaces/spider';
-import { ScrapingResponse, IScrapingRequest, ScrapingStatus, ScrapingError } from '../interfaces/scraping';
+import { DataSelector, SelectorStatus } from '../interfaces/spider';
+import { ScrapingResponse, IScrapingRequest, ScrapingStatus, ScrapingError, DataSelectorValidityResponse, DataSelectorValidityError, GenericResponseStatus } from '../interfaces/scraping';
 
+
+export const isDataSelectorValidityError = (o: DataSelectorValidityResponse): o is DataSelectorValidityError => {
+    return ("message" in o && "selector" in o && "status" in o);
+}
 
 /**
- * validates a selector path, based on its language
+ * validates a selector path
  * 
  * If not provided, the default language is 'css'
  * 
  * @param selector (DataSelector)
- * @returns a promise of a boolean 
+ * @returns a DataSelector completed with the validity status
  */
-export const validateSelector = async (selector: DataSelector): Promise<boolean> => {
+export const validateSelector = async (selector: DataSelector): Promise<DataSelectorValidityResponse> => {
 
     if (selector.language !== 'css' && selector.language !== undefined) {
         return Promise.reject(`Unsupported language ${selector.language}, only CSS is currently supported`);
@@ -26,13 +30,27 @@ export const validateSelector = async (selector: DataSelector): Promise<boolean>
     /**
      * create a blank rule {} 
      * to validate the CSS selector
-     * because the lib validates the rules; not only a selector
+     * because the lib validates CSS rules; not selectors
      */
     try {
+
         const result = await cssValidator.validateText(`${selector.path} {}`);
-        return Promise.resolve(result.valid);
+        if (result.valid) {
+            selector.status = SelectorStatus.VALID;
+        } else {
+            selector.status = SelectorStatus.INVALID;
+        }
+        return Promise.resolve({
+            selector: selector,
+            status: GenericResponseStatus.SUCCESS
+        });
+
     } catch (err) {
-        return Promise.reject(err);
+        return Promise.reject({
+            selector: selector,
+            message: err,
+            status: GenericResponseStatus.ERROR
+        } as DataSelectorValidityError);
     }
 
 };
@@ -43,19 +61,37 @@ export const clickElement = async (page: playwright.Page, selector: DataSelector
     if (selector !== undefined && selector.path !== undefined) {
 
         if (selector.language !== 'css' && selector.language !== undefined) {
-            return Promise.reject(`Unsupported language ${selector.language}, only CSS is currently supported`);
+            return Promise.reject(
+                {
+                    message: `Unsupported language ${selector.language}, only CSS is currently supported`,
+                    status: ScrapingStatus.ERROR,
+                    selector: selector
+                } as ScrapingError
+            )
         }
 
         try {
-            const isSelectorValid = await validateSelector(selector);
-            if (!isSelectorValid) {
+            const validityResponse = await validateSelector(selector);
+
+            if (validityResponse.status === GenericResponseStatus.ERROR) {
+
                 return Promise.reject({
-                    message: `invalid selector ${selector} provided`,
+                    message: `Error validating the selector ${selector}`,
                     status: ScrapingStatus.ERROR,
-                    selector: selector
+                    selector: validityResponse.selector
+                } as ScrapingError);
+
+            } else if (validityResponse.selector.status === SelectorStatus.INVALID) {
+
+                return Promise.reject({
+                    message: `Invalid selector ${selector}`,
+                    status: ScrapingStatus.ERROR,
+                    selector: validityResponse.selector
                 } as ScrapingError);
             }
+
         } catch (err) {
+
             return Promise.reject({
                 message: `invalid selector, ${err}`,
                 status: ScrapingStatus.ERROR,
@@ -110,17 +146,28 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         } as ScrapingError);
     }
 
-    // validate selectors provided
     try {
-        const isSelectorValid = await validateSelector(req.selector);
-        if (!isSelectorValid) {
+
+        const validityResponse = await validateSelector(req.selector);
+        if (validityResponse.status === GenericResponseStatus.ERROR) {
+
             return Promise.reject({
-                message: `invalid selector ${req.selector} provided`,
+                message: `Error validating the selector ${req.selector}`,
                 status: ScrapingStatus.ERROR,
-                selector: req.selector
+                selector: validityResponse.selector
+            } as ScrapingError);
+
+        } else if (validityResponse.selector.status === SelectorStatus.INVALID) {
+
+            return Promise.reject({
+                message: `Invalid selector ${req.selector}`,
+                status: ScrapingStatus.ERROR,
+                selector: validityResponse.selector
             } as ScrapingError);
         }
+
     } catch (err) {
+
         return Promise.reject({
             message: `invalid selector, ${err}`,
             status: ScrapingStatus.ERROR,
@@ -172,11 +219,13 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
             }
 
         } catch (error) {
-            return Promise.reject({
-                message: error,
-                status: ScrapingStatus.ERROR,
-                selector: req.selector
-            } as ScrapingError)
+            return Promise.reject(
+                {
+                    message: error,
+                    status: ScrapingStatus.ERROR,
+                    selector: req.selector
+                } as ScrapingError
+            );
         }
 
         // await the page to be ready
@@ -186,15 +235,32 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
 
         // eventually click elements 
         // before scraping
-        if (req.clickBefore !== undefined) {
+        if (req.clickBefore) {
             try {
                 req.clickBefore.forEach(async (element) => {
-                    if (element !== undefined) {
-                        await clickElement(page, element);
+                    if (element) {
+                        try {
+                            await clickElement(page, element);
+                        } catch (err) {
+                            Promise.reject(
+                                {
+                                    message: JSON.stringify(err),
+                                    status: ScrapingStatus.ERROR,
+                                    selector: req.selector
+                                } as ScrapingError
+                            );
+                        }
+
                     }
                 });
             } catch (err) {
-                Promise.reject(err);
+                Promise.reject(
+                    {
+                        message: JSON.stringify(err),
+                        status: ScrapingStatus.ERROR,
+                        selector: req.selector
+                    } as ScrapingError
+                );
             }
         }
 
@@ -215,28 +281,34 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         await unlink(screenshotPath);
 
         if (content !== null) {
-            return Promise.resolve({
-                screenshot: `data:image/gif;base64,${imageAsBase64}`,
-                content: content,
-                status: ScrapingStatus.SUCCESS
-            } as ScrapingResponse);
+            return Promise.resolve(
+                {
+                    screenshot: `data:image/gif;base64,${imageAsBase64}`,
+                    content: content,
+                    status: ScrapingStatus.SUCCESS
+                } as ScrapingResponse
+            );
         } else {
-            return Promise.reject({
-                message: `no content found for selector ${req.selector.path}`,
-                status: ScrapingStatus.NO_CONTENT,
-                selector: req.selector
-            } as ScrapingError);
+            return Promise.reject(
+                {
+                    message: `no content found for selector ${req.selector.path}`,
+                    status: ScrapingStatus.NO_CONTENT,
+                    selector: req.selector
+                } as ScrapingError
+            );
         }
 
     } catch (error) {
 
         if (error instanceof playwright.errors.TimeoutError) {
 
-            return Promise.reject({
-                message: `the selector ${req.selector.path} could not be found`,
-                status: ScrapingStatus.NO_CONTENT,
-                selector: req.selector
-            } as ScrapingError);
+            return Promise.reject(
+                {
+                    message: `the selector ${req.selector.path} could not be found`,
+                    status: ScrapingStatus.NO_CONTENT,
+                    selector: req.selector
+                } as ScrapingError
+            );
 
         } else {
             // try to unlink the screenshot
@@ -255,11 +327,13 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
                 // do nothing
             }
 
-            return Promise.reject({
-                message: `error ${error} when scraping ${req.selector.path}`,
-                status: ScrapingStatus.ERROR,
-                selector: req.selector
-            } as ScrapingError);
+            return Promise.reject(
+                {
+                    message: `error ${error} when scraping ${req.selector.path}`,
+                    status: ScrapingStatus.ERROR,
+                    selector: req.selector
+                } as ScrapingError
+            );
         }
 
     }

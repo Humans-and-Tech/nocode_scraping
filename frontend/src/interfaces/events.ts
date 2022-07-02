@@ -7,6 +7,11 @@ export enum ScrapingStatus {
     ELEMENT_NOT_FOUND = "element_not_found" // the cookie popup was not found
 }
 
+export enum GenericResponseStatus {
+    SUCCESS = 'success',
+    ERROR = 'error', // a backend error
+}
+
 export interface IScrapingRequest {
     selector: DataSelector;
     url: URL;
@@ -30,6 +35,18 @@ export interface ScrapingError extends ScrapingResponse {
     message: string;
     status: ScrapingStatus.ERROR | ScrapingStatus.NO_CONTENT | ScrapingStatus.ELEMENT_NOT_FOUND;
     selector: DataSelector
+}
+
+export interface DataSelectorValidityResponse {
+    message?: string;
+    selector: DataSelector;
+    status: GenericResponseStatus;
+}
+
+export interface DataSelectorValidityError extends DataSelectorValidityResponse {
+    message: string;
+    selector: DataSelector;
+    status: GenericResponseStatus.ERROR;
 }
 
 

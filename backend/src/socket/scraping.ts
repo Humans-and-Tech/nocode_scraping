@@ -2,7 +2,7 @@
 
 import { DataSelector } from '../interfaces/spider';
 import { getContent, validateSelector } from '../scraping';
-import { ScrapingError, ScrapingResponse, IScrapingRequest, ScrapingStatus } from '../interfaces/scraping';
+import { ScrapingError, ScrapingResponse, IScrapingRequest, ScrapingStatus, DataSelectorValidityResponse, GenericResponseStatus } from '../interfaces/scraping';
 
 
 function isScrapingError(o: any): o is ScrapingError {
@@ -50,20 +50,16 @@ module.exports = () => {
      * @param selector 
      * @returns true|false
      */
-    const isSelectorValid = async (selector: DataSelector, callback: (resp: boolean, error: Error | undefined) => void) => {
+    const isSelectorValid = async (selector: DataSelector, callback: (resp: DataSelectorValidityResponse | undefined, error: Error | undefined) => void) => {
 
-        /**
-         * create a blank rule {} 
-         * to validate the CSS selector
-         * because the lib validates the rules; not only a selector
-         */
         try {
 
-            const result = await validateSelector(selector);
-            return callback(result, undefined);
+            const validityResponse = await validateSelector(selector);
+            return callback(validityResponse, undefined);
 
         } catch (error) {
-            callback(false, error as Error);
+
+            callback(undefined, error as Error);
         }
     };
 

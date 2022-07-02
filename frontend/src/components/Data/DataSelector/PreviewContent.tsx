@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { Fragment } from "react";
 import { Space, Image } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -83,7 +83,6 @@ export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
                 </Space>
             )}
         </>
-
     );
 };
 
