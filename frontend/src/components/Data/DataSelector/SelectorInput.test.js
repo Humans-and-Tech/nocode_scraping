@@ -31,19 +31,39 @@ jest.mock('../../../socket/scraping', () => ({
     // callback would be a jest mock
     // for example a simple jest.fn()
     validateCssSelector: (socket, { }, s, callback) => {
+        // the response can be DataSelectorValidityResponse | DataSelectorValidityError
         const pathToCallback = {
-            '.a-good-selector': true,
-            '.a-bad-selector': false,
-            '.a-error-selector': false
-        };
-        if (s.path === '.a-good-selector') {
-            return callback(true, undefined);
-        } else if (s.path === '.a-bad-selector') {
-            return callback(false, undefined);
-        } else if ((s.path === '.a-error-selector')) {
-            return callback(false, new Error('this is a backend error'));
-        }
+            '.a-good-selector': {
+                selector: {
+                    path: '.a-good-selector',
+                    status: "valid"
+                },
+                status: "success"
+            },
 
+            // a selector which is invalid
+            // but no error on the backend side
+            '.a-bad-selector': {
+                message: "a message",
+                selector: {
+                    path: ".a-bad-selector",
+                    status: "invalid"
+                },
+                status: "success"
+            },
+
+            // a selector which caused
+            // a backend error 
+            '.a-error-selector': {
+                message: "a message",
+                selector: {
+                    path: ".a-error-selector",
+                    status: "invalid"
+                },
+                status: "error"
+            }
+        };
+        return callback(pathToCallback[s.path]);
     }
 }));
 
@@ -173,7 +193,6 @@ describe('onSelectorChange is called when changing the input value', () => {
         // a message should be displayed to notify the user
         const span = getByTestId('backend_error');
         expect(span).toBeInTheDocument();
-
 
     });
 
