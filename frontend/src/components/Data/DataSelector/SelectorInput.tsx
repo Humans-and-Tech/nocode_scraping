@@ -7,7 +7,7 @@ import { Socket } from "socket.io-client";
 import { SocketContext } from '../../../socket';
 import { validateCssSelector } from '../../../socket/scraping';
 import { DataSelector, SelectorStatus } from "../../../interfaces/spider";
-import { DataSelectorValidityResponse, GenericResponseStatus } from "../../../interfaces/events";
+import { DataSelectorValidityError, DataSelectorValidityResponse, GenericResponseStatus } from "../../../interfaces/events";
 
 import './SelectorInput.scoped.css';
 
@@ -51,24 +51,25 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
     const validateSelector = (s: DataSelector) => {
 
         setIsBackendError(false);
-        validateCssSelector(socket, {}, s, (resp: DataSelectorValidityResponse | undefined, err: Error | undefined) => {
 
-            if (err) {
+        validateCssSelector(socket, {}, s, (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
+
+            if (resp.status === GenericResponseStatus.ERROR) {
+
                 setIsBackendError(true);
                 setInputClass('error');
                 s.status = SelectorStatus.INVALID;
-            } else {
 
-                if (resp?.status === GenericResponseStatus.SUCCESS) {
+            } else {
+                s.status = resp.selector.status;
+
+                if (resp.selector.status === SelectorStatus.VALID) {
                     setInputClass('success');
-                    s.status = SelectorStatus.VALID;
-                    onChange(s);
                 } else {
                     setInputClass('error');
-                    s.status = SelectorStatus.INVALID;
-                    onChange(s);
                 }
 
+                onChange(s);
             }
         });
     };

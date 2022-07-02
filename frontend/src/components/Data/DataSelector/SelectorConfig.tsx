@@ -72,7 +72,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      * the result of the CSS Selector evaluation on the URL (evalUrl)
      * scraped by the backend
      */
-    const [evaluation, setEvaluation] = useState<ScrapingResponse | undefined>(undefined);
+    const [evaluation, setEvaluation] = useState<ScrapingResponse | ScrapingError | undefined>(undefined);
     const [evaluationHelperMessage, setEvaluationHelperMessage] = useState<string>('');
 
     /**
@@ -150,33 +150,31 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             // don't pass the cookiePopupPath if the switch button is not activated
             const _cookiePpSelector = (isPopup ? popupSelector : undefined);
 
-            getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => {
+            getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | ScrapingError) => {
 
                 // check the response status
-                if (response && response.status == ScrapingStatus.SUCCESS) {
+                if (response.status == ScrapingStatus.SUCCESS) {
 
                     // send the configuration to the parent
                     setEvaluation(response);
                     data.selector = selector;
                     onConfigured(data);
 
-                } else if (error && error.status == ScrapingStatus.ELEMENT_NOT_FOUND) {
-
-                    // message to the user
-                    setEvaluation(error);
-                    onError();
-
-                } else if (error && error.status == ScrapingStatus.NO_CONTENT) {
-                    // message to the user
-                    setEvaluation(error);
-                    onError();
-
                 } else {
-                    // there has been a technical error
-                    // on the backend side
-                    // notify the user by a special message
-                    console.error("Error calling the backend", error);
-                    setIsBackendError(true);
+
+                    // the error details will be reported
+                    // to the user by the PreviewContent component
+                    // fed with the response (which is a ScrapingError)
+                    setEvaluation(response);
+
+                    if (response.status === ScrapingStatus.ERROR) {
+                        // there has been a technical error
+                        // on the backend side
+                        // notify the user by a special message
+                        console.error("Error calling the backend", response.message);
+                        setIsBackendError(true);
+                    }
+                    onError();
                 }
 
                 setIsLoading(false);
@@ -216,8 +214,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             if (popupSelector === undefined) {
                 setPopupSelector(createSelector());
             }
-
-            console.log("setEvaluation", undefined);
 
             // reset the preview component
             // when data change 

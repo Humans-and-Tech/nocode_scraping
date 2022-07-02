@@ -2,11 +2,11 @@
 
 import { DataSelector } from '../interfaces/spider';
 import { getContent, validateSelector } from '../scraping';
-import { ScrapingError, ScrapingResponse, IScrapingRequest, ScrapingStatus, DataSelectorValidityResponse, GenericResponseStatus } from '../interfaces/scraping';
+import { ScrapingError, ScrapingResponse, IScrapingRequest, ScrapingStatus, DataSelectorValidityResponse, GenericResponseStatus, DataSelectorValidityError } from '../interfaces/scraping';
 
 
 function isScrapingError(o: any): o is ScrapingError {
-    return 'message' in o && 'status' in o && 'selector' in o;
+    return 'message' in o && 'status' in o && 'selector' in o && o.status !== ScrapingStatus.SUCCESS;
 }
 
 module.exports = () => {
@@ -19,27 +19,29 @@ module.exports = () => {
      * @param callback 
      * @returns 
      */
-    const scrapeContent = async (req: IScrapingRequest, callback: (resp: ScrapingResponse | undefined, error: ScrapingError | undefined) => void) => {
+    const scrapeContent = async (req: IScrapingRequest, callback: (resp: ScrapingResponse | ScrapingError) => void) => {
 
         try {
 
             const response = await getContent(req);
-            callback(response, undefined);
+            callback(response);
 
         } catch (error) {
 
+            console.log('scrapeContent -> error', error);
+
             if (isScrapingError(error)) {
-                callback(undefined, {
+                callback({
                     message: error.message,
                     status: error.status,
                     selector: error.selector
-                });
+                } as ScrapingError);
             } else {
-                callback(undefined, {
+                callback({
                     message: JSON.stringify(error),
                     status: ScrapingStatus.ERROR,
                     selector: req.selector
-                });
+                } as ScrapingError);
             }
         }
     };
@@ -50,16 +52,15 @@ module.exports = () => {
      * @param selector 
      * @returns true|false
      */
-    const isSelectorValid = async (selector: DataSelector, callback: (resp: DataSelectorValidityResponse | undefined, error: Error | undefined) => void) => {
+    const isSelectorValid = async (selector: DataSelector, callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void) => {
 
         try {
 
             const validityResponse = await validateSelector(selector);
-            return callback(validityResponse, undefined);
+            return callback(validityResponse);
 
         } catch (error) {
-
-            callback(undefined, error as Error);
+            callback(error as DataSelectorValidityError);
         }
     };
 

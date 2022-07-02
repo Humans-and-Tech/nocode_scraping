@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "concurrently -k -n \"Typescript,Node\" -p \"[{name}]\" -c \"blue,green\" \"tsc --watch\" \"nodemon dist/index.js\"",
-    "start": "tsc && GOOGLE_APPLICATION_CREDENTIALS=./firestore-creds.json node dist/index.js",
+    "start": "tsc && GOOGLE_APPLICATION_CREDENTIALS=./firestore-creds.json node --trace-warnings dist/index.js",
     "test": "jest --verbose",
     "test-watch": "jest --verbose --watchAll"
   },

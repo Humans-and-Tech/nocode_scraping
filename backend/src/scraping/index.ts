@@ -9,9 +9,6 @@ import { DataSelector, SelectorStatus } from '../interfaces/spider';
 import { ScrapingResponse, IScrapingRequest, ScrapingStatus, ScrapingError, DataSelectorValidityResponse, DataSelectorValidityError, GenericResponseStatus } from '../interfaces/scraping';
 
 
-export const isDataSelectorValidityError = (o: DataSelectorValidityResponse): o is DataSelectorValidityError => {
-    return ("message" in o && "selector" in o && "status" in o);
-}
 
 /**
  * validates a selector path
@@ -21,10 +18,16 @@ export const isDataSelectorValidityError = (o: DataSelectorValidityResponse): o 
  * @param selector (DataSelector)
  * @returns a DataSelector completed with the validity status
  */
-export const validateSelector = async (selector: DataSelector): Promise<DataSelectorValidityResponse> => {
+export const validateSelector = async (selector: DataSelector): Promise<DataSelectorValidityResponse | DataSelectorValidityError> => {
 
     if (selector.language !== 'css' && selector.language !== undefined) {
-        return Promise.reject(`Unsupported language ${selector.language}, only CSS is currently supported`);
+        return Promise.reject(
+            {
+                message: `Unsupported language ${selector.language}, only CSS is currently supported`,
+                selector: selector,
+                status: GenericResponseStatus.ERROR
+            } as DataSelectorValidityError
+        );
     }
 
     /**
@@ -40,23 +43,28 @@ export const validateSelector = async (selector: DataSelector): Promise<DataSele
         } else {
             selector.status = SelectorStatus.INVALID;
         }
-        return Promise.resolve({
-            selector: selector,
-            status: GenericResponseStatus.SUCCESS
-        });
+        return Promise.resolve(
+            {
+                selector: selector,
+                status: GenericResponseStatus.SUCCESS,
+                selectorErrors: result.errors
+            } as DataSelectorValidityResponse
+        );
 
     } catch (err) {
-        return Promise.reject({
-            selector: selector,
-            message: err,
-            status: GenericResponseStatus.ERROR
-        } as DataSelectorValidityError);
+        return Promise.reject(
+            {
+                selector: selector,
+                message: err,
+                status: GenericResponseStatus.ERROR
+            } as DataSelectorValidityError
+        );
     }
 
 };
 
 
-export const clickElement = async (page: playwright.Page, selector: DataSelector): Promise<ScrapingResponse | void> => {
+export const clickElement = async (page: playwright.Page, selector: DataSelector): Promise<ScrapingResponse | ScrapingError | void> => {
 
     if (selector !== undefined && selector.path !== undefined) {
 
@@ -71,35 +79,42 @@ export const clickElement = async (page: playwright.Page, selector: DataSelector
         }
 
         try {
-            const validityResponse = await validateSelector(selector);
 
+            const validityResponse = await validateSelector(selector);
             if (validityResponse.status === GenericResponseStatus.ERROR) {
 
-                return Promise.reject({
-                    message: `Error validating the selector ${selector}`,
-                    status: ScrapingStatus.ERROR,
-                    selector: validityResponse.selector
-                } as ScrapingError);
+                return Promise.reject(
+                    {
+                        message: `Error validating the selector ${selector}`,
+                        status: ScrapingStatus.ERROR,
+                        selector: validityResponse.selector
+                    } as ScrapingError
+                );
 
             } else if (validityResponse.selector.status === SelectorStatus.INVALID) {
 
-                return Promise.reject({
-                    message: `Invalid selector ${selector}`,
-                    status: ScrapingStatus.ERROR,
-                    selector: validityResponse.selector
-                } as ScrapingError);
+                return Promise.reject(
+                    {
+                        message: `Invalid selector ${selector}`,
+                        status: ScrapingStatus.INVALID_SELECTOR,
+                        selector: validityResponse.selector
+                    } as ScrapingError
+                );
             }
 
         } catch (err) {
 
-            return Promise.reject({
-                message: `invalid selector, ${err}`,
-                status: ScrapingStatus.ERROR,
-                selector: selector
-            } as ScrapingError);
+            return Promise.reject(
+                {
+                    message: `invalid selector, ${err}`,
+                    status: ScrapingStatus.ERROR,
+                    selector: selector
+                } as ScrapingError
+            );
         }
 
         try {
+
             await page.click(selector.path);
             await page.waitForTimeout(500);
 
@@ -107,18 +122,23 @@ export const clickElement = async (page: playwright.Page, selector: DataSelector
             // but no need to return anything...
             return Promise.resolve();
         } catch (err) {
+
             if (err instanceof playwright.errors.TimeoutError) {
-                return Promise.reject({
-                    message: `the selector ${selector.path} could not be found`,
-                    status: ScrapingStatus.ELEMENT_NOT_FOUND,
-                    selector: selector
-                } as ScrapingError);
+                return Promise.reject(
+                    {
+                        message: `the selector ${selector.path} could not be found`,
+                        status: ScrapingStatus.ELEMENT_NOT_FOUND,
+                        selector: selector
+                    } as ScrapingError
+                );
             } else {
-                return Promise.reject({
-                    message: `error ${err} when scraping ${selector.path}`,
-                    status: ScrapingStatus.ERROR,
-                    selector: selector
-                } as ScrapingError);
+                return Promise.reject(
+                    {
+                        message: `error ${err} when scraping ${selector.path}`,
+                        status: ScrapingStatus.ERROR,
+                        selector: selector
+                    } as ScrapingError
+                );
             }
         }
     }
@@ -132,7 +152,7 @@ export const clickElement = async (page: playwright.Page, selector: DataSelector
  * @param req IScrapingRequest
  * @returns a Promise of a ScrapingResponse
  */
-export const getContent = async (req: IScrapingRequest): Promise<ScrapingResponse> => {
+export const getContent = async (req: IScrapingRequest): Promise<ScrapingResponse | ScrapingError> => {
 
     // should never occur in reality
     // but required for TS compilation 
@@ -147,7 +167,6 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
     }
 
     try {
-
         const validityResponse = await validateSelector(req.selector);
         if (validityResponse.status === GenericResponseStatus.ERROR) {
 
@@ -161,13 +180,13 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
 
             return Promise.reject({
                 message: `Invalid selector ${req.selector}`,
-                status: ScrapingStatus.ERROR,
+                status: ScrapingStatus.INVALID_SELECTOR,
                 selector: validityResponse.selector
             } as ScrapingError);
         }
 
     } catch (err) {
-
+        console.log('validityResponse err', err)
         return Promise.reject({
             message: `invalid selector, ${err}`,
             status: ScrapingStatus.ERROR,
@@ -237,28 +256,33 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapingRespons
         // before scraping
         if (req.clickBefore) {
             try {
-                req.clickBefore.forEach(async (element) => {
+                let clickErr;
+
+                // click all elements passed
+                // but if an error occurs rethrow it !
+                await Promise.all(req.clickBefore.map(async (element) => {
                     if (element) {
                         try {
                             await clickElement(page, element);
                         } catch (err) {
-                            Promise.reject(
-                                {
-                                    message: JSON.stringify(err),
-                                    status: ScrapingStatus.ERROR,
-                                    selector: req.selector
-                                } as ScrapingError
-                            );
+                            // err is a scrapingError
+                            // it contains the Selector which is not valid
+                            clickErr = err as ScrapingError;
                         }
-
                     }
-                });
+                }));
+
+                // the clickErr will be recatched just below
+                // thus the promise will be rejected
+                if (clickErr) {
+                    throw clickErr as ScrapingError
+                }
             } catch (err) {
-                Promise.reject(
+                return Promise.reject(
                     {
-                        message: JSON.stringify(err),
-                        status: ScrapingStatus.ERROR,
-                        selector: req.selector
+                        message: (err as ScrapingError).message,
+                        status: (err as ScrapingError).status,
+                        selector: (err as ScrapingError).selector
                     } as ScrapingError
                 );
             }
