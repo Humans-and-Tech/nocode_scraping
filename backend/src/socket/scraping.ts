@@ -28,8 +28,6 @@ module.exports = () => {
 
         } catch (error) {
 
-            console.log('scrapeContent -> error', error);
-
             if (isScrapingError(error)) {
                 callback({
                     message: error.message,

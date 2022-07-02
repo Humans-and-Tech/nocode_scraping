@@ -93,7 +93,7 @@ describe('onSelectorChange is called when changing the input value', () => {
         // the onChange function prop
         const mockOnConchange = jest.fn();
 
-        const { getByTestId } = render(
+        const { container } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
                     <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
@@ -104,7 +104,7 @@ describe('onSelectorChange is called when changing the input value', () => {
         // access the textarea input DOM Element
         // and check the data-* attributes
         // which hold the states of the component
-        const input = getByTestId('selectorPathInput');
+        const input = container.querySelector('textarea');
 
         // simulate a user input 
         fireEvent.change(input, { target: { value: '.a-good-selector' } });
@@ -118,7 +118,7 @@ describe('onSelectorChange is called when changing the input value', () => {
 
         // verify the input class of the textarea
         // refetch it
-        const input2 = getByTestId('selectorPathInput');
+        const input2 = container.querySelector('textarea');
         expect(input2).toHaveClass('success');
 
     });
@@ -130,7 +130,7 @@ describe('onSelectorChange is called when changing the input value', () => {
         // the onChange function prop
         const mockOnConchange = jest.fn();
 
-        const { getByTestId } = render(
+        const { getByTestId, container } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
                     <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
@@ -141,7 +141,7 @@ describe('onSelectorChange is called when changing the input value', () => {
         // access the textarea input DOM Element
         // and check the data-* attributes
         // which hold the states of the component
-        const input = getByTestId('selectorPathInput');
+        const input = container.querySelector('textarea');
 
         // simulate a user input 
         fireEvent.change(input, { target: { value: '.a-bad-selector' } });
@@ -155,7 +155,7 @@ describe('onSelectorChange is called when changing the input value', () => {
 
         // verify the input class of the textarea
         // refetch it
-        const input2 = getByTestId('selectorPathInput');
+        const input2 = container.querySelector('textarea');
         expect(input2).toHaveClass('error');
     });
 
@@ -166,7 +166,7 @@ describe('onSelectorChange is called when changing the input value', () => {
         // the onChange function prop
         const mockOnConchange = jest.fn();
 
-        const { getByTestId } = render(
+        const { getByTestId, container } = render(
             <SocketContext.Provider value={socket}>
                 <I18nextProvider i18n={i18n}>
                     <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
@@ -177,7 +177,7 @@ describe('onSelectorChange is called when changing the input value', () => {
         // access the textarea input DOM Element
         // and check the data-* attributes
         // which hold the states of the component
-        const input = getByTestId('selectorPathInput');
+        const input = container.querySelector('textarea');
 
         // simulate a user input 
         fireEvent.change(input, { target: { value: '.a-error-selector' } });
@@ -187,7 +187,7 @@ describe('onSelectorChange is called when changing the input value', () => {
 
         // verify the input class of the textarea
         // refetch it
-        const input2 = getByTestId('selectorPathInput');
+        const input2 = container.querySelector('textarea');
         expect(input2).toHaveClass('error');
 
         // a message should be displayed to notify the user

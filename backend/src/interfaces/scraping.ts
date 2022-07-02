@@ -18,6 +18,7 @@ export interface ScrapingResponse {
     content: string | null;
     status: ScrapingStatus.SUCCESS;
     selector: DataSelector;
+    clickBefore?: Array<DataSelector | undefined>;
 }
 
 export interface ScrapingError {

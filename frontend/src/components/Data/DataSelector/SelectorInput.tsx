@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, Fragment } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Input, Space } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -20,11 +20,22 @@ interface ISelectorInputPropsType {
 }
 
 
+/**
+ * A Textarea input which makes auto-validation of CSS selector 
+ * 
+ * NB: initially, validateSelector is not called when setting the path
+ * because there is no change on the textarea input value
+ * 
+ * The selector (validated or not) is returned in the onChange prop function
+ * 
+ * @param props : ISelectorInputPropsType
+ * @returns JSX.Element
+ */
 export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
 
     const { t } = useTranslation("configurator");
 
-    const { selector, onChange } = props;
+    const { selector, onChange, ...rest } = props;
 
     const socket = useContext<Socket>(SocketContext);
 
@@ -93,6 +104,9 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
 
     /**
      * initializes the selector path if provided by the selector prop
+     * 
+     * NB: initially, validateSelector is not called when setting the path
+     * because there is no change on the textarea input value
      */
     useEffect(() => {
         if (selector.path) {
@@ -113,8 +127,8 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
                     onBlur={onSelectorChange}
                     onChange={onSelectorChange}
                     value={path}
-                    data-testid="selectorPathInput"
                     className={inputClass}
+                    {...rest}
                 />
 
                 {isBackendError && (

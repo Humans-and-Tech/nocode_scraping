@@ -146,8 +146,8 @@ export const clickElement = async (page: playwright.Page, selector: DataSelector
 }
 
 /**
- * scrape content on a given URL, with the possibility to eliminate a pop-up
- * that appears in the foreground
+ * scrape content on a given URL, with the possibility to click on elements 
+ * before scraping the content
  * 
  * @param req IScrapingRequest
  * @returns a Promise of a ScrapingResponse
