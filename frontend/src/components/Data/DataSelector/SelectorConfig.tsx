@@ -84,17 +84,15 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    /**
-     * action buttons enabled or not
-     */
-    const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
+    // /**
+    //  * action buttons enabled or not
+    //  */
+    // const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
 
-    const toggleEvaluation = (s: DataSelector) => {
+    const setEvaluationHelper = (s: DataSelector) => {
         if (s.status === SelectorStatus.VALID && sampleUrl !== undefined && isURL(sampleUrl.toString())) {
-            setIsEvaluationEnabled(true);
             setEvaluationHelperMessage(t('field.evaluation.enabled'));
         } else {
-            setIsEvaluationEnabled(false);
             setEvaluationHelperMessage(t(`field.evaluation.disabled`, { value: s.path }));
         }
     };
@@ -102,7 +100,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const onDataSelectorChange = (s: DataSelector) => {
         setSelector(s);
-        toggleEvaluation(s);
+        setEvaluationHelper(s);
 
         data.selector = s;
         onChange(data)
@@ -110,12 +108,20 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const onPopupSelectorChange = (s: DataSelector) => {
         setPopupSelector(s);
-        toggleEvaluation(s);
+        setEvaluationHelper(s);
 
         data.selector = s;
         onChange(data)
     };
 
+    const isEvaluationEnabled = (): boolean => {
+        let condition = sampleUrl !== undefined && data.selector?.path !== undefined && selector?.status === SelectorStatus.VALID;
+        if (isPopup) {
+            condition = condition && popupSelector?.status === SelectorStatus.VALID;
+        }
+        console.log(`isEvaluationEnabled ${condition}`, `popup: ${isPopup}`)
+        return condition;
+    };
 
     /**
      * evaluates the CSS selector path
@@ -133,9 +139,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         setEvaluation(undefined);
 
         setIsLoading(true);
-
-        // reset the evaluation status !
-        // setEvaluationStatus(undefined);
 
         // reset backend error
         setIsBackendError(false);
@@ -221,13 +224,13 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             // reset the preview component
             // when data change 
-            setIsEvaluationEnabled(false);
+            // setIsEvaluationEnabled(false);
             setEvaluation(undefined);
 
             // enable eventually a new evaluation 
-            if (sampleUrl !== undefined && data.selector?.path !== undefined) {
-                setIsEvaluationEnabled(true);
-            }
+            // if (sampleUrl !== undefined && data.selector?.path !== undefined) {
+            //     setIsEvaluationEnabled(true);
+            // }
         }
 
     }, [sampleUrl, data]);
@@ -293,7 +296,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
                         <Tooltip title={evaluationHelperMessage}>
-                            <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluation-button" >
+                            <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled()} data-testid="evaluation-button" >
                                 <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
                             </Button>
                         </Tooltip>
