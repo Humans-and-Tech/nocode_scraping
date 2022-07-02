@@ -48,6 +48,14 @@ export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
                     }
                 </Space>
             )}
+            {content && content.status == ScrapingStatus.INVALID_SELECTOR && (
+                <Space data-testid="preview-invalid-selector-message" direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                    <Space direction="horizontal">
+                        <CloseCircleOutlined className="error"></CloseCircleOutlined>
+                        <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.invalid_selector', { selector: content.selector.path }) }}></span>
+                    </Space>
+                </Space>
+            )}
             {content && content.status == ScrapingStatus.NO_CONTENT && (
                 <Space data-testid="preview-no-content-message" direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal">

@@ -20,6 +20,7 @@
       "result": "We fetched the following data with this selector: {{ value }}",
       "no_selector_path": "Enter a valid  CSS path to evaluate the selector",
       "no_content": "No content could be found using the path <code>{{ selector }}</code>",
+      "invalid_selector": "The selector {{ selector }} is invalid",
       "failure": "Scraping failed using the path <code>{{ selector }}</code>",
       "no_popup": "No popup could be found using the path <code>{{ selector }}</code>",
       "failure_unknown": "An unexpected error occured, {{ message }}",
