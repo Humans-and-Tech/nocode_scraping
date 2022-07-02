@@ -206,7 +206,11 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             setPopupSelector(createSelector());
         }
 
-        // update the button states
+        // reset the preview component
+        // when changing data 
+        setEvaluation(undefined);
+
+        // enable eventually a new evaluation 
         if (sampleUrl !== undefined && selector?.path !== undefined) {
             setIsEvaluationEnabled(true);
         }
