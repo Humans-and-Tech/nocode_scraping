@@ -149,7 +149,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | undefined, error: ScrapingError | undefined) => {
 
-                console.log('getContent', response, error);
                 // check the response status
                 if (response && response.status == ScrapingStatus.SUCCESS) {
 
@@ -218,8 +217,9 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
         <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
 
-            {(sampleUrl == undefined || sampleUrl.toString() == '') &&
-                <Space direction="horizontal">
+            {
+                !sampleUrl &&
+                <Space direction="horizontal" size="middle">
                     <CloseCircleOutlined className="error"></CloseCircleOutlined>
                     <span data-testid="no_url">{t('field.evaluation.no_url')}</span>
                 </Space>
@@ -228,22 +228,22 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 selector &&
                 <>
                     <span>{t('field.selector.intro')}</span>
-                    <SelectorInput selector={selector} onChange={onDataSelectorChange} />
+                    <SelectorInput data-testid="selector-input" selector={selector} onChange={onDataSelectorChange} />
                 </>
             }
             {
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     {
-                        <Space direction="horizontal" size="middle">
+                        <Space data-testid="switch-popup-selector" direction="horizontal" size="middle">
                             <Switch onChange={setIsPopup} checked={isPopup} />
-                            <h4><a id="switch-cookie-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
+                            <h4><a id="switch-popup-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
                         </Space>
                     }
                     {
                         isPopup && popupSelector &&
                         <>
                             <span>{t('field.popup_selector.intro')}</span>
-                            <SelectorInput selector={popupSelector} onChange={onPopupSelectorChange} />
+                            <SelectorInput data-testid="popup-selector-input" selector={popupSelector} onChange={onPopupSelectorChange} />
                         </>
                     }
                 </Space>
@@ -251,7 +251,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             {
                 isLoading &&
-                <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
+                <Space data-testid="sample-url" direction="vertical" size="large" style={{ 'width': '100%' }}>
                     <Space direction="horizontal"><Spin /><span>{t('loading')}</span></Space>
                     {
                         selector !== null && sampleUrl &&
@@ -271,7 +271,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             {
                 !isLoading &&
-                <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                <Space data-testid="evaluation-button" direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
                         <Tooltip title={evaluationHelperMessage}>
                             <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluate_btn" >
@@ -284,7 +284,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             {
                 evaluation &&
-                <PreviewContent content={evaluation} />
+                <PreviewContent data-testid="preview-content" content={evaluation} />
             }
 
             {
@@ -300,7 +300,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             {
                 isBackendError && (
-                    <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
+                    <Space data-testid="backend-error-message" direction="vertical" size="middle" style={{ 'width': '100%' }}>
                         <Space direction="horizontal">
                             <CloseCircleOutlined className="error"></CloseCircleOutlined>
                             <span>{t("field.evaluation.backend_error")}</span>

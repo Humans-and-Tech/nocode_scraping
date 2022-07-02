@@ -128,6 +128,27 @@ describe('Component initiation', () => {
 
 });
 
+describe('When the Selector Input changes', () => {
+});
+
+describe('When the popup selector is activated', () => {
+});
+
+describe('When the evaluation is running', () => {
+});
+
+describe('When the evaluation is running', () => {
+    // display of loading message...
+    // evaluation-button is hidden
+});
+
+describe('When the evaluation is available', () => {
+});
+
+describe('When there is a backend error', () => {
+});
+
+
 // describe('Action buttons', () => {
 
 //     let socket;
