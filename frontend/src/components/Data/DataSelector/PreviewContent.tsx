@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from "../../../interfaces/events";
 
 import '../Data.scoped.css';
+import { useEffect } from "react";
 
 interface ISelectorEvalPropsType {
     content: ScrapingResponse | ScrapingError | undefined;
@@ -25,6 +26,10 @@ export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
     const { t } = useTranslation("configurator");
 
     const { content } = props;
+
+    useEffect(() => {
+        console.log("PreviewContent with content", content);
+    }, []);
 
     return (
         <>

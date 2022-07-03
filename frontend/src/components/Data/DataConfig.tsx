@@ -1,14 +1,13 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Tabs, Space, Button } from "antd";
 import { useTranslation } from "react-i18next";
 import { Socket } from "socket.io-client";
 
 import { SocketContext } from "../../socket";
-import { Data, Spider } from "../../interfaces/spider";
+import { Data, Spider, mergeSpiderData } from "../../interfaces/spider";
 import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext'
 
 import { SelectorConfig } from "./DataSelector/SelectorConfig";
-// import { DataAlterators } from '../Alterators/DataAlterators'
 
 import './Data.scoped.css';
 
@@ -30,62 +29,28 @@ export const DataConfig = ({
   data: Data,
   spider: Spider
 }): JSX.Element => {
+
   const { t } = useTranslation("configurator");
 
   const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
 
   const socket = useContext<Socket>(SocketContext);
 
-  const [isConfigured, setIsConfigured] = useState<boolean>(false);
+  // keep track of the current data loaded in this component
+  // so that the component states are re-init when the data change
+  const dataName = useRef<string>('');
 
-  const [tmpData, setTmpData] = useState<Data | undefined>(undefined);
+  const [localData, setLocalData] = useState<Data | undefined>(undefined);
+  const [localSpider, setLocalSpider] = useState<Spider | undefined>(undefined);
 
-  const upsertSpider = (_spider: Spider) => {
-
-    spiderProvider.upsert(socket, _spider, (b: boolean, err: Error | undefined) => {
-      // if (b) {
-      //   console.info('upsert successful for spider', _spider);
-      // } else {
-      //   console.error('upsert failed', err);
-      // }
-    });
-
-  };
-
-  const saveSpiderData = (_data: Data) => {
-    let existingDataIndex = -1;
-    spider.data?.forEach((d: Data, index: number) => {
-      if (d.name == _data.name) {
-        existingDataIndex = index;
-        d = _data;
-      }
-    });
-
-    if (spider.data === undefined) {
-      spider.data = [];
-    }
-    if (existingDataIndex == -1) {
-      spider.data.push(_data);
-    } else {
-      spider.data[existingDataIndex] = _data
-    }
-    upsertSpider(spider);
-  };
 
   const onConfigured = (_data: Data): void => {
-    setIsConfigured(true);
+    setLocalData(_data);
     saveSpiderData(_data);
-    setTmpData(_data);
   };
-
-  const onError = (): void => {
-    setIsConfigured(false);
-    setTmpData(undefined);
-  };
-
 
   const onDataChange = (_data: Data): void => {
-    setTmpData(_data);
+    setLocalData(_data);
     saveSpiderData(_data);
   };
 
@@ -93,13 +58,51 @@ export const DataConfig = ({
     console.log(key);
   };
 
-  const saveConfig = () => {
-    if (tmpData !== undefined) {
-      saveSpiderData(tmpData)
+  const triggerSave = () => {
+    if (localData) {
+      saveSpiderData(localData);
     }
+  }
+
+  const saveSpiderData = (_data: Data) => {
+
+    // update the local spider
+    // when updated, the useEffect will be triggered 
+    // to save the spider
+    if (localSpider !== undefined) {
+
+      // merge the data into the spider
+      const _spider = mergeSpiderData(localSpider, _data);
+
+      // sync the DB
+      spiderProvider.upsert(socket, _spider, (b: boolean, err: Error | undefined) => {
+        if (b) {
+          console.log('data is synced');
+          // and update the local state accordingly
+          setLocalSpider(_spider);
+        } else {
+          console.error('upsert failed', err);
+        }
+      });
+    }
+
   };
 
-  const saveBtn = <Button onClick={saveConfig}>{t('field.action.save_data_configuration')}</Button>;
+  useEffect(() => {
+
+    // when mouting initially
+    if (localData === undefined || data.name !== dataName.current) {
+      dataName.current = data.name;
+      setLocalData(data);
+    }
+
+    if (localSpider === undefined) {
+      setLocalSpider(spider);
+    }
+
+  }, [data, spider]);
+
+  const saveBtn = <Button onClick={triggerSave}>{t('field.action.save_data_configuration')}</Button>;
 
   return (
 
@@ -107,10 +110,9 @@ export const DataConfig = ({
       <TabPane tab={t('tab.selector_config')} key="1">
         <h2>{data.label}</h2>
         <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
-
           {
             //spider.sampleURLs && spider.sampleURLs.length > 0 &&
-            <SelectorConfig data={data} sampleUrl={new URL('https://www.manomano.fr/p/salon-de-jardin-en-imitation-resine-tressee-ensemble-de-4-meubles-livre-avec-accoudoirs-coussins-de-dossier-et-verre-32868538?model_id=32849419')} onConfigured={onConfigured} onError={onError} onChange={onDataChange} />
+            localData && <SelectorConfig data={localData} sampleUrl={new URL('https://www.manomano.fr/p/salon-de-jardin-en-imitation-resine-tressee-ensemble-de-4-meubles-livre-avec-accoudoirs-coussins-de-dossier-et-verre-32868538?model_id=32849419')} onConfigured={onConfigured} onChange={onDataChange} />
           }
 
           {/* {isConfigured &&

@@ -17,6 +17,11 @@ export interface Data {
     label?: string;
     type?: string | number | boolean;
     selector?: DataSelector;
+    // optional elements on which to click
+    // before scraping the content
+    // ex: cookie popup...
+    isPopup?: boolean;
+    popupSelector?: DataSelector;
     sweepers?: Set<DataSweeperFunction>;
 }
 
@@ -80,4 +85,32 @@ export interface Pipeline {
 
 export interface Settings {
     proxy: unknown;
+}
+
+/**
+ * care for overriding a spider data with a given Data object
+ * 
+ * @param s 
+ * @return a spider object, updated wit the given data
+ */
+export const mergeSpiderData = (spider: Spider, data: Data): Spider => {
+
+    let existingDataIndex = -1;
+    spider.data?.forEach((d: Data, index: number) => {
+        if (d.name == data.name) {
+            existingDataIndex = index;
+            d = data;
+        }
+    });
+
+    if (spider.data === undefined) {
+        spider.data = [];
+    }
+    if (existingDataIndex == -1) {
+        spider.data.push(data);
+    } else {
+        spider.data[existingDataIndex] = data;
+    }
+
+    return spider
 }

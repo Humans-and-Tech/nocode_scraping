@@ -13,7 +13,6 @@ import { SelectorInput } from './SelectorInput'
 import { PreviewContent } from "./PreviewContent";
 
 import '../Data.scoped.css';
-import { useCallback } from "react";
 
 
 const createSelector = (): DataSelector => {
@@ -25,7 +24,11 @@ const createSelector = (): DataSelector => {
 interface ISelectorConfigPropsType {
     data: Data;
     onConfigured: (data: Data) => void;
-    onError: () => void;
+
+    // the onError is just there 
+    // in case of functional error 
+    // to let the parent know of an error
+    onError?: () => void;
     onChange: (d: Data) => void;
 
     // sample of pages to test / validate the selector
@@ -44,7 +47,6 @@ interface ISelectorConfigPropsType {
  * When the evaluation fails, and the user does not bypass the evaluation
  * the onError is called
  * 
- * 
  * @param props IDataSelectorPropsType
  * @returns JSX.Element
  */
@@ -54,7 +56,13 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const socket = useContext<Socket>(SocketContext);
 
-    const { data, onConfigured, onError, sampleUrl, onChange } = props;
+    const { data, onConfigured, sampleUrl, onError, onChange } = props;
+
+    const [localData, setLocalData] = useState<Data | undefined>(undefined);
+
+    // keep track of the current data loaded in this component
+    // so that the component states are re-init when the data change
+    const dataName = useRef<string>('');
 
     // we need to manage both the select and its status
     // to pass the status in the dependency array of useEffect
@@ -63,17 +71,13 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
     const [selector, setSelector] = useState<DataSelector | undefined>(undefined);
     const [selectorStatus, setSelectorStatus] = useState<SelectorStatus | undefined>(undefined);
 
-
-
-    const dataName = useRef('');
-
     /**
      * optionnally, the user may want to configure
      * a CSS selector to click on a cookie pop-up and eliminate it
      * 
      * the cookie pop-up is just used to evaluate the selector 
      */
-    const [isPopup, setIsPopup] = useState<boolean>(false);
+    const [isPopup, setIsPopup] = useState<boolean | undefined>(false);
     const [popupSelector, setPopupSelector] = useState<DataSelector | undefined>(undefined);
     const [popupSelectorStatus, setPopupSelectorStatus] = useState<SelectorStatus | undefined>(undefined);
 
@@ -99,25 +103,14 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      * @param s 
      */
     const onDataSelectorChange = (s: DataSelector) => {
-
         setSelector(s);
         setSelectorStatus(s.status);
-
-        // pass the changed object to the parent
-        data.selector = s;
-        onChange(data);
-
     };
 
 
     const onPopupSelectorChange = (s: DataSelector) => {
         setPopupSelector(s);
         setPopupSelectorStatus(s.status);
-
-        // pass the changed object to the parent
-        data.selector = s;
-        onChange(data);
-
     };
 
     /**
@@ -144,7 +137,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         // reset backend error
         setIsBackendError(false);
 
-        if (selector?.path !== undefined && sampleUrl !== undefined) {
+        if (localData && selector?.path !== undefined && sampleUrl !== undefined) {
             // for testing purpose
             // re-assign the path which might not be up-to-date
             // when calling the evaluateSelectorPath after calling the onChange
@@ -156,23 +149,32 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | ScrapingError) => {
 
+                // whether the evaluation is successful or not
+                // send it to the PreviewContent component
+                // to display adequate information
+                setEvaluation(response);
+
+                console.log('setEvaluation ->', response);
+
                 // check the response status
                 if (response.status == ScrapingStatus.SUCCESS) {
 
-                    // send the configuration to the parent
-                    setEvaluation(response);
-
                     // assign the response selector
                     // which is enriched with a status valid/invalid
-                    data.selector = response.selector;
-                    onConfigured(data);
+                    localData.selector = response.selector;
+                    localData.isPopup = isPopup;
+
+                    if (response.clickBefore) {
+                        localData.popupSelector = response.clickBefore[0];
+                    } else {
+                        console.debug("assuming an undefined value for the popupSelector");
+                        localData.popupSelector = undefined;
+                    }
+
+                    setLocalData(localData);
+                    onConfigured(localData);
 
                 } else {
-
-                    // the error details will be reported
-                    // to the user by the PreviewContent component
-                    // fed with the response (which is a ScrapingError)
-                    setEvaluation(response);
 
                     if (response.status === ScrapingStatus.ERROR) {
                         // there has been a technical error
@@ -181,7 +183,11 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                         console.error("Error calling the backend", response.message);
                         setIsBackendError(true);
                     }
-                    onError();
+
+                    // this is a functional error 
+                    if (onError) {
+                        onError();
+                    }
                 }
 
                 setIsLoading(false);
@@ -230,9 +236,17 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
         // reset only the component state when data name changes
         // because data is a complet ovject, its inner value change
-        if (dataName.current !== data.name) {
+        if (localData === undefined || data.name !== dataName.current) {
 
             dataName.current = data.name;
+
+            // create local copy
+            // so that data can evolve without impacting / being impacted 
+            // by the rest of the application
+            setLocalData(data);
+
+            // these objects have their own lifecycle
+            setIsPopup(data.isPopup);
 
             if (data.selector) {
                 setSelector(data.selector);
@@ -240,19 +254,30 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 setSelector(createSelector());
             }
 
-            if (popupSelector === undefined) {
+            if (data.popupSelector) {
+                setPopupSelector(data.popupSelector);
+            } else {
                 setPopupSelector(createSelector());
             }
 
             // reset the preview component
             // when data change 
             setEvaluation(undefined);
-        }
 
-        // recompute the evaluation stuff
-        // in all cases
-        setIsEvaluationEnabled(_isEvaluationEnabled());
-        setEvaluationHelperMessage(_evaluationHelperMessage());
+        } else {
+
+            // recompute the evaluation stuff
+            // in all cases
+            setIsEvaluationEnabled(_isEvaluationEnabled());
+            setEvaluationHelperMessage(_evaluationHelperMessage());
+
+            // saveData
+            // pass the changed object to the parent
+            localData.selector = selector;
+            localData.isPopup = isPopup;
+            localData.popupSelector = popupSelector;
+            onChange(localData);
+        }
 
     }, [sampleUrl, data, selectorStatus, popupSelectorStatus, isPopup]);
 

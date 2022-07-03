@@ -17,6 +17,11 @@ export interface Data {
     label?: string;
     type?: string | number | boolean;
     selector?: DataSelector;
+    // optional elements on which to click
+    // before scraping the content
+    // ex: cookie popup...
+    isPopup: boolean;
+    popupSelector?: DataSelector;
     sweepers?: Set<DataSweeperFunction>;
 }
 
