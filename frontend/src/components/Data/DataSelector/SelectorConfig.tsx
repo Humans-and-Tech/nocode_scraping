@@ -212,24 +212,28 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      */
     useEffect(() => {
 
-        const _isEvaluationEnabled = (): boolean => {
-            let condition = sampleUrl !== undefined && isURL(sampleUrl.toString()) && selector?.status === SelectorStatus.VALID;
-            if (isPopup && popupSelector) {
-                condition = condition && popupSelector.status === SelectorStatus.VALID;
+        const _isEvaluationEnabled = (_selector: DataSelector | undefined, _popupSelector: DataSelector | undefined, _isPopup: boolean | undefined): boolean => {
+
+            if (!_selector) {
+                return false;
+            }
+            let condition = sampleUrl !== undefined && isURL(sampleUrl.toString()) && _selector?.status === SelectorStatus.VALID;
+            if (_isPopup && _popupSelector) {
+                condition = condition && _popupSelector.status === SelectorStatus.VALID;
             }
             return condition;
         };
 
-        const _evaluationHelperMessage = (): string => {
+        const _evaluationHelperMessage = (_selector: DataSelector | undefined, _popupSelector: DataSelector | undefined, _isPopup: boolean | undefined): string => {
 
             if (sampleUrl === undefined || !isURL(sampleUrl.toString())) {
                 return t('field.evaluation.disabled_incorrect_sample_url');
             }
-            if (selector?.status === SelectorStatus.INVALID) {
-                return t(`field.evaluation.disabled`, { value: selector?.path });
+            if (_selector?.status === SelectorStatus.INVALID) {
+                return t(`field.evaluation.disabled`, { value: _selector?.path });
             }
-            if (isPopup && popupSelector && popupSelector.status === SelectorStatus.INVALID) {
-                return t(`field.evaluation.disabled`, { value: popupSelector?.path });
+            if (_isPopup && _popupSelector && _popupSelector.status === SelectorStatus.INVALID) {
+                return t(`field.evaluation.disabled`, { value: _popupSelector?.path });
             }
             return t('field.evaluation.enabled');
         };
@@ -264,12 +268,16 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             // when data change 
             setEvaluation(undefined);
 
+            // initially, compute if evaluation is enabled
+            // by passing directly the info coming from the data
+            setIsEvaluationEnabled(_isEvaluationEnabled(data.selector, data.popupSelector, data.isPopup));
+            setEvaluationHelperMessage(_evaluationHelperMessage(data.selector, data.popupSelector, data.isPopup));
+
         } else {
 
             // recompute the evaluation stuff
-            // in all cases
-            setIsEvaluationEnabled(_isEvaluationEnabled());
-            setEvaluationHelperMessage(_evaluationHelperMessage());
+            setIsEvaluationEnabled(_isEvaluationEnabled(selector, popupSelector, isPopup));
+            setEvaluationHelperMessage(_evaluationHelperMessage(selector, popupSelector, isPopup));
 
             // saveData
             // pass the changed object to the parent
@@ -341,7 +349,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 !isLoading &&
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
-                        <Tooltip title={`${isEvaluationEnabled}: ${evaluationHelperMessage}`}>
+                        <Tooltip title={evaluationHelperMessage}>
                             <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluation-button" >
                                 <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
                             </Button>
