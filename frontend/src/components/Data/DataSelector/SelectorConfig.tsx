@@ -13,6 +13,7 @@ import { SelectorInput } from './SelectorInput'
 import { PreviewContent } from "./PreviewContent";
 
 import '../Data.scoped.css';
+import { useCallback } from "react";
 
 
 const createSelector = (): DataSelector => {
@@ -55,7 +56,14 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const { data, onConfigured, onError, sampleUrl, onChange } = props;
 
+    // we need to manage both the select and its status
+    // to pass the status in the dependency array of useEffect
+    // where evaluation stuff will be recomputed
+    // indeed, passing the [selector] in the dependency array of useEffect won't work
     const [selector, setSelector] = useState<DataSelector | undefined>(undefined);
+    const [selectorStatus, setSelectorStatus] = useState<SelectorStatus | undefined>(undefined);
+
+
 
     const dataName = useRef('');
 
@@ -67,6 +75,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      */
     const [isPopup, setIsPopup] = useState<boolean>(false);
     const [popupSelector, setPopupSelector] = useState<DataSelector | undefined>(undefined);
+    const [popupSelectorStatus, setPopupSelectorStatus] = useState<SelectorStatus | undefined>(undefined);
 
     /**
      * the result of the CSS Selector evaluation on the URL (evalUrl)
@@ -74,6 +83,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      */
     const [evaluation, setEvaluation] = useState<ScrapingResponse | ScrapingError | undefined>(undefined);
     const [evaluationHelperMessage, setEvaluationHelperMessage] = useState<string>('');
+    const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
 
     /**
      * sometimes shit happen on the backend side
@@ -84,48 +94,39 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    // /**
-    //  * action buttons enabled or not
-    //  */
-    // const [isEvaluationEnabled, setIsEvaluationEnabled] = useState<boolean>(false);
-
-    const setEvaluationHelper = (s: DataSelector) => {
-        if (s.status === SelectorStatus.VALID && sampleUrl !== undefined && isURL(sampleUrl.toString())) {
-            setEvaluationHelperMessage(t('field.evaluation.enabled'));
-        } else {
-            setEvaluationHelperMessage(t(`field.evaluation.disabled`, { value: s.path }));
-        }
-    };
-
-
+    /**
+     * triggered when the user changes the selector input value
+     * @param s 
+     */
     const onDataSelectorChange = (s: DataSelector) => {
-        setSelector(s);
-        setEvaluationHelper(s);
 
+        setSelector(s);
+        setSelectorStatus(s.status);
+
+        // pass the changed object to the parent
         data.selector = s;
-        onChange(data)
+        onChange(data);
+
     };
+
 
     const onPopupSelectorChange = (s: DataSelector) => {
         setPopupSelector(s);
-        setEvaluationHelper(s);
+        setPopupSelectorStatus(s.status);
 
+        // pass the changed object to the parent
         data.selector = s;
-        onChange(data)
-    };
+        onChange(data);
 
-    const isEvaluationEnabled = (): boolean => {
-        let condition = sampleUrl !== undefined && data.selector?.path !== undefined && selector?.status === SelectorStatus.VALID;
-        if (isPopup) {
-            condition = condition && popupSelector?.status === SelectorStatus.VALID;
-        }
-        console.log(`isEvaluationEnabled ${condition}`, `popup: ${isPopup}`)
-        return condition;
     };
 
     /**
-     * evaluates the CSS selector path
+     * evaluates the CSS selector path, which means gets the content
+     * of this selector 
      * 
+     * Under the hood: calls the backend :
+     * - if the response is successfull, onConfigured() is called
+     * - if not onError() is called
      * 
      * @param event 
      */
@@ -155,7 +156,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | ScrapingError) => {
 
-                console.log('getContent', response);
                 // check the response status
                 if (response.status == ScrapingStatus.SUCCESS) {
 
@@ -206,6 +206,28 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
      */
     useEffect(() => {
 
+        const _isEvaluationEnabled = (): boolean => {
+            let condition = sampleUrl !== undefined && isURL(sampleUrl.toString()) && selector?.status === SelectorStatus.VALID;
+            if (isPopup && popupSelector) {
+                condition = condition && popupSelector.status === SelectorStatus.VALID;
+            }
+            return condition;
+        };
+
+        const _evaluationHelperMessage = (): string => {
+
+            if (sampleUrl === undefined || !isURL(sampleUrl.toString())) {
+                return t('field.evaluation.disabled_incorrect_sample_url');
+            }
+            if (selector?.status === SelectorStatus.INVALID) {
+                return t(`field.evaluation.disabled`, { value: selector?.path });
+            }
+            if (isPopup && popupSelector && popupSelector.status === SelectorStatus.INVALID) {
+                return t(`field.evaluation.disabled`, { value: popupSelector?.path });
+            }
+            return t('field.evaluation.enabled');
+        };
+
         // reset only the component state when data name changes
         // because data is a complet ovject, its inner value change
         if (dataName.current !== data.name) {
@@ -224,16 +246,15 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             // reset the preview component
             // when data change 
-            // setIsEvaluationEnabled(false);
             setEvaluation(undefined);
-
-            // enable eventually a new evaluation 
-            // if (sampleUrl !== undefined && data.selector?.path !== undefined) {
-            //     setIsEvaluationEnabled(true);
-            // }
         }
 
-    }, [sampleUrl, data]);
+        // recompute the evaluation stuff
+        // in all cases
+        setIsEvaluationEnabled(_isEvaluationEnabled());
+        setEvaluationHelperMessage(_evaluationHelperMessage());
+
+    }, [sampleUrl, data, selectorStatus, popupSelectorStatus, isPopup]);
 
     return (
 
@@ -257,7 +278,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     {
                         <Space direction="horizontal" size="middle">
-                            <Switch onChange={setIsPopup} checked={isPopup} />
+                            <Switch onChange={switchCookiePopupSelector} checked={isPopup} />
                             <h4><a id="switch-popup-selector">{t('field.evaluation.set_cookie_popup_path')}</a></h4>
                         </Space>
                     }
@@ -295,8 +316,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 !isLoading &&
                 <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
                     <Space direction="horizontal" size="middle">
-                        <Tooltip title={evaluationHelperMessage}>
-                            <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled()} data-testid="evaluation-button" >
+                        <Tooltip title={`${isEvaluationEnabled}: ${evaluationHelperMessage}`}>
+                            <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluation-button" >
                                 <span data-testid="evaluate_selector" >{t("field.action.evaluate_selector")}</span>
                             </Button>
                         </Tooltip>
