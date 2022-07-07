@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Socket, Server } from 'socket.io';
 
+const logger = require('pino')();
 const app = express();
 const server = http.createServer(app);
 
@@ -37,5 +38,5 @@ io.on('connect_error', (err: unknown) => {
 });
 
 server.listen(3001, () => {
-  console.info('listening on *:3001');
+  logger.info('listening on *:3001');
 });

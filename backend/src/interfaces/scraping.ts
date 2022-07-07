@@ -1,6 +1,5 @@
 import { DataSelector } from '../models';
 
-
 export interface IScrapingRequest {
   selector: DataSelector;
   // although sent as type URL

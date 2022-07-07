@@ -19,11 +19,7 @@ module.exports = () => {
       callback(response);
     } catch (error) {
       if (error instanceof ScrapingError) {
-        callback({
-          message: error.message,
-          status: error.status,
-          selector: error.selector
-        } as ScrapingError);
+        callback(error);
       } else {
         callback({
           message: JSON.stringify(error),

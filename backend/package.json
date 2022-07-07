@@ -21,6 +21,7 @@
     "firebase": "^9.8.3",
     "http": "^0.0.1-security",
     "jsdom": "^19.0.0",
+    "pino": "^8.1.0",
     "playwright-chromium": "^1.22.2",
     "schema-dts": "^1.1.0",
     "socket.io": "^4.5.1",

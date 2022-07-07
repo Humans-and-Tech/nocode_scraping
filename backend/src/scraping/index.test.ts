@@ -1,9 +1,9 @@
 import { readFile, unlink, access } from 'fs/promises';
 import * as playwright from 'playwright-chromium';
-import {FileSystemCache} from 'file-system-cache';
+import { FileSystemCache } from 'file-system-cache';
 
 import { GenericResponseStatus, SelectorStatus, ScrapingStatus, ScrapedContent } from '../models';
-import {ScrapingError, DataSelectorValidityError} from '../errors';
+import { ScrapingError, DataSelectorValidityError } from '../errors';
 import { getContent, validateSelector, clickElement } from '.';
 
 // timeout of 10 seconds
@@ -12,7 +12,7 @@ jest.setTimeout(10000);
 
 /**
  * Mock Playwright
- * 
+ *
  * NB: we could have used playwright for real during these tests
  * but
  * 1. it would have required pages to be stable, to be sure of the response when calling them, clicking on elements..
@@ -22,68 +22,63 @@ jest.setTimeout(10000);
  *
  */
 jest.mock('playwright-chromium', () => ({
+  chromium: {
+    launch: () => {
+      const newContext = () => {
+        const newPage = () => {
+          const goto = async (url: string) => {
+            console.log(`I'm going to ${url}`);
+            return Promise.resolve();
+          };
 
-    chromium: {
-        launch: () => {
-            const newContext = () => {
-                const newPage = () => {
-
-                    const goto = async (url: string) => {
-                        console.log(`I'm going to ${url}`);
-                        return Promise.resolve();
-                    };
-
-                    const click = async (path: string) => {
-                        
-                        if (path=='.not-found') {
-                            return Promise.reject('error');
-                        }
-                        console.log(`I clicked ${path}`);
-                        return Promise.resolve();
-                    };
-                    
-                    const waitForTimeout = async (t: number) => {
-                        console.log(`I waited ${t} millisecs`);
-                        return Promise.resolve();
-                    };
-
-                    const setDefaultTimeout = (t: number) => {
-                        console.log(`Set the page timeout to ${t} millisecs`);
-                    };
-
-                    const setContent = async (html: string) => {
-                        console.log("set page content");
-                        return Promise.resolve();
-                    };
-
-                    const content = async () => {
-                        console.log("got page content");
-                        return Promise.resolve('content');
-                    };
-
-                    const locator = (path: string) => {
-
-                        const textContent = async () => {
-                            console.log("textContent at", path);
-                            if (path=='.no-content') {
-                                return Promise.reject('error');
-                            }
-                            return Promise.resolve(`Hello @ ${path}`);
-                        };
-                        const screenshot = async (o: any) => {
-                            console.log('took a screenshot and saved it loccaly');
-                            return Promise.resolve();
-                        }
-                        return {textContent, screenshot};
-                    };
-                    return {goto, click, waitForTimeout, locator, setDefaultTimeout, content, setContent};
-                }
-                return {newPage};
+          const click = async (path: string) => {
+            if (path == '.not-found') {
+              return Promise.reject('error');
             }
-            return {newContext};
-        }
-    }
+            console.log(`I clicked ${path}`);
+            return Promise.resolve();
+          };
 
+          const waitForTimeout = async (t: number) => {
+            console.log(`I waited ${t} millisecs`);
+            return Promise.resolve();
+          };
+
+          const setDefaultTimeout = (t: number) => {
+            console.log(`Set the page timeout to ${t} millisecs`);
+          };
+
+          const setContent = async (html: string) => {
+            console.log('set page content');
+            return Promise.resolve();
+          };
+
+          const content = async () => {
+            console.log('got page content');
+            return Promise.resolve('content');
+          };
+
+          const locator = (path: string) => {
+            const textContent = async () => {
+              console.log('textContent at', path);
+              if (path == '.no-content') {
+                return Promise.reject('error');
+              }
+              return Promise.resolve(`Hello @ ${path}`);
+            };
+            const screenshot = async (o: any) => {
+              console.log('took a screenshot and saved it loccaly');
+              return Promise.resolve();
+            };
+            return { textContent, screenshot };
+          };
+          return { goto, click, waitForTimeout, locator, setDefaultTimeout, content, setContent };
+        };
+        return { newPage };
+      };
+      return { newContext };
+    }
+  }
 }));
 
 /**
@@ -91,178 +86,155 @@ jest.mock('playwright-chromium', () => ({
  * we don't really want to read or write from the filesystem
  * let's suppose it works correctly
  */
-jest
-  .spyOn(FileSystemCache.prototype, 'get')
-  .mockImplementation(async (key: string) => {
-    console.log("get cache");
-    return Promise.resolve('bla');
-  }); 
+jest.spyOn(FileSystemCache.prototype, 'get').mockImplementation(async (key: string) => {
+  console.log('get cache');
+  return Promise.resolve('bla');
+});
 
-jest
-  .spyOn(FileSystemCache.prototype, 'set')
-  .mockImplementation(async (key: string, content: string) => {
-    console.log("set cache");
-    return Promise.resolve({path: 'bla'});
-  }); 
+jest.spyOn(FileSystemCache.prototype, 'set').mockImplementation(async (key: string, content: string) => {
+  console.log('set cache');
+  return Promise.resolve({ path: 'bla' });
+});
 
 /**
  * mock the node fs functions
  * we don't really want to read / delete files
  */
 jest.mock('fs/promises', () => ({
-    readFile: async (location: string) => {
-        console.log('read file at ', location);
-        return Promise.resolve('bla');
-    },
-    unlink: async (location: string) => {
-        console.log('unlink ', location);
-        return Promise.resolve();
-    },
+  readFile: async (location: string) => {
+    console.log('read file at ', location);
+    return Promise.resolve('bla');
+  },
+  unlink: async (location: string) => {
+    console.log('unlink ', location);
+    return Promise.resolve();
+  }
 }));
 
-
 describe('Testing validateSelector response', () => {
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-    const testInvalidSelector = {
-        path: '1'
-    };
+  const testInvalidSelector = {
+    path: '1'
+  };
 
-    const testErrorSelector = {
-        path: undefined
-    };
+  const testErrorSelector = {
+    path: undefined
+  };
 
-    const testValidSelector = {
-        path: '.hey-oh'
-    };
+  const testValidSelector = {
+    path: '.hey-oh'
+  };
 
-    test('when the validation is not successful, but no error is thrown', async () => {
-        const resp = await validateSelector(testInvalidSelector);
+  test('when the validation is not successful, but no error is thrown', async () => {
+    const resp = await validateSelector(testInvalidSelector);
 
-        // remove the errors messages which are complex and unused
-        // don't want to couple the tests with these messages
-        // the important is the structure of the rest of the object
-        expect(resp.status).toEqual(GenericResponseStatus.SUCCESS);
-        expect(resp.selector?.status).toEqual(SelectorStatus.INVALID);
-    });
+    // remove the errors messages which are complex and unused
+    // don't want to couple the tests with these messages
+    // the important is the structure of the rest of the object
+    expect(resp.status).toEqual(GenericResponseStatus.SUCCESS);
+    expect(resp.selector?.status).toEqual(SelectorStatus.INVALID);
+  });
 
-    test('when the validation throws an error', async () => {
-        try {
-        const resp = await validateSelector(testErrorSelector);
-        } catch (err) {
-        expect((err as DataSelectorValidityError).status).toEqual(GenericResponseStatus.ERROR);
-        expect((err as DataSelectorValidityError).selector?.path).toEqual(undefined);
-        }
-    });
+  test('when the validation throws an error', async () => {
+    try {
+      const resp = await validateSelector(testErrorSelector);
+    } catch (err) {
+      expect((err as DataSelectorValidityError).status).toEqual(GenericResponseStatus.ERROR);
+      expect((err as DataSelectorValidityError).selector?.path).toEqual(undefined);
+    }
+  });
 
-    test('when the validation is successful', async () => {
-        const resp = await validateSelector(testValidSelector);
+  test('when the validation is successful', async () => {
+    const resp = await validateSelector(testValidSelector);
 
-        // remove the errors messages which are complex and unused
-        // don't want to couple the tests with these messages
-        // the important is the structure of the rest of the object
-        expect(resp.status).toEqual(GenericResponseStatus.SUCCESS);
-        expect(resp.selector?.status).toEqual(SelectorStatus.VALID);
-    });
+    // remove the errors messages which are complex and unused
+    // don't want to couple the tests with these messages
+    // the important is the structure of the rest of the object
+    expect(resp.status).toEqual(GenericResponseStatus.SUCCESS);
+    expect(resp.selector?.status).toEqual(SelectorStatus.VALID);
+  });
 });
-
 
 describe('Testing click Element', () => {
-  
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-    const testClickableElement = {
-        path: '.clickable'
-    };
+  const testClickableElement = {
+    path: '.clickable'
+  };
 
-    const testInvalidClickableElement = {
-        path: '??'
-    };
+  const testInvalidClickableElement = {
+    path: '??'
+  };
 
-    const testElementNotFound = {
-        path: '.not-found'
-    };
+  const testElementNotFound = {
+    path: '.not-found'
+  };
 
-    test('the click on an element succeeds', async () => {
-        const browser = await playwright.chromium.launch();
-        const context = await browser.newContext();
-        const page = await context.newPage();
-        await page.goto('http://www.google.fr');
-        const result = await clickElement(page, testClickableElement);
+  test('the click on an element succeeds', async () => {
+    const browser = await playwright.chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('http://www.google.fr');
+    const result = await clickElement(page, testClickableElement);
 
-        expect(result).toBe(true);
-    });
+    expect(result).toBe(true);
+  });
 
+  test('try to click on an invalid element selector', async () => {
+    const browser = await playwright.chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('http://www.google.fr');
 
-    test('try to click on an invalid element selector', async () => {
+    await expect(clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
+  });
 
-        const browser = await playwright.chromium.launch();
-        const context = await browser.newContext();
-        const page = await context.newPage();
-        await page.goto('http://www.google.fr');
+  test('try to click on an element which cannot be found', async () => {
+    const browser = await playwright.chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('http://www.google.fr');
 
-        await expect(clickElement(page, testInvalidClickableElement))
-            .rejects
-            .toBeInstanceOf(ScrapingError);
-    });
-
-    test('try to click on an element which cannot be found', async () => {
-
-        const browser = await playwright.chromium.launch();
-        const context = await browser.newContext();
-        const page = await context.newPage();
-        await page.goto('http://www.google.fr');
-
-        await expect(clickElement(page, testInvalidClickableElement))
-            .rejects
-            .toBeInstanceOf(ScrapingError);
-            // mocking the playwright.errors.TimeoutError is difficult
-            // because playwright is mocked
-            // TODO : later
-
-    });
-        
+    await expect(clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
+    // mocking the playwright.errors.TimeoutError is difficult
+    // because playwright is mocked
+    // TODO : later
+  });
 });
 
+describe('Testing getContent', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-describe("Testing getContent", () => {
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
+  const simpleElementSelector = {
+    path: '.content'
+  };
 
-    const simpleElementSelector = {
-        path: '.content'
-    };
+  const simpleRequest = {
+    selector: simpleElementSelector,
+    url: 'http://www.google.fr'
+  };
 
-    const simpleRequest = {
-        selector: simpleElementSelector,
-        url: 'http://www.google.fr',
-    };
+  const noElementSelector = {
+    path: '.no-content'
+  };
 
-    const noElementSelector = {
-        path: '.no-content'
-    };
+  const noContentFoundRequest = {
+    selector: noElementSelector,
+    url: 'http://www.google.fr'
+  };
 
-    const noContentFoundRequest = {
-        selector: noElementSelector,
-        url: 'http://www.google.fr',
-    };
+  test('a simple scraping that succeeds without popup', async () => {
+    await expect(getContent(simpleRequest)).resolves.toBeInstanceOf(ScrapedContent);
+  });
 
-    test('a simple scraping that succeeds without popup', async () => {
-
-        await expect(getContent(simpleRequest))
-            .resolves
-            .toBeInstanceOf(ScrapedContent);
-    });
-
-    test('no content found', async () => {
-
-        await expect(getContent(noContentFoundRequest))
-            .rejects
-            .toBeInstanceOf(ScrapingError);
-    });
+  test('no content found', async () => {
+    await expect(getContent(noContentFoundRequest)).rejects.toBeInstanceOf(ScrapingError);
+  });
 });

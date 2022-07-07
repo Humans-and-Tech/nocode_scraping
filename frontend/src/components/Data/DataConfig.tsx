@@ -112,7 +112,7 @@ export const DataConfig = ({
         <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
           {
             //spider.sampleURLs && spider.sampleURLs.length > 0 &&
-            localData && <SelectorConfig data={localData} sampleUrl={new URL('https://www.manomano.fr/p/salon-de-jardin-en-imitation-resine-tressee-ensemble-de-4-meubles-livre-avec-accoudoirs-coussins-de-dossier-et-verre-32868538?model_id=32849419')} onConfigured={onConfigured} onChange={onDataChange} />
+            localData && <SelectorConfig data={localData} sampleUrl={new URL('https://www.manomano.fr/p/piscine-tubulaire-ronde-366-x-122m-summer-waves-avec-pompe-32127122?product_id=31948595')} onConfigured={onConfigured} onChange={onDataChange} />
           }
 
           {/* {isConfigured &&

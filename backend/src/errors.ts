@@ -1,7 +1,7 @@
 import { ScrapingStatus, GenericResponseStatus, DataSelector } from './models';
 
 export class BaseError extends Error {
-    constructor(message: string) {
+  constructor(message: string) {
     super(message);
     // Ensure the name of this error is the same as the class name
     this.name = this.constructor.name;
@@ -11,11 +11,10 @@ export class BaseError extends Error {
   }
 }
 
-
 export class SelectorError extends BaseError {
   selector?: DataSelector;
 
-  constructor(message: string, selector: DataSelector|undefined) {
+  constructor(message: string, selector: DataSelector | undefined) {
     super(message);
     this.selector = selector;
   }
@@ -31,7 +30,7 @@ export class ScrapingError extends SelectorError {
       | ScrapingStatus.NO_CONTENT
       | ScrapingStatus.ELEMENT_NOT_FOUND
       | ScrapingStatus.INVALID_SELECTOR,
-    selector: DataSelector|undefined
+    selector: DataSelector | undefined
   ) {
     super(message, selector);
     this.status = status;
