@@ -1,4 +1,4 @@
-import { Data, DataSelector } from './spider';
+import { DataSelector } from './spider';
 
 export enum ScrapingStatus {
   SUCCESS = 'success',

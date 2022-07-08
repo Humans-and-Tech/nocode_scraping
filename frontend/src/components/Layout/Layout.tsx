@@ -1,10 +1,10 @@
 import React from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import '../../i18n';
 
-const { Header, Sider, Content } = Layout;
+const { Header, Content } = Layout;
 
 export const OnBoardingLayout = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation('layout');

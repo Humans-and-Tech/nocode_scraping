@@ -1,9 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Input, Space, Anchor } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
 import isURL from 'validator/lib/isURL';
 import { Socket } from 'socket.io-client';
 
@@ -11,10 +9,8 @@ import { SocketContext } from '../../socket';
 
 import { Spider } from '../../interfaces/spider';
 import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
-import './SpiderConfig.scoped.css';
-import { t } from 'i18next';
 
-const { TextArea } = Input;
+import './SpiderConfig.scoped.css';
 
 const { Link } = Anchor;
 

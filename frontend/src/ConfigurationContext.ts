@@ -67,6 +67,7 @@ function useSpider(): ISpiderProvider {
       throw new Error('cannot remove a spider with a blank name');
     }
     // todo
+    callback(true, undefined);
   };
 
   return { get, upsert, remove, create };

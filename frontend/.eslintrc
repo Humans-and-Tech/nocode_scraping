@@ -20,8 +20,9 @@
   },
   "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
-    "no-console": 1, // Means warning
-    "prettier/prettier": 1 // Means error
+    "no-console": 0, // ignore
+    "prettier/prettier": 1, // Means error
+    "@typescript-eslint/ban-ts-comment": 0 // ignore ts comments
   }
 }
 

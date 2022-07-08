@@ -47,13 +47,17 @@ export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
           )}
           {content.parentPage.isCached ? (
             <Space direction="horizontal">
-                <InfoCircleOutlined></InfoCircleOutlined>
-                <span>{t('field.evaluation.cached_version', { date: dayjs(content.parentPage.lastScrapedDate).format('MMMM D') })}</span>
+              <InfoCircleOutlined></InfoCircleOutlined>
+              <span>
+                {t('field.evaluation.cached_version', {
+                  date: dayjs(content.parentPage.lastScrapedDate).format('MMMM D')
+                })}
+              </span>
             </Space>
           ) : (
             <Space direction="horizontal">
-                <InfoCircleOutlined></InfoCircleOutlined>
-                <span>{t('field.evaluation.fresh_version')}</span>
+              <InfoCircleOutlined></InfoCircleOutlined>
+              <span>{t('field.evaluation.fresh_version')}</span>
             </Space>
           )}
         </Space>

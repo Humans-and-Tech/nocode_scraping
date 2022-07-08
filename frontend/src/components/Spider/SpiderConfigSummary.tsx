@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-import { Drawer } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { Spider } from '../../interfaces/spider';
 import './SpiderConfig.scoped.css';
 
 /**

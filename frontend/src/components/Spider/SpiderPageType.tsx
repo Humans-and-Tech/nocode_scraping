@@ -35,9 +35,10 @@ export const SpiderPageType = (props: SpiderPageTyperProps): JSX.Element => {
   const saveSpider = () => {
     if (spider !== undefined) {
       spiderProvider.upsert(socket, spider, (b: boolean) => {
-        console.log('upsert successful');
         // TODO notify the user
-        onChange(spider);
+        if (b) {
+          onChange(spider);
+        }
       });
     }
   };

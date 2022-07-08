@@ -8,7 +8,6 @@ import { PreviewContent } from './PreviewContent';
 
 describe('display the correct message', () => {
   test('when the ScrapingStatus is SUCCESS', async () => {
-
     const testSuccessfulContent = {
       screenshot: 'http://image.org/image.png',
       content: 'hello',
@@ -17,7 +16,7 @@ describe('display the correct message', () => {
         name: 'a-good-selector'
       },
       parentPage: {
-        content: "bla",
+        content: 'bla',
         isCached: false,
         lastScrapedDate: new Date()
       }
