@@ -1,15 +1,18 @@
 import express from 'express';
 import http from 'http';
 import { Socket, Server } from 'socket.io';
+const config = require('config');
+
 import logger from './logging';
+
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
-    allowedHeaders: ['gus'],
+    origin: config.get('server.cors.allowedOrigin'),
+    allowedHeaders: config.get('server.cors.allowedHeaders'),
     credentials: false
   }
 });
@@ -39,6 +42,6 @@ io.on('connect_error', (err: unknown) => {
   logger.error(`socket.io connect error due to ${err}`);
 });
 
-server.listen(3001, () => {
-  logger.info('listening on *:3001');
+server.listen(config.get('server.port'), () => {
+  logger.info(`listening on *:${config.get('server.port')}`);
 });

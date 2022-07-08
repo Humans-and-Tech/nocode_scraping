@@ -3,3 +3,5 @@ dist
 firestore-creds.json
 .cache
 logs
+screenshots
+config/production.json

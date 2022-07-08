@@ -33,7 +33,6 @@ export const cachePageContent = async (key: string, content: string): Promise<bo
       }
       try {
         if (compressed) {
-          // const obj = new CachedObject(compressed);
           await upsert({ name: 'test' }, { content: compressed.toString('base64') }, document);
           return Promise.resolve(true);
         } else {

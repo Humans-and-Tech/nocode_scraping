@@ -1,5 +1,6 @@
 import { readFile, unlink } from 'fs/promises';
 import { createHash } from 'crypto';
+const config = require('config');
 
 import * as playwright from 'playwright-chromium';
 import cssValidator from 'w3c-css-validator';
@@ -229,9 +230,9 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
   // but we need to decompose it (for the caching mecanism)
   const _url = new URL(req.url);
 
-  // the screenshot filename
+  const SCREENSHOTS_DIR = config.get("scraping.screenshotsDir") || '.';
   const baseName = _url.toString().substring(_url.toString().lastIndexOf('/') + 1);
-  const screenshotPath = `./${_url.hostname}-${baseName}.png`;
+  const screenshotPath = `${SCREENSHOTS_DIR}/${_url.hostname}-${baseName}.png`;
 
   let browser: playwright.Browser | undefined = undefined;
   let context;
@@ -246,7 +247,9 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
     context = await browser.newContext();
     page = await context.newPage();
     await page.setContent(webPage.content);
-    await page.waitForTimeout(500);
+
+    const WAIT=parseInt(config.get("scraping.waitForTimeout")) || 500;
+    await page.waitForTimeout(WAIT);
 
     // eventually click elements
     // before scraping
