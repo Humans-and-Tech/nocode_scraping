@@ -2,9 +2,7 @@ import { DocumentData, DocumentSnapshot } from '@google-cloud/firestore';
 
 import { Spider } from '../models';
 import { firestore, upsert, isFireStoreError } from '../database';
-
-const logger = require('pino')();
-const moduleLogger = logger.child({ module: 'socket' });
+import logger from '../logging';
 
 module.exports = () => {
   /**
@@ -26,7 +24,7 @@ module.exports = () => {
       const b: boolean = await upsert({}, spider, document);
       callback(b, undefined);
     } catch (error) {
-      moduleLogger.error('updateSpider error', error);
+      logger.error('updateSpider error', error);
       callback(false, error as Error);
     }
   };
@@ -59,7 +57,7 @@ module.exports = () => {
       if (isFireStoreError(error) && error.code === 5) {
         // this is a document not found error
       } else {
-        moduleLogger.error('Unhandled error', error);
+        logger.error('Unhandled error', error);
       }
       callback(undefined, error as Error);
     }

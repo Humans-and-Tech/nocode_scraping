@@ -32,7 +32,9 @@
       "bypass_evaluation": "I am sure of this selector",
       "set_cookie_popup_path": "Click on a cookie pop-up",
       "input_cookie_popup_placeholder": "Enter a CSS Path to click on a cookie pop-up",
-      "backend_error": "We are sorry, there has been a technical error, can you try again ?"
+      "backend_error": "We are sorry, there has been a technical error, can you try again ?",
+      "cached_version": "You are viewing a cached version (last scraped on {{ date }})",
+      "fresh_version": "You are viewing fresh version of the page"
     },
     "action": {
       "evaluate_selector": "Evaluate this selector",

@@ -1,110 +1,109 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-    Space,
-    Card,
-    Divider,
-} from "antd";
+import React, { useContext, useEffect, useState } from 'react';
+import { Space, Card, Divider } from 'antd';
 
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { Socket } from "socket.io-client";
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Socket } from 'socket.io-client';
 
-import { PageType, Spider } from '../../interfaces/spider'
-import { useTranslation } from "react-i18next";
-import { SocketContext } from "../../socket";
+import { PageType, Spider } from '../../interfaces/spider';
+import { useTranslation } from 'react-i18next';
+import { SocketContext } from '../../socket';
 import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
 
-
-import "../../style.css";
-import "./SpiderConfig.scoped.css"
-
+import '../../style.css';
+import './SpiderConfig.scoped.css';
 
 const { Meta } = Card;
 
 interface SpiderPageTyperProps {
-    spider: Spider;
-    onChange: (spider: Spider) => void;
+  spider: Spider;
+  onChange: (spider: Spider) => void;
 }
 
 export const SpiderPageType = (props: SpiderPageTyperProps): JSX.Element => {
+  const { t } = useTranslation('onboarding');
 
-    const { t } = useTranslation("onboarding");
+  const { spider, onChange } = props;
 
-    const { spider, onChange } = props;
+  const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
 
-    const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
+  const socket = useContext<Socket>(SocketContext);
 
-    const socket = useContext<Socket>(SocketContext);
+  // manage a state on the pageType
+  // to refresh the card when changing the spider pageType
+  const [pageType, setPageType] = useState<PageType | undefined>(undefined);
 
-    // manage a state on the pageType
-    // to refresh the card when changing the spider pageType
-    const [pageType, setPageType] = useState<PageType | undefined>(undefined);
+  const saveSpider = () => {
+    if (spider !== undefined) {
+      spiderProvider.upsert(socket, spider, (b: boolean) => {
+        console.log('upsert successful');
+        // TODO notify the user
+        onChange(spider);
+      });
+    }
+  };
 
-    const saveSpider = () => {
-        if (spider !== undefined) {
-            spiderProvider.upsert(socket, spider, (b: boolean) => {
-                console.log('upsert successful');
-                // TODO notify the user
-                onChange(spider);
-            });
+  const chooseProductSheet = () => {
+    if (spider !== undefined) {
+      spider.pageType = PageType.ProductSheet;
+      setPageType(PageType.ProductSheet);
+      saveSpider();
+    }
+  };
+
+  const chooseCategoryPage = () => {
+    if (spider !== undefined) {
+      spider.pageType = PageType.CategoryPage;
+      setPageType(PageType.CategoryPage);
+      saveSpider();
+    }
+  };
+
+  useEffect(() => {
+    // initialization of the pageType
+    if (spider !== undefined) {
+      setPageType(spider.pageType);
+    }
+  }, [spider]);
+
+  return (
+    <Space direction="horizontal" split={<Divider type="vertical" style={{ height: '300px' }} />}>
+      <Card
+        hoverable
+        style={{ width: 240, margin: '1em 2em' }}
+        cover={<img alt={t('page_type.product_sheet_image')} src="assets/product-sheet.png" />}
+        onClick={chooseProductSheet}
+        extra={
+          pageType == PageType.ProductSheet ? (
+            <Space direction="horizontal" align="end" className="card-selected">
+              <CheckCircleOutlined />
+              {t('page_type.product_sheet_selected')}
+            </Space>
+          ) : (
+            <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
+          )
         }
-    };
+      >
+        <Meta title={t('page_type.product_sheet')} description={t('page_type.product_sheet_desc')} />
+      </Card>
 
-    const chooseProductSheet = () => {
-        if (spider !== undefined) {
-            spider.pageType = PageType.ProductSheet;
-            setPageType(PageType.ProductSheet);
-            saveSpider();
+      <Card
+        hoverable
+        style={{ width: 240, margin: '1em 2em' }}
+        cover={<img alt={t('page_type.category_page_image')} src="assets/category-page.png" />}
+        onClick={chooseCategoryPage}
+        extra={
+          pageType == PageType.CategoryPage ? (
+            <Space direction="horizontal" align="end" className="card-selected">
+              <CheckCircleOutlined />
+              {t('page_type.category_page_selected')}
+            </Space>
+          ) : (
+            <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
+          )
         }
-    };
-
-    const chooseCategoryPage = () => {
-        if (spider !== undefined) {
-            spider.pageType = PageType.CategoryPage;
-            setPageType(PageType.CategoryPage);
-            saveSpider();
-        }
-    };
-
-    useEffect(() => {
-        // initialization of the pageType
-        if (spider !== undefined) {
-            setPageType(spider.pageType);
-        }
-    }, [spider]);
-
-
-    return (
-
-        <Space direction="horizontal" split={<Divider type="vertical" style={{ 'height': '300px' }} />}>
-            <Card
-                hoverable
-                style={{ width: 240, 'margin': '1em 2em' }}
-                cover={<img alt={t('page_type.product_sheet_image')} src="assets/product-sheet.png" />}
-                onClick={chooseProductSheet}
-                extra={
-                    pageType == PageType.ProductSheet
-                        ? <Space direction="horizontal" align="end" className="card-selected"><CheckCircleOutlined />{t('page_type.product_sheet_selected')}</Space>
-                        : <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
-                }
-            >
-                <Meta title={t('page_type.product_sheet')} description={t('page_type.product_sheet_desc')} />
-            </Card>
-
-            <Card
-                hoverable
-                style={{ width: 240, 'margin': '1em 2em' }}
-                cover={<img alt={t('page_type.category_page_image')} src="assets/category-page.png" />}
-                onClick={chooseCategoryPage}
-                extra={
-                    pageType == PageType.CategoryPage
-                        ? <Space direction="horizontal" align="end" className="card-selected"><CheckCircleOutlined />{t('page_type.category_page_selected')}</Space>
-                        : <span className="card-not-selected">{t('page_type.click_to_select_helper')}</span>
-                }
-            >
-                <Meta title={t('page_type.category_page')} description={t('page_type.category_page_desc')} />
-            </Card>
-        </Space>
-
-    );
+      >
+        <Meta title={t('page_type.category_page')} description={t('page_type.category_page_desc')} />
+      </Card>
+    </Space>
+  );
 };
-

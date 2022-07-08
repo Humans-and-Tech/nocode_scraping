@@ -19,14 +19,9 @@ export const getSpider = (
   // there is a trick
   // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
   debounce(() => {
-    _socket.emit(
-      'spider:get',
-      {},
-      name,
-      (data: Spider | undefined, error: Error | undefined) => {
-        callback(data, error);
-      }
-    );
+    _socket.emit('spider:get', {}, name, (data: Spider | undefined, error: Error | undefined) => {
+      callback(data, error);
+    });
   }, 500)();
 };
 
@@ -44,13 +39,8 @@ export const saveSpider = (
   callback: (b: boolean, error: Error | undefined) => void
 ) => {
   debounce(() => {
-    _socket.emit(
-      'spider:upsert',
-      {},
-      spider,
-      (resp: boolean, error: Error | undefined) => {
-        callback(resp, error);
-      }
-    );
+    _socket.emit('spider:upsert', {}, spider, (resp: boolean, error: Error | undefined) => {
+      callback(resp, error);
+    });
   }, 500)();
 };

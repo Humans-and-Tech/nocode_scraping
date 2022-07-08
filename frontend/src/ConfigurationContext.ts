@@ -5,21 +5,9 @@ import { getSpider, saveSpider } from './socket/spider';
 import { Spider } from './interfaces/spider';
 
 export interface ISpiderProvider {
-  get: (
-    socket: Socket,
-    name: string,
-    callback: (data: Spider | undefined, error: Error | undefined) => void
-  ) => void;
-  upsert: (
-    socket: Socket,
-    spider: Spider,
-    callback: (b: boolean, error: Error | undefined) => void
-  ) => void;
-  remove: (
-    socket: Socket,
-    spider: Spider,
-    callback: (b: boolean, error: Error | undefined) => void
-  ) => void;
+  get: (socket: Socket, name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => void;
+  upsert: (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
+  remove: (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
   create: (socket: Socket, name: string) => Spider;
 }
 
@@ -34,14 +22,9 @@ function useSpider(): ISpiderProvider {
     if (name === '') {
       throw new Error('cannot get a spider with a blank name');
     }
-    getSpider(
-      socket,
-      {},
-      name,
-      (data: Spider | undefined, error: Error | undefined) => {
-        callback(data, error);
-      }
-    );
+    getSpider(socket, {}, name, (data: Spider | undefined, error: Error | undefined) => {
+      callback(data, error);
+    });
   };
 
   /**
@@ -62,11 +45,7 @@ function useSpider(): ISpiderProvider {
    * @param _name
    * @returns
    */
-  const upsert = (
-    socket: Socket,
-    spider: Spider,
-    callback: (b: boolean, error: Error | undefined) => void
-  ) => {
+  const upsert = (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => {
     if (spider.name === '' || spider.name === undefined) {
       throw new Error('cannot save a spider with a blank name');
     }
@@ -83,11 +62,7 @@ function useSpider(): ISpiderProvider {
    * @param spider
    * @param callback
    */
-  const remove = (
-    socket: Socket,
-    spider: Spider,
-    callback: (b: boolean, error: Error | undefined) => void
-  ): void => {
+  const remove = (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void): void => {
     if (spider.name === '') {
       throw new Error('cannot remove a spider with a blank name');
     }
@@ -103,5 +78,4 @@ export const SpiderProvider: ISpiderProvider = useSpider();
  * the scraping context will convey
  * the spider accross all elements
  */
-export const ScrapingContext =
-  React.createContext<ISpiderProvider>(SpiderProvider);
+export const ScrapingContext = React.createContext<ISpiderProvider>(SpiderProvider);

@@ -1,3 +1,5 @@
+import { Page } from 'playwright-chromium';
+
 export enum ScrapingStatus {
   SUCCESS = 'success',
   NO_CONTENT = 'no_content', // there is no error, but no content could be scraped
@@ -28,19 +30,36 @@ export class DataSelector {
   }
 }
 
+export class WebPage {
+  content: string;
+  url: URL;
+  isCached: boolean;
+  lastScrapedDate: Date;
+
+  constructor(url: URL, content: string, isCached: boolean, lastScrapedDate: Date) {
+    this.url = url;
+    this.content = content;
+    this.isCached = isCached;
+    this.lastScrapedDate = lastScrapedDate;
+  }
+}
+
 export class ScrapedContent {
   screenshot: string;
   content: string | null;
   selector: DataSelector;
   clickBefore?: Array<DataSelector | undefined>;
   status: ScrapingStatus;
+  parentPage: WebPage;
 
   constructor(
+    parentPage: WebPage,
     content: string | null,
     selector: DataSelector,
     screenshot: string,
     clickBefore?: Array<DataSelector | undefined>
   ) {
+    this.parentPage = parentPage;
     this.content = content;
     this.selector = selector;
     this.screenshot = screenshot;
@@ -97,7 +116,11 @@ export class Data {
   }
 }
 
-export interface Item {
+/**
+ * an exportItem modelizes the way the data are going to be exported
+ * for the user
+ */
+export interface ExportItem {
   name: string;
   dataSet: Set<Data>;
 }
@@ -116,10 +139,10 @@ export interface Spider {
   name: string;
   website?: Website;
   data?: Set<Data>;
-  pipelines?: Set<Pipeline>;
+  pipelines?: Set<ExportPipeline>;
   urlSet?: Set<URL>;
   pageType?: PageType;
-  items?: Set<Item>;
+  items?: Set<ExportItem>;
   settings?: Settings; // will be typed later
   headers?: unknown;
   cookies?: unknown;
@@ -131,7 +154,12 @@ export interface Spider {
   sampleURLs?: Array<URL>;
 }
 
-export interface Pipeline {
+/**
+ * the configuration of an exporter
+ * it can be the configuration of RabbitMQ, Pub/Sub/Google Buckets
+ * or any 3-part system to which we'll send `ExportItem`
+ */
+export interface ExportPipeline {
   [key: string]: unknown;
 }
 

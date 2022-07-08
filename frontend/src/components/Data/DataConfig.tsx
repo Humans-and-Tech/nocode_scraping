@@ -1,36 +1,28 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { Tabs, Space, Button } from "antd";
-import { useTranslation } from "react-i18next";
-import { Socket } from "socket.io-client";
+import React, { useState, useContext, useEffect, useRef } from 'react';
+import { Tabs, Space, Button } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { Socket } from 'socket.io-client';
 
-import { SocketContext } from "../../socket";
-import { Data, Spider, mergeSpiderData } from "../../interfaces/spider";
-import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext'
+import { SocketContext } from '../../socket';
+import { Data, Spider, mergeSpiderData } from '../../interfaces/spider';
+import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
 
-import { SelectorConfig } from "./DataSelector/SelectorConfig";
+import { SelectorConfig } from './DataSelector/SelectorConfig';
 
 import './Data.scoped.css';
 
-
 const { TabPane } = Tabs;
-
 
 /**
  * Builds a UI to configure a Selector for the given scraping element
- * 
+ *
  * TODO: the dataconfig embeds 3 Tabs
  * - selector config
  * - export config
  * - data definition (name, type)
  */
-export const DataConfig = ({
-  data, spider
-}: {
-  data: Data,
-  spider: Spider
-}): JSX.Element => {
-
-  const { t } = useTranslation("configurator");
+export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JSX.Element => {
+  const { t } = useTranslation('configurator');
 
   const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
 
@@ -42,7 +34,6 @@ export const DataConfig = ({
 
   const [localData, setLocalData] = useState<Data | undefined>(undefined);
   const [localSpider, setLocalSpider] = useState<Spider | undefined>(undefined);
-
 
   const onConfigured = (_data: Data): void => {
     setLocalData(_data);
@@ -62,15 +53,13 @@ export const DataConfig = ({
     if (localData) {
       saveSpiderData(localData);
     }
-  }
+  };
 
   const saveSpiderData = (_data: Data) => {
-
     // update the local spider
-    // when updated, the useEffect will be triggered 
+    // when updated, the useEffect will be triggered
     // to save the spider
     if (localSpider !== undefined) {
-
       // merge the data into the spider
       const _spider = mergeSpiderData(localSpider, _data);
 
@@ -85,11 +74,9 @@ export const DataConfig = ({
         }
       });
     }
-
   };
 
   useEffect(() => {
-
     // when mouting initially
     if (localData === undefined || data.name !== dataName.current) {
       dataName.current = data.name;
@@ -99,20 +86,29 @@ export const DataConfig = ({
     if (localSpider === undefined) {
       setLocalSpider(spider);
     }
-
   }, [data, spider]);
 
   const saveBtn = <Button onClick={triggerSave}>{t('field.action.save_data_configuration')}</Button>;
 
   return (
-
     <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>
       <TabPane tab={t('tab.selector_config')} key="1">
         <h2>{data.label}</h2>
-        <Space direction="vertical" size="large" style={{ 'width': '100%' }}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {
             //spider.sampleURLs && spider.sampleURLs.length > 0 &&
-            localData && <SelectorConfig data={localData} sampleUrl={new URL('https://www.manomano.fr/p/piscine-tubulaire-ronde-366-x-122m-summer-waves-avec-pompe-32127122?product_id=31948595')} onConfigured={onConfigured} onChange={onDataChange} />
+            localData && (
+              <SelectorConfig
+                data={localData}
+                sampleUrl={
+                  new URL(
+                    'https://www.manomano.fr/p/piscine-tubulaire-ronde-366-x-122m-summer-waves-avec-pompe-32127122?product_id=31948595'
+                  )
+                }
+                onConfigured={onConfigured}
+                onChange={onDataChange}
+              />
+            )
           }
 
           {/* {isConfigured &&
@@ -130,7 +126,5 @@ export const DataConfig = ({
         Exporters
       </TabPane>
     </Tabs>
-
   );
 };
-

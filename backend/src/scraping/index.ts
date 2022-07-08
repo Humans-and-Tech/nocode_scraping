@@ -1,5 +1,4 @@
 import { readFile, unlink, access } from 'fs/promises';
-import { FileSystemCache } from 'file-system-cache';
 import { createHash } from 'crypto';
 
 import * as playwright from 'playwright-chromium';
@@ -13,11 +12,11 @@ import {
   DataSelector,
   SelectorStatus,
   ScrapingStatus,
-  GenericResponseStatus
+  GenericResponseStatus,
+  WebPage
 } from '../models';
-
-const logger = require('pino')();
-const moduleLogger = logger.child({ module: 'scraping' });
+import { loadPageContentFromCache, cachePageContent } from '../cache';
+import logger from '../logging';
 
 /**
  * validates a selector path
@@ -64,10 +63,7 @@ export const validateSelector = async (
  * @param selector
  * @returns
  */
-export const clickElement = async (
-  page: playwright.Page,
-  selector: DataSelector
-): Promise<ScrapedContent | ScrapingError | boolean> => {
+export const clickElement = async (page: playwright.Page, selector: DataSelector): Promise<ScrapingError | boolean> => {
   if (selector !== undefined && selector.path !== undefined) {
     if (selector.language !== 'css' && selector.language !== undefined) {
       return Promise.reject(
@@ -129,46 +125,44 @@ export const clickElement = async (
  * so that next time, the page is loaded from the cache
  *
  * @param url: URL
- * @returns Promise<<playwright.Page>
+ * @returns Promise<WebPage>
  */
-const loadPage = async (url: URL): Promise<playwright.Page> => {
-  const browser = await playwright.chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  // short timeout of 1 seconds
-  // TODO : configure it externally
-  page.setDefaultTimeout(1000);
-
+const loadWebPage = async (url: URL): Promise<WebPage> => {
+  let isCached = false;
+  let lastScrapedDate = new Date();
   let cachedHtml = undefined;
+
   // calculate a hash for the url
   // to retrieve the cached version
   const key = createHash('sha256').update(url.pathname.toString()).digest('hex');
 
-  // use a cache for HTML pages
-  // downloaded by playwright
-  const cache = new FileSystemCache({
-    basePath: './.cache', // Path where cache files are stored (default).
-    ns: url.hostname // cached files are grouped by hostname
-  });
-
   try {
-    cachedHtml = await cache.get(key);
+    const cached = await loadPageContentFromCache(key);
 
-    if (cachedHtml !== undefined) {
-      moduleLogger.info(`Using cached content for ${url.toString()}`);
-      await page.setContent(cachedHtml);
-    } else {
-      moduleLogger.warn(`Downloading content from the web for ${url.toString()}`);
+    if (!cached || !cached.content) {
+      // store the page content into the cache
+      // await cache.set(key, cachedHtml);
+      const browser = await playwright.chromium.launch();
+      const context = await browser.newContext();
+      const page = await context.newPage();
       await page.goto(url.toString());
       cachedHtml = await page.content();
+      await cachePageContent(key, cachedHtml);
 
-      // store the page content into the cache
-      await cache.set(key, cachedHtml);
+      page.close();
+      browser.close();
+
+      logger.info('loaded content from the web, and cached it');
+    } else {
+      isCached = true;
+      lastScrapedDate = cached.updateTime || new Date();
+      cachedHtml = cached.content;
+      logger.info('loaded content from the cache');
     }
 
-    return Promise.resolve(page);
+    return Promise.resolve(new WebPage(url, cachedHtml, isCached, lastScrapedDate));
   } catch (error) {
+    logger.error(`Error downloading from cache, Downloading content from the web for ${url.toString()}`);
     return Promise.reject(error);
   }
 };
@@ -221,8 +215,19 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
   const baseName = _url.toString().substring(_url.toString().lastIndexOf('/') + 1);
   const screenshotPath = `./${_url.hostname}-${baseName}.png`;
 
+  let browser: playwright.Browser | undefined = undefined;
+  let context;
+  let page: playwright.Page | undefined = undefined;
+
   try {
-    const page = await loadPage(_url);
+    const webPage = await loadWebPage(_url);
+
+    // now launch a browser to click in it
+    // and scrape content
+    browser = await playwright.chromium.launch();
+    context = await browser.newContext();
+    page = await context.newPage();
+    await page.setContent(webPage.content);
     await page.waitForTimeout(500);
 
     // eventually click elements
@@ -234,7 +239,7 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
       // but if an error occurs rethrow it !
       await Promise.all(
         req.clickBefore.map(async (element) => {
-          if (element) {
+          if (element && page) {
             try {
               await clickElement(page, element);
               await page.waitForTimeout(500);
@@ -261,20 +266,41 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
     // TODO: externalise the root path
     // to store screenshots
     // convert to base64 to return it to the user
-    let imageAsBase64: string = '';
+    let imageAsBase64 = '';
     await page.locator(req.selector.path).screenshot({ path: screenshotPath });
     imageAsBase64 = await readFile(screenshotPath, { encoding: 'base64' });
     // remove the screenshot file
     await unlink(screenshotPath);
 
+    page.close();
+    browser.close();
+
     if (content) {
-      return Promise.resolve(new ScrapedContent(content, req.selector, `data:image/gif;base64,${imageAsBase64}`));
+      return Promise.resolve(
+        new ScrapedContent(webPage, content, req.selector, `data:image/gif;base64,${imageAsBase64}`)
+      );
     } else {
       return Promise.reject(
         new ScrapingError(`no content found for selector ${req.selector.path}`, ScrapingStatus.NO_CONTENT, req.selector)
       );
     }
   } catch (error) {
+    // close if not
+    if (page) {
+      try {
+        page.close();
+      } catch (err) {
+        logger.error(err);
+      }
+    }
+    if (browser) {
+      try {
+        browser.close();
+      } catch (err) {
+        logger.error(err);
+      }
+    }
+
     // just for testing, we must verifiy the playwright.errors object
     // because during the tests it is mocked and equals undefined
     if (playwright.errors && error instanceof playwright.errors.TimeoutError) {

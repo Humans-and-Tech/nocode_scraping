@@ -1,16 +1,8 @@
 import { Socket } from 'socket.io-client';
 import debounce from 'lodash/debounce';
 
-import { DataSelector } from '../interfaces/spider';
-import {
-  IScrapingRequest,
-  ScrapingError,
-  ScrapingResponse,
-  DataSelectorValidityResponse,
-  ScrapingStatus,
-  GenericResponseStatus,
-  DataSelectorValidityError
-} from '../interfaces/events';
+import { DataSelector, DataSelectorValidityResponse, DataSelectorValidityError } from '../interfaces/spider';
+import { IScrapingRequest, ScrapingError, ScrapingResponse } from '../interfaces/scraping';
 
 /**
  * fetches the content of the css selector and provides it back to the callback function
@@ -30,13 +22,9 @@ export const getContent = (
     clickBefore: [popupSelector],
     useCache: true
   };
-  _socket.emit(
-    'scraping:get-content',
-    evaluateConfig,
-    (response: ScrapingResponse | ScrapingError) => {
-      callback(response);
-    }
-  );
+  _socket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse | ScrapingError) => {
+    callback(response);
+  });
 };
 
 /**
@@ -49,9 +37,7 @@ export const validateCssSelector = (
   _socket: Socket,
   user: unknown,
   p: DataSelector,
-  callback: (
-    resp: DataSelectorValidityResponse | DataSelectorValidityError
-  ) => void
+  callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void
 ) => {
   debounce(() => {
     _socket.emit(

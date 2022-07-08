@@ -1,8 +1,8 @@
 import express from 'express';
 import http from 'http';
 import { Socket, Server } from 'socket.io';
+import logger from './logging';
 
-const logger = require('pino')();
 const app = express();
 const server = http.createServer(app);
 

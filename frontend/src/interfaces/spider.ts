@@ -1,3 +1,5 @@
+import { GenericResponseStatus } from '.';
+
 export enum SelectorStatus {
   VALID = 'valid',
   INVALID = 'invalid'
@@ -26,6 +28,25 @@ export interface Data {
 }
 
 /**
+ * to be used when the validation services succeeds
+ * even if the selector is invalid
+ */
+export interface DataSelectorValidityResponse {
+  selectorErrors?: Array<unknown>; // the
+  selector: DataSelector;
+  status: GenericResponseStatus.SUCCESS;
+}
+
+/**
+ * to be used when there is a technical error
+ */
+export interface DataSelectorValidityError {
+  message: string;
+  selector: DataSelector;
+  status: GenericResponseStatus.ERROR;
+}
+
+/**
  * to sweep data, you must stringify the data
  * and you get it back as a string,
  * then it's up to you to cast it to the desired type
@@ -40,10 +61,7 @@ export interface Data {
  *
  * const cleanData = MySweeper(data, ',', '.');
  */
-export type DataSweeperFunction = (
-  input: string,
-  ...args: (string | number | boolean)[]
-) => string;
+export type DataSweeperFunction = (input: string, ...args: (string | number | boolean)[]) => string;
 
 export interface Item {
   name: string;

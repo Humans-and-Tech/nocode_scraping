@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -7,15 +6,13 @@ import i18n from '../../tests/i18n';
 import socketIOClient from 'socket.io-client';
 import MockedSocket from 'socket.io-mock';
 
-
 import { getSpider } from '../../socket/spider';
-import { SpiderSearch } from './SpiderSearch'
-import { SocketContext } from '../../socket'
-
+import { SpiderSearch } from './SpiderSearch';
+import { SocketContext } from '../../socket';
 
 /**
  * mock socketio
- * 
+ *
  * /!\ not mocking this part would lead to
  * setImmediate is not defined
  * because it would try to make requests using setImmediate
@@ -27,90 +24,75 @@ jest.mock('socket.io-client');
  * so that it returns a correct ScrapingResponse
  */
 jest.mock('../../socket/spider', () => ({
+  // callback would be a jest mock
+  // for example a simple jest.fn()
+  getSpider: (socket, {}, name, callback) => {
+    const returnValue = {
+      'my-spider': {
+        name: 'existing spider'
+      },
+      'new-spider': undefined
+    };
 
-    // callback would be a jest mock
-    // for example a simple jest.fn()
-    getSpider: (socket, { }, name, callback) => {
-
-        const returnValue = {
-            'my-spider': {
-                name: 'existing spider'
-            },
-            'new-spider': undefined
-        };
-
-
-
-        // mock a ScrapingResponse object
-        // made up of content + screenshot 
-        return callback(returnValue[name]);
-    }
+    // mock a ScrapingResponse object
+    // made up of content + screenshot
+    return callback(returnValue[name]);
+  }
 }));
 
-
 describe('Search results', () => {
+  let socket;
 
-    let socket;
+  beforeEach(() => {
+    socket = new MockedSocket();
+    socketIOClient.mockReturnValue(socket);
+  });
 
-    beforeEach(() => {
-        socket = new MockedSocket();
-        socketIOClient.mockReturnValue(socket);
-    });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
+  test('search returns no spider', async () => {
+    const onLoadedMock = jest.fn();
 
-    test('search returns no spider', async () => {
+    const { getByTestId } = render(
+      <SocketContext.Provider value={socket}>
+        <I18nextProvider i18n={i18n}>
+          <SpiderSearch onLoaded={onLoadedMock} />
+        </I18nextProvider>
+      </SocketContext.Provider>
+    );
 
-        const onLoadedMock = jest.fn();
+    const input = getByTestId('spiderSearchInput');
 
-        const { getByTestId } = render(
-            <SocketContext.Provider value={socket}>
-                <I18nextProvider i18n={i18n}>
-                    <SpiderSearch onLoaded={onLoadedMock} />
-                </I18nextProvider>
-            </SocketContext.Provider>
-        );
+    // simulate a user input
+    // this simulates the fact that no spider exists with this name
+    fireEvent.change(input, { target: { value: 'new-spider' } });
 
-        const input = getByTestId('spiderSearchInput');
+    // the link to create a new spider should be displayed
+    const createSpiderLink = getByTestId('spider-no-proposal-found');
+    expect(createSpiderLink).toBeInTheDocument();
+  });
 
-        // simulate a user input 
-        // this simulates the fact that no spider exists with this name
-        fireEvent.change(input, { target: { value: 'new-spider' } });
+  test('search returns an existing spider', async () => {
+    const onLoadedMock = jest.fn();
 
-        // the link to create a new spider should be displayed
-        const createSpiderLink = getByTestId('spider-no-proposal-found');
-        expect(createSpiderLink).toBeInTheDocument();
+    const { getByTestId } = render(
+      <SocketContext.Provider value={socket}>
+        <I18nextProvider i18n={i18n}>
+          <SpiderSearch onLoaded={onLoadedMock} />
+        </I18nextProvider>
+      </SocketContext.Provider>
+    );
 
+    const input = getByTestId('spiderSearchInput');
 
-    });
+    // simulate a user input
+    // this simulates the fact that no spider exists with this name
+    fireEvent.change(input, { target: { value: 'my-spider' } });
 
-    test('search returns an existing spider', async () => {
-
-        const onLoadedMock = jest.fn();
-
-        const { getByTestId } = render(
-            <SocketContext.Provider value={socket}>
-                <I18nextProvider i18n={i18n}>
-                    <SpiderSearch onLoaded={onLoadedMock} />
-                </I18nextProvider>
-            </SocketContext.Provider>
-        );
-
-        const input = getByTestId('spiderSearchInput');
-
-        // simulate a user input 
-        // this simulates the fact that no spider exists with this name
-        fireEvent.change(input, { target: { value: 'my-spider' } });
-
-        // the link to create a new spider should be displayed
-        const selectSpider = getByTestId('spider-select-proposal');
-        expect(selectSpider).toBeInTheDocument();
-
-
-    });
-
+    // the link to create a new spider should be displayed
+    const selectSpider = getByTestId('spider-select-proposal');
+    expect(selectSpider).toBeInTheDocument();
+  });
 });
-
-

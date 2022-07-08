@@ -10,6 +10,7 @@
     "start": "tsc && GOOGLE_APPLICATION_CREDENTIALS=./firestore-creds.json node --trace-warnings dist/index.js",
     "test": "jest --verbose",
     "test-watch": "jest --verbose --watchAll",
+    "lint": "yarn run eslint src/* --fix --no-error-on-unmatched-pattern",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "dependencies": {
@@ -21,12 +22,12 @@
     "firebase": "^9.8.3",
     "http": "^0.0.1-security",
     "jsdom": "^19.0.0",
-    "pino": "^8.1.0",
     "playwright-chromium": "^1.22.2",
     "schema-dts": "^1.1.0",
     "socket.io": "^4.5.1",
     "validator": "^13.7.0",
-    "w3c-css-validator": "^1.2.1"
+    "w3c-css-validator": "^1.2.1",
+    "winston": "^3.8.1"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.18.6",
@@ -34,6 +35,8 @@
     "@types/jest": "^28.1.4",
     "@types/jsdom": "^16.2.14",
     "@types/validator": "^13.7.3",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
     "eslint": "^8.19.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",

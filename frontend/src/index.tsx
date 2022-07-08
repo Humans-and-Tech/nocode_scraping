@@ -1,27 +1,19 @@
-import React, { StrictMode, } from "react";
-import { createRoot } from "react-dom/client";
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate
-} from 'react-router-dom';
-import "./i18n";
-import { SocketContext, socket } from "./socket";
-import ProductSheet from "./views/ProductSheet/ProductSheet";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import './i18n';
+import { SocketContext, socket } from './socket';
+import ProductSheet from './views/ProductSheet/ProductSheet';
 import OnBoarding from './views/OnBoarding/OnBoarding';
-import { ScraperLayout, OnBoardingLayout } from './components/Layout/Layout'
-import { ScrapingContext, SpiderProvider } from './ConfigurationContext'
-import { SpiderConfigSummary } from "./components/Spider/SpiderConfigSummary";
+import { ScraperLayout, OnBoardingLayout } from './components/Layout/Layout';
+import { ScrapingContext, SpiderProvider } from './ConfigurationContext';
+import { SpiderConfigSummary } from './components/Spider/SpiderConfigSummary';
 
-
-
-const rootElement = document.getElementById("root");
+const rootElement = document.getElementById('root');
 // to prevent TS compilation error
-if (!rootElement) throw new Error("Failed to find the root element");
+if (!rootElement) throw new Error('Failed to find the root element');
 const root = createRoot(rootElement);
-
 
 /**
  * the default route is /applications
@@ -32,7 +24,6 @@ root.render(
     <SocketContext.Provider value={socket}>
       <Router>
         <Routes>
-
           <Route
             path="/onboarding"
             element={
@@ -47,13 +38,9 @@ root.render(
           <Route
             path="/spider/:name/product-sheet"
             element={
-
-              <ScraperLayout header={
-                <SpiderConfigSummary />
-              }>
+              <ScraperLayout header={<SpiderConfigSummary />}>
                 <ProductSheet />
               </ScraperLayout>
-
             }
           />
           <Route path="*" element={<Navigate to="/onboarding" replace />} />
