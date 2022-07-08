@@ -14,8 +14,10 @@ const io = new Server(server, {
   }
 });
 
+/* eslint-disable */
 const { scrapeContent, isSelectorValid } = require('./socket/scraping')(io);
 const { getSpider, updateSpider } = require('./socket/spider')(io);
+/* eslint-enable */
 
 /**
  * all the socketio routes are listed here
@@ -34,7 +36,7 @@ const onConnection = (socket: Socket) => {
 io.on('connection', onConnection);
 
 io.on('connect_error', (err: unknown) => {
-  console.error(`connect_error due to ${err}`);
+  logger.error(`socket.io connect error due to ${err}`);
 });
 
 server.listen(3001, () => {

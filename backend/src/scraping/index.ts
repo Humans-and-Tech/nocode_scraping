@@ -1,4 +1,4 @@
-import { readFile, unlink, access } from 'fs/promises';
+import { readFile, unlink } from 'fs/promises';
 import { createHash } from 'crypto';
 
 import * as playwright from 'playwright-chromium';

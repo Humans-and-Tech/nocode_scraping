@@ -1,5 +1,3 @@
-import { Page } from 'playwright-chromium';
-
 export enum ScrapingStatus {
   SUCCESS = 'success',
   NO_CONTENT = 'no_content', // there is no error, but no content could be scraped

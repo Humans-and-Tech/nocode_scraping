@@ -34,7 +34,7 @@ export const cachePageContent = async (key: string, content: string): Promise<bo
       try {
         if (compressed) {
           // const obj = new CachedObject(compressed);
-          const b: boolean = await upsert({}, { content: compressed.toString('base64') }, document);
+          await upsert({ name: 'test' }, { content: compressed.toString('base64') }, document);
           return Promise.resolve(true);
         } else {
           logger.error(`undefined compressed content`);

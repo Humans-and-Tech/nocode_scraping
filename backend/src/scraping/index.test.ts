@@ -4,7 +4,7 @@ import * as playwright from 'playwright-chromium';
 import { GenericResponseStatus, SelectorStatus, ScrapedContent } from '../models';
 import { ScrapingError, DataSelectorValidityError } from '../errors';
 import { getContent, validateSelector, clickElement } from '.';
-import {loadPageContentFromCache, ICachedContent} from '../cache';
+import { loadPageContentFromCache, ICachedContent } from '../cache';
 
 // timeout of 10 seconds
 // some tests with playwright are long
@@ -78,18 +78,17 @@ jest.mock('playwright-chromium', () => ({
             return Promise.resolve();
           };
 
-
           return { goto, click, waitForTimeout, locator, setDefaultTimeout, content, setContent, close };
         };
         return { newPage };
       };
 
-      const close = async() => {
-        console.log("closed browser")
+      const close = async () => {
+        console.log('closed browser');
         return Promise.resolve();
       };
       return { newContext, close };
-    },
+    }
   }
 }));
 
@@ -98,15 +97,13 @@ jest.mock('playwright-chromium', () => ({
  */
 jest.mock('../cache', () => ({
   loadPageContentFromCache: async (key: string) => {
-    console.log("loadPageContentFromCache for ", key);
+    console.log('loadPageContentFromCache for ', key);
     return Promise.resolve({
       content: 'bla',
       updateTime: new Date()
     } as ICachedContent);
   }
 }));
-
-
 
 /**
  * mock the node fs functions
