@@ -4,7 +4,8 @@ import * as playwright from 'playwright-chromium';
 import { GenericResponseStatus, SelectorStatus, ScrapedContent } from '../models';
 import { ScrapingError, DataSelectorValidityError } from '../errors';
 import { getContent, validateSelector, clickElement } from '.';
-import { loadPageContentFromCache, ICachedContent } from '../cache';
+import { loadPageContentFromCache } from '../cache/firestore';
+import {ICachedContent} from '../cache'
 
 // timeout of 10 seconds
 // some tests with playwright are long
