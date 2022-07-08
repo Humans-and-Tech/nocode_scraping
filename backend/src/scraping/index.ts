@@ -132,6 +132,10 @@ const loadWebPage = async (url: URL): Promise<WebPage> => {
   let lastScrapedDate = new Date();
   let cachedHtml = undefined;
 
+  let browser: playwright.Browser | undefined = undefined;
+  let context;
+  let page: playwright.Page | undefined = undefined;
+
   // calculate a hash for the url
   // to retrieve the cached version
   const key = createHash('sha256').update(url.pathname.toString()).digest('hex');
@@ -142,15 +146,15 @@ const loadWebPage = async (url: URL): Promise<WebPage> => {
     if (!cached || !cached.content) {
       // store the page content into the cache
       // await cache.set(key, cachedHtml);
-      const browser = await playwright.chromium.launch();
-      const context = await browser.newContext();
-      const page = await context.newPage();
+      browser = await playwright.chromium.launch();
+      context = await browser.newContext();
+      page = await context.newPage();
       await page.goto(url.toString());
       cachedHtml = await page.content();
       await cachePageContent(key, cachedHtml);
 
-      page.close();
-      browser.close();
+      await page.close();
+      await browser.close();
 
       logger.info('loaded content from the web, and cached it');
     } else {
@@ -163,6 +167,20 @@ const loadWebPage = async (url: URL): Promise<WebPage> => {
     return Promise.resolve(new WebPage(url, cachedHtml, isCached, lastScrapedDate));
   } catch (error) {
     logger.error(`Error downloading from cache, Downloading content from the web for ${url.toString()}`);
+    if (page) {
+      try {
+        await page.close();
+      } catch (err) {
+        logger.error(err);
+      }
+    }
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (err) {
+        logger.error(err);
+      }
+    }
     return Promise.reject(error);
   }
 };
@@ -272,8 +290,8 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
     // remove the screenshot file
     await unlink(screenshotPath);
 
-    page.close();
-    browser.close();
+    await page.close();
+    await browser.close();
 
     if (content) {
       return Promise.resolve(
@@ -288,14 +306,14 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
     // close if not
     if (page) {
       try {
-        page.close();
+        await page.close();
       } catch (err) {
         logger.error(err);
       }
     }
     if (browser) {
       try {
-        browser.close();
+        await browser.close();
       } catch (err) {
         logger.error(err);
       }

@@ -1,10 +1,10 @@
 import { readFile, unlink, access } from 'fs/promises';
 import * as playwright from 'playwright-chromium';
-import { FileSystemCache } from 'file-system-cache';
 
-import { GenericResponseStatus, SelectorStatus, ScrapingStatus, ScrapedContent } from '../models';
+import { GenericResponseStatus, SelectorStatus, ScrapedContent } from '../models';
 import { ScrapingError, DataSelectorValidityError } from '../errors';
 import { getContent, validateSelector, clickElement } from '.';
+import {loadPageContentFromCache, ICachedContent} from '../cache';
 
 // timeout of 10 seconds
 // some tests with playwright are long
@@ -72,29 +72,41 @@ jest.mock('playwright-chromium', () => ({
             };
             return { textContent, screenshot };
           };
-          return { goto, click, waitForTimeout, locator, setDefaultTimeout, content, setContent };
+
+          const close = async () => {
+            console.log('closed page');
+            return Promise.resolve();
+          };
+
+
+          return { goto, click, waitForTimeout, locator, setDefaultTimeout, content, setContent, close };
         };
         return { newPage };
       };
-      return { newContext };
-    }
+
+      const close = async() => {
+        console.log("closed browser")
+        return Promise.resolve();
+      };
+      return { newContext, close };
+    },
   }
 }));
 
 /**
- * let's mock as well the cache system
- * we don't really want to read or write from the filesystem
- * let's suppose it works correctly
+ * mock the cache system, we don't really want to use firestore
  */
-jest.spyOn(FileSystemCache.prototype, 'get').mockImplementation(async (key: string) => {
-  console.log('get cache');
-  return Promise.resolve('bla');
-});
+jest.mock('../cache', () => ({
+  loadPageContentFromCache: async (key: string) => {
+    console.log("loadPageContentFromCache for ", key);
+    return Promise.resolve({
+      content: 'bla',
+      updateTime: new Date()
+    } as ICachedContent);
+  }
+}));
 
-jest.spyOn(FileSystemCache.prototype, 'set').mockImplementation(async (key: string, content: string) => {
-  console.log('set cache');
-  return Promise.resolve({ path: 'bla' });
-});
+
 
 /**
  * mock the node fs functions
