@@ -16,7 +16,8 @@ import {
   GenericResponseStatus,
   WebPage
 } from '../models';
-import { loadPageContentFromCache, cachePageContent } from '../cache';
+
+import { loadPageContentFromCache, cachePageContent } from '../cache/firestore';
 import logger from '../logging';
 
 /**
@@ -120,9 +121,9 @@ export const clickElement = async (page: playwright.Page, selector: DataSelector
 };
 
 /**
- * Loads the page from a local Cache or from the Web if not cached
+ * Loads the page from a Cache or from the Web if not cached
  *
- * If the page content is not found in the cache, it is automatically added to the cache
+ * If the page content is not found in the cache, it is added to the cache
  * so that next time, the page is loaded from the cache
  *
  * @param url: URL

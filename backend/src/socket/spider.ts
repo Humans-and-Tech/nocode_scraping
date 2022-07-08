@@ -45,9 +45,7 @@ module.exports = () => {
     }
 
     const organizationName = 'test';
-
     const configCollection: DocumentData = firestore.collection(`organizations`);
-
     const document = configCollection.doc(`${organizationName}/spiders/${name}`);
 
     try {

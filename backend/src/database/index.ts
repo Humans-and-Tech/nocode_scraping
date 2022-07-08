@@ -1,4 +1,5 @@
 import { Firestore } from '@google-cloud/firestore';
+
 import { Organization } from '../interfaces/auth';
 import logger from '../logging';
 
@@ -7,6 +8,7 @@ import logger from '../logging';
 // which is stored at the root of the project
 // and the path of which is passed as env variable when launching node
 export const firestore = new Firestore();
+
 
 export interface FireStoreError {
   code: number;
