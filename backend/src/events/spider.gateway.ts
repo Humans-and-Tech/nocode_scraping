@@ -3,14 +3,21 @@ import {
   WebSocketServer,
   SubscribeMessage,
   OnGatewayConnection,
-  OnGatewayDisconnect
+  OnGatewayDisconnect,
+  MessageBody
 } from '@nestjs/websockets';
+import logger from 'src/logging';
+import { SpiderService } from '../services/SpiderService';
+
 const config = require('config');
 
 @WebSocketGateway({
   namespace: 'spider'
 })
 export class SpiderEventGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
+  constructor(private readonly spiderService: SpiderService) {}
+
   @WebSocketServer()
   server;
 
@@ -24,7 +31,13 @@ export class SpiderEventGateway implements OnGatewayConnection, OnGatewayDisconn
   }
 
   @SubscribeMessage('get')
-  async onGet(client, message) {
-    console.log('get spider', message);
+  async onGet(@MessageBody('name') name: string) {
+    console.log('get spider', name);
+    try {
+      return await this.spiderService.getSpider({}, name);
+    } catch(err) {
+      logger.error(err);
+      return err;
+    }
   }
 }

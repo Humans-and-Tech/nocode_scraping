@@ -50,17 +50,38 @@ export interface IBackendServicesProvider {
   scraping: IScrapingBackend;
 }
 
+interface BackendSpiderInterface {
+  name: string; // the spidername
+}
+
+/**
+ * TODO: complete this check with other props
+ * it's quite weak !!
+ * 
+ * @param obj 
+ * @returns 
+ */
+function isSpider(obj: unknown): obj is Spider {
+  return typeof obj === 'object' && obj !== null && 'name' in obj;
+}
+
+
 function spiderBackend(): ISpiderBackend {
-  const get = (name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
-    if (name === '') {
+  const get = (_name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
+    if (_name === '') {
       throw new Error('cannot get a spider with a blank name');
     }
     // debounce does not work in anonymous functions
     // there is a trick
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
-      spiderSocket.emit('get', {}, name, (data: Spider | undefined, error: Error | undefined) => {
-        callback(data, error);
+      const params: BackendSpiderInterface =  {name: _name};
+      spiderSocket.emit('get', params, (data: Spider | Error | undefined) => {
+        if (isSpider(data)){
+          callback(data, undefined);
+        } else {
+          callback(undefined, data);
+        }
       });
     }, 500)();
   };
