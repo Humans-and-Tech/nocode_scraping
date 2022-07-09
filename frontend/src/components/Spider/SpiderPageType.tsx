@@ -6,8 +6,8 @@ import { Socket } from 'socket.io-client';
 
 import { PageType, Spider } from '../../interfaces/spider';
 import { useTranslation } from 'react-i18next';
-import { SocketContext } from '../../socket';
-import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
+// import { SpiderSocketContext } from '../../socket';
+import { BackendContext, IBackendServicesProvider } from '../../ConfigurationContext';
 
 import '../../style.css';
 import './SpiderConfig.scoped.css';
@@ -24,9 +24,9 @@ export const SpiderPageType = (props: SpiderPageTyperProps): JSX.Element => {
 
   const { spider, onChange } = props;
 
-  const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
+  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
-  const socket = useContext<Socket>(SocketContext);
+  // const socket = useContext<Socket>(SpiderSocketContext);
 
   // manage a state on the pageType
   // to refresh the card when changing the spider pageType
@@ -34,7 +34,7 @@ export const SpiderPageType = (props: SpiderPageTyperProps): JSX.Element => {
 
   const saveSpider = () => {
     if (spider !== undefined) {
-      spiderProvider.upsert(socket, spider, (b: boolean) => {
+      backendProvider.spider.upsert(spider, (b: boolean) => {
         // TODO notify the user
         if (b) {
           onChange(spider);

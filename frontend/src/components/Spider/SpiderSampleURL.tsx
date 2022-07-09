@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 import { Socket } from 'socket.io-client';
 
-import { SocketContext } from '../../socket';
+// import { SpiderSocketContext } from '../../socket';
 
 import { Spider } from '../../interfaces/spider';
-import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
+import { BackendContext, IBackendServicesProvider } from '../../ConfigurationContext';
 
 import './SpiderConfig.scoped.css';
 
@@ -29,9 +29,9 @@ export const SpiderSampleURL = (): JSX.Element => {
 
   const { name } = useParams();
 
-  const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
+  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
-  const socket = useContext<Socket>(SocketContext);
+  // const socket = useContext<Socket>(SpiderSocketContext);
 
   const [spider, setSpider] = useState<Spider | undefined>(undefined);
   const [url, setUrl] = useState<URL | undefined>(undefined);
@@ -54,7 +54,7 @@ export const SpiderSampleURL = (): JSX.Element => {
 
     if (spider !== undefined) {
       spider.sampleURLs?.push(new URL(val));
-      spiderProvider.upsert(socket, spider, (b: boolean) => {
+      backendProvider.spider.upsert(spider, (b: boolean) => {
         console.log('upsert succesful, notify the user');
       });
     }

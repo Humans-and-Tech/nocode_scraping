@@ -3,9 +3,9 @@ import { Tabs, Space, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Socket } from 'socket.io-client';
 
-import { SocketContext } from '../../socket';
+// import { ScrapingSocketContext } from '../../socket';
 import { Data, Spider, mergeSpiderData } from '../../interfaces/spider';
-import { ScrapingContext, ISpiderProvider } from '../../ConfigurationContext';
+import { BackendContext, IBackendServicesProvider } from '../../ConfigurationContext';
 
 import { SelectorConfig } from './DataSelector/SelectorConfig';
 
@@ -24,9 +24,9 @@ const { TabPane } = Tabs;
 export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JSX.Element => {
   const { t } = useTranslation('configurator');
 
-  const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
+  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
-  const socket = useContext<Socket>(SocketContext);
+  // const socket = useContext<Socket>(ScrapingSocketContext);
 
   // keep track of the current data loaded in this component
   // so that the component states are re-init when the data change
@@ -64,7 +64,7 @@ export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JS
       const _spider = mergeSpiderData(localSpider, _data);
 
       // sync the DB
-      spiderProvider.upsert(socket, _spider, (b: boolean, err: Error | undefined) => {
+      backendProvider.spider.upsert(_spider, (b: boolean, err: Error | undefined) => {
         if (b) {
           console.log('data is synced');
           // and update the local state accordingly

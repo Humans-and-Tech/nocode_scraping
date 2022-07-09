@@ -7,9 +7,9 @@ import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import { Data, Spider } from '../../interfaces/spider';
-import { ISpiderProvider, ScrapingContext } from '../../ConfigurationContext';
+import { IBackendServicesProvider, BackendContext } from '../../ConfigurationContext';
 import { DataConfig } from '../../components/Data/DataConfig';
-import { SocketContext } from '../../socket';
+// import { ScrapingSocketContext } from '../../socket';
 
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
 
@@ -25,9 +25,9 @@ const ProductSheet: React.FC = () => {
 
   const spider = useRef<Spider | undefined>(undefined);
 
-  const spiderProvider = useContext<ISpiderProvider>(ScrapingContext);
+  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
-  const socket = useContext<Socket>(SocketContext);
+  // const socket = useContext<Socket>(ScrapingSocketContext);
 
   const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
 
@@ -99,7 +99,7 @@ const ProductSheet: React.FC = () => {
   useEffect(() => {
     if (spider.current?.name !== name && name !== undefined) {
       setIsLoading(true);
-      spiderProvider.get(socket, name, (_spider: Spider | undefined) => {
+      backendProvider.spider.get(name, (_spider: Spider | undefined) => {
         if (_spider) {
           spider.current = _spider;
         } else {
@@ -112,7 +112,7 @@ const ProductSheet: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [spiderProvider, socket, name]);
+  }, [backendProvider, name]);
 
   return (
     <Fragment>

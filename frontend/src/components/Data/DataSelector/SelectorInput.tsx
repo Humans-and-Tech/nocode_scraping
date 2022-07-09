@@ -4,8 +4,9 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { Socket } from 'socket.io-client';
 
-import { SocketContext } from '../../../socket';
-import { validateCssSelector } from '../../../socket/scraping';
+// import { ScrapingSocketContext } from '../../../socket';
+import { BackendContext, IBackendServicesProvider } from '../../../ConfigurationContext';
+// import { validateCssSelector } from '../../../socket/scraping';
 import { GenericResponseStatus } from '../../../interfaces';
 import {
   DataSelector,
@@ -39,7 +40,8 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
 
   const { selector, onChange, ...rest } = props;
 
-  const socket = useContext<Socket>(SocketContext);
+  // const socket = useContext<Socket>(ScrapingSocketContext);
+  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
   /**
    * the textare input path
@@ -63,7 +65,7 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
   const validateSelector = (s: DataSelector) => {
     setIsBackendError(false);
 
-    validateCssSelector(socket, {}, s, (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
+    backendProvider.scraping.validateCssSelector({}, s, (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
       if (resp.status === GenericResponseStatus.ERROR) {
         setIsBackendError(true);
         setInputClass('error');

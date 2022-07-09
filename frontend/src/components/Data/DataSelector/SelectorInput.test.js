@@ -8,7 +8,7 @@ import MockedSocket from 'socket.io-mock';
 
 import { validateCssSelector } from '../../../socket/scraping';
 import { SelectorInput } from './SelectorInput';
-import { SocketContext } from '../../../socket';
+import { ScrapingSocketContext } from '../../../socket';
 
 /**
  * mock socketio

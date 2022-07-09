@@ -5,8 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { Socket } from 'socket.io-client';
 import isURL from 'validator/lib/isURL';
 
-import { SocketContext } from '../../../socket';
-import { getContent } from '../../../socket/scraping';
+// import { ScrapingSocketContext } from '../../../socket';
+// import { getContent } from '../../../socket/scraping';
+import { BackendContext, IBackendServicesProvider } from '../../../ConfigurationContext';
 import { Data, DataSelector, SelectorStatus } from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { SelectorInput } from './SelectorInput';
@@ -51,7 +52,8 @@ interface ISelectorConfigPropsType {
 export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => {
   const { t } = useTranslation('configurator');
 
-  const socket = useContext<Socket>(SocketContext);
+  // const socket = useContext<Socket>(ScrapingSocketContext);
+  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
   const { data, onConfigured, sampleUrl, onError, onChange } = props;
 
@@ -140,7 +142,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
       // don't pass the cookiePopupPath if the switch button is not activated
       const _cookiePpSelector = isPopup ? popupSelector : undefined;
 
-      getContent(socket, {}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | ScrapingError) => {
+      backendProvider.scraping.getContent({}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | ScrapingError) => {
         // whether the evaluation is successful or not
         // send it to the PreviewContent component
         // to display adequate information

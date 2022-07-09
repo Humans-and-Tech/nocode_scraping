@@ -1,30 +1,65 @@
 import React from 'react';
-import { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import debounce from 'lodash/debounce';
 
+import { DataSelector, DataSelectorValidityResponse, DataSelectorValidityError } from './interfaces/spider';
+import { IScrapingRequest, ScrapingError, ScrapingResponse } from './interfaces/scraping';
 import { getSpider, saveSpider } from './socket/spider';
 import { Spider } from './interfaces/spider';
 
-export interface ISpiderProvider {
-  get: (socket: Socket, name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => void;
-  upsert: (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
-  remove: (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
-  create: (socket: Socket, name: string) => Spider;
+
+/**
+ * there is one socket per namespace
+ * see https://socket.io/fr/docs/v4/namespaces/
+ */
+const spiderSocket = io('localhost:3001/spider', {
+  withCredentials: false,
+  extraHeaders: {
+    gus: 'token'
+  }
+});
+const scrapingSocket = io('localhost:3001/scraping', {
+  withCredentials: false,
+  extraHeaders: {
+    gus: 'token'
+  }
+});
+
+export interface ISpiderBackend {
+  get: (name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => void;
+  upsert: (spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
+  remove: (spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => void;
+  create: (name: string) => Spider;
 }
 
-// TODO: read and write config from backend
-// not from localStorage
-function useSpider(): ISpiderProvider {
+export interface IScrapingBackend {
+  getContent: (user: unknown,s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse | ScrapingError) => void) => void;
+  validateCssSelector: (user: unknown, p: DataSelector, callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void) => void;
+}
+
+export interface IBackendServicesProvider {
+  spider: ISpiderBackend,
+  scraping: IScrapingBackend
+}
+
+
+function spiderBackend(): ISpiderBackend {
+  
   const get = (
-    socket: Socket,
     name: string,
     callback: (data: Spider | undefined, error: Error | undefined) => void
   ) => {
     if (name === '') {
       throw new Error('cannot get a spider with a blank name');
     }
-    getSpider(socket, {}, name, (data: Spider | undefined, error: Error | undefined) => {
+    // debounce does not work in anonymous functions
+  // there is a trick
+  // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
+  debounce(() => {
+    spiderSocket.emit('get', {}, name, (data: Spider | undefined, error: Error | undefined) => {
       callback(data, error);
     });
+  }, 500)();
   };
 
   /**
@@ -33,7 +68,7 @@ function useSpider(): ISpiderProvider {
    * @param _name
    * @returns
    */
-  const create = (socket: Socket, _name: string): Spider => {
+  const create = (_name: string): Spider => {
     return {
       name: _name
     };
@@ -45,14 +80,16 @@ function useSpider(): ISpiderProvider {
    * @param _name
    * @returns
    */
-  const upsert = (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => {
+  const upsert = (spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => {
     if (spider.name === '' || spider.name === undefined) {
       throw new Error('cannot save a spider with a blank name');
     }
 
-    saveSpider(socket, {}, spider, (b: boolean, error: Error | undefined) => {
-      callback(b, error);
+      debounce(() => {
+    spiderSocket.emit('upsert', {}, spider, (resp: boolean, error: Error | undefined) => {
+      callback(resp, error);
     });
+  }, 500)();
   };
 
   /**
@@ -62,7 +99,7 @@ function useSpider(): ISpiderProvider {
    * @param spider
    * @param callback
    */
-  const remove = (socket: Socket, spider: Spider, callback: (b: boolean, error: Error | undefined) => void): void => {
+  const remove = (spider: Spider, callback: (b: boolean, error: Error | undefined) => void): void => {
     if (spider.name === '') {
       throw new Error('cannot remove a spider with a blank name');
     }
@@ -73,10 +110,55 @@ function useSpider(): ISpiderProvider {
   return { get, upsert, remove, create };
 }
 
-export const SpiderProvider: ISpiderProvider = useSpider();
+function scrapingBackend(): IScrapingBackend {
+  
+const getContent = (
+    user: unknown,s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse | ScrapingError) => void
+  ) => {
+    const evaluateConfig: IScrapingRequest = {
+    selector: s,
+    url: url,
+    clickBefore: [popupSelector],
+    useCache: true
+  };
+    scrapingSocket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse | ScrapingError) => {
+    callback(response);
+  });
+  };
 
 /**
- * the scraping context will convey
- * the spider accross all elements
+ * validation of a selector by the backend
+ * this backend called is debounced because it takes a bit of time
+ * so don't emit a socket message for the backend each time
+ *
  */
-export const ScrapingContext = React.createContext<ISpiderProvider>(SpiderProvider);
+const validateCssSelector = (
+  user: unknown,
+  p: DataSelector,
+  callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void
+) => {
+  debounce(() => {
+    scrapingSocket.emit(
+      'scraping:validate-css-selector',
+      p,
+      (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
+        callback(resp);
+      }
+    );
+  }, 1000)();
+};
+
+
+  return {getContent,validateCssSelector };
+}
+
+function useBackend(): IBackendServicesProvider {
+  return {
+    spider: spiderBackend(),
+    scraping: scrapingBackend()
+  }
+}
+
+export const BackendServicesProvider: IBackendServicesProvider = useBackend();
+
+export const BackendContext = React.createContext<IBackendServicesProvider>(BackendServicesProvider);
