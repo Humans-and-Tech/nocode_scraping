@@ -1,11 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { Space, Input, Spin, Anchor } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { Socket } from 'socket.io-client';
 
-// import { SpiderSocketContext } from '../../socket';
 import { Spider } from '../../interfaces/spider';
-import { BackendContext, IBackendServicesProvider } from '../../ConfigurationContext';
+import { BackendContext, IBackendServicesProvider } from '../../BackendSocketContext';
 
 import './SpiderConfig.scoped.css';
 

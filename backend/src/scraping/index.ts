@@ -231,7 +231,7 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
   // but we need to decompose it (for the caching mecanism)
   const _url = new URL(req.url);
 
-  const SCREENSHOTS_DIR = config.get("scraping.screenshotsDir") || '.';
+  const SCREENSHOTS_DIR = config.get('scraping.screenshotsDir') || '.';
   const baseName = _url.toString().substring(_url.toString().lastIndexOf('/') + 1);
   const screenshotPath = `${SCREENSHOTS_DIR}/${_url.hostname}-${baseName}.png`;
 
@@ -249,7 +249,7 @@ export const getContent = async (req: IScrapingRequest): Promise<ScrapedContent 
     page = await context.newPage();
     await page.setContent(webPage.content);
 
-    const WAIT=parseInt(config.get("scraping.waitForTimeout")) || 500;
+    const WAIT = parseInt(config.get('scraping.waitForTimeout')) || 500;
     await page.waitForTimeout(WAIT);
 
     // eventually click elements

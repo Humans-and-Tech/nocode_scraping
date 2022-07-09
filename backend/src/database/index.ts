@@ -9,7 +9,6 @@ import logger from '../logging';
 // and the path of which is passed as env variable when launching node
 export const firestore = new Firestore();
 
-
 export interface FireStoreError {
   code: number;
   details: string;

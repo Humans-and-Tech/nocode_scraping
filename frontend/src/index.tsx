@@ -3,11 +3,11 @@ import { createRoot } from 'react-dom/client';
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './i18n';
-// import { SpiderSocketContext, spiderSocket, ScrapingSocketContext, scrapingSocket } from './socket';
+
 import ProductSheet from './views/ProductSheet/ProductSheet';
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScraperLayout, OnBoardingLayout } from './components/Layout/Layout';
-import { BackendContext, BackendServicesProvider } from './ConfigurationContext';
+import { BackendContext, BackendServicesProvider } from './BackendSocketContext';
 import { SpiderConfigSummary } from './components/Spider/SpiderConfigSummary';
 
 const rootElement = document.getElementById('root');
@@ -56,6 +56,6 @@ root.render(
 
         </Routes>
       </Router>
-</BackendContext.Provider>
+    </BackendContext.Provider>
   </StrictMode>
 );

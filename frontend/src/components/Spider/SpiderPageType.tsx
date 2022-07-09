@@ -2,12 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Space, Card, Divider } from 'antd';
 
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { Socket } from 'socket.io-client';
 
 import { PageType, Spider } from '../../interfaces/spider';
 import { useTranslation } from 'react-i18next';
-// import { SpiderSocketContext } from '../../socket';
-import { BackendContext, IBackendServicesProvider } from '../../ConfigurationContext';
+import { BackendContext, IBackendServicesProvider } from '../../BackendSocketContext';
 
 import '../../style.css';
 import './SpiderConfig.scoped.css';

@@ -7,9 +7,8 @@ import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 import { Data, Spider } from '../../interfaces/spider';
-import { IBackendServicesProvider, BackendContext } from '../../ConfigurationContext';
+import { IBackendServicesProvider, BackendContext } from '../../BackendSocketContext';
 import { DataConfig } from '../../components/Data/DataConfig';
-// import { ScrapingSocketContext } from '../../socket';
 
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
 

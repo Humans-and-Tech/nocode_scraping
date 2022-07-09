@@ -9,7 +9,6 @@ const config = require('config');
 
 logger.info(config);
 
-
 // adapter for cors with socket.io
 // @see https://stackoverflow.com/questions/65957386/cors-error-with-socket-io-connections-on-chrome-v88-and-nestjs-server
 class SocketAdapter extends IoAdapter {
@@ -18,7 +17,7 @@ class SocketAdapter extends IoAdapter {
     options?: ServerOptions & {
       namespace?: string;
       server?: any;
-    },
+    }
   ) {
     const server = super.createIOServer(port, { ...options, cors: true });
     return server;
@@ -31,7 +30,7 @@ async function bootstrap() {
   app.enableCors({
     origin: config.get('server.cors.allowedOrigin'),
     allowedHeaders: config.get('server.cors.allowedHeaders'),
-    credentials: false,
+    credentials: false
   });
   await app.listen(config.get('server.port'));
 }

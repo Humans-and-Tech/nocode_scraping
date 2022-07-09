@@ -2,11 +2,8 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Input, Space } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { Socket } from 'socket.io-client';
 
-// import { ScrapingSocketContext } from '../../../socket';
-import { BackendContext, IBackendServicesProvider } from '../../../ConfigurationContext';
-// import { validateCssSelector } from '../../../socket/scraping';
+import { BackendContext, IBackendServicesProvider } from '../../../BackendSocketContext';
 import { GenericResponseStatus } from '../../../interfaces';
 import {
   DataSelector,

@@ -4,9 +4,7 @@ import debounce from 'lodash/debounce';
 
 import { DataSelector, DataSelectorValidityResponse, DataSelectorValidityError } from './interfaces/spider';
 import { IScrapingRequest, ScrapingError, ScrapingResponse } from './interfaces/scraping';
-import { getSpider, saveSpider } from './socket/spider';
 import { Spider } from './interfaces/spider';
-
 
 /**
  * there is one socket per namespace
@@ -33,33 +31,38 @@ export interface ISpiderBackend {
 }
 
 export interface IScrapingBackend {
-  getContent: (user: unknown,s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse | ScrapingError) => void) => void;
-  validateCssSelector: (user: unknown, p: DataSelector, callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void) => void;
+  getContent: (
+    user: unknown,
+    s: DataSelector,
+    url: URL,
+    popupSelector: DataSelector | undefined,
+    callback: (response: ScrapingResponse | ScrapingError) => void
+  ) => void;
+  validateCssSelector: (
+    user: unknown,
+    p: DataSelector,
+    callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void
+  ) => void;
 }
 
 export interface IBackendServicesProvider {
-  spider: ISpiderBackend,
-  scraping: IScrapingBackend
+  spider: ISpiderBackend;
+  scraping: IScrapingBackend;
 }
 
-
 function spiderBackend(): ISpiderBackend {
-  
-  const get = (
-    name: string,
-    callback: (data: Spider | undefined, error: Error | undefined) => void
-  ) => {
+  const get = (name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
     if (name === '') {
       throw new Error('cannot get a spider with a blank name');
     }
     // debounce does not work in anonymous functions
-  // there is a trick
-  // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
-  debounce(() => {
-    spiderSocket.emit('get', {}, name, (data: Spider | undefined, error: Error | undefined) => {
-      callback(data, error);
-    });
-  }, 500)();
+    // there is a trick
+    // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
+    debounce(() => {
+      spiderSocket.emit('get', {}, name, (data: Spider | undefined, error: Error | undefined) => {
+        callback(data, error);
+      });
+    }, 500)();
   };
 
   /**
@@ -85,11 +88,11 @@ function spiderBackend(): ISpiderBackend {
       throw new Error('cannot save a spider with a blank name');
     }
 
-      debounce(() => {
-    spiderSocket.emit('upsert', {}, spider, (resp: boolean, error: Error | undefined) => {
-      callback(resp, error);
-    });
-  }, 500)();
+    debounce(() => {
+      spiderSocket.emit('upsert', {}, spider, (resp: boolean, error: Error | undefined) => {
+        callback(resp, error);
+      });
+    }, 500)();
   };
 
   /**
@@ -111,52 +114,54 @@ function spiderBackend(): ISpiderBackend {
 }
 
 function scrapingBackend(): IScrapingBackend {
-  
-const getContent = (
-    user: unknown,s: DataSelector, url: URL, popupSelector: DataSelector | undefined, callback: (response: ScrapingResponse | ScrapingError) => void
+  const getContent = (
+    user: unknown,
+    s: DataSelector,
+    url: URL,
+    popupSelector: DataSelector | undefined,
+    callback: (response: ScrapingResponse | ScrapingError) => void
   ) => {
     const evaluateConfig: IScrapingRequest = {
-    selector: s,
-    url: url,
-    clickBefore: [popupSelector],
-    useCache: true
-  };
+      selector: s,
+      url: url,
+      clickBefore: [popupSelector],
+      useCache: true
+    };
     scrapingSocket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse | ScrapingError) => {
-    callback(response);
-  });
+      callback(response);
+    });
   };
 
-/**
- * validation of a selector by the backend
- * this backend called is debounced because it takes a bit of time
- * so don't emit a socket message for the backend each time
- *
- */
-const validateCssSelector = (
-  user: unknown,
-  p: DataSelector,
-  callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void
-) => {
-  debounce(() => {
-    scrapingSocket.emit(
-      'scraping:validate-css-selector',
-      p,
-      (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
-        callback(resp);
-      }
-    );
-  }, 1000)();
-};
+  /**
+   * validation of a selector by the backend
+   * this backend called is debounced because it takes a bit of time
+   * so don't emit a socket message for the backend each time
+   *
+   */
+  const validateCssSelector = (
+    user: unknown,
+    p: DataSelector,
+    callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void
+  ) => {
+    debounce(() => {
+      scrapingSocket.emit(
+        'scraping:validate-css-selector',
+        p,
+        (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
+          callback(resp);
+        }
+      );
+    }, 1000)();
+  };
 
-
-  return {getContent,validateCssSelector };
+  return { getContent, validateCssSelector };
 }
 
 function useBackend(): IBackendServicesProvider {
   return {
     spider: spiderBackend(),
     scraping: scrapingBackend()
-  }
+  };
 }
 
 export const BackendServicesProvider: IBackendServicesProvider = useBackend();

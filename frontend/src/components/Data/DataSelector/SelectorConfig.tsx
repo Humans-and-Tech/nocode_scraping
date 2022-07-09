@@ -2,12 +2,9 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Space, Spin, Switch, Button, Tooltip } from 'antd';
 import { CloseCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { Socket } from 'socket.io-client';
 import isURL from 'validator/lib/isURL';
 
-// import { ScrapingSocketContext } from '../../../socket';
-// import { getContent } from '../../../socket/scraping';
-import { BackendContext, IBackendServicesProvider } from '../../../ConfigurationContext';
+import { BackendContext, IBackendServicesProvider } from '../../../BackendSocketContext';
 import { Data, DataSelector, SelectorStatus } from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { SelectorInput } from './SelectorInput';

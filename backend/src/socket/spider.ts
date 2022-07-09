@@ -21,7 +21,7 @@ module.exports = () => {
     try {
       const configCollection: DocumentData = firestore.collection(`organizations`);
       const document = configCollection.doc(`${organizationName}/spiders/${spider.name}`);
-      const b: boolean = await upsert({name: 'test'}, spider, document);
+      const b: boolean = await upsert({ name: 'test' }, spider, document);
       callback(b, undefined);
     } catch (error) {
       logger.error('updateSpider error', error);

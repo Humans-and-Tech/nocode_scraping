@@ -4,7 +4,7 @@ import { promisify } from 'util';
 
 import { DocumentData, DocumentSnapshot } from '@google-cloud/firestore';
 import { firestore, upsert } from '../database';
-import {ICachedContent, ISavePageContent, IGetPageContent} from '.';
+import { ICachedContent, ISavePageContent, IGetPageContent } from '.';
 import logger from '../logging';
 
 /**
@@ -15,7 +15,10 @@ import logger from '../logging';
  * @param content
  * @returns
  */
-export const cachePageContent: ISavePageContent = async (key: string, content: string): Promise<boolean | undefined> => {
+export const cachePageContent: ISavePageContent = async (
+  key: string,
+  content: string
+): Promise<boolean | undefined> => {
   const organizationName = 'test';
   try {
     const configCollection: DocumentData = firestore.collection(`organizations`);

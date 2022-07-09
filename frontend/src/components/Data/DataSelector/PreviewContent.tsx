@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { useEffect } from 'react';
 import { Space, Image } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 
 import '../Data.scoped.css';
-import { useEffect } from 'react';
 
 interface ISelectorEvalPropsType {
   content: ScrapingResponse | ScrapingError | undefined;

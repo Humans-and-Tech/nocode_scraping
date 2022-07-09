@@ -1,11 +1,9 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Tabs, Space, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { Socket } from 'socket.io-client';
 
-// import { ScrapingSocketContext } from '../../socket';
 import { Data, Spider, mergeSpiderData } from '../../interfaces/spider';
-import { BackendContext, IBackendServicesProvider } from '../../ConfigurationContext';
+import { BackendContext, IBackendServicesProvider } from '../../BackendSocketContext';
 
 import { SelectorConfig } from './DataSelector/SelectorConfig';
 
