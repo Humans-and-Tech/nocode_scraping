@@ -9,6 +9,12 @@ const config = require('config');
 
 logger.info(config);
 
+// TODO:
+// cache/firestore --> FireStoreCacheService.ts --> in /services
+// scraping --> ScrapingService.ts --> /services
+// /socket --> X
+
+
 // adapter for cors with socket.io
 // @see https://stackoverflow.com/questions/65957386/cors-error-with-socket-io-connections-on-chrome-v88-and-nestjs-server
 class SocketAdapter extends IoAdapter {
