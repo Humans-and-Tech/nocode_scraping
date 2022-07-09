@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './controllers/app.controller';
+import { SpiderController } from './controllers/spider.controller';
 
 import { SpiderEventGateway } from './events/spider.gateway';
 import { ScrapingEventGateway } from './events/scraping.gateway';
@@ -9,7 +9,7 @@ import { ScrapingService } from './services/ScrapingService'
 
 @Module({
   imports: [],
-  controllers: [AppController],
+  controllers: [SpiderController],
   providers: [
     SpiderEventGateway, 
     ScrapingEventGateway,

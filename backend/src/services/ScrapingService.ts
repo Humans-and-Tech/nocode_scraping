@@ -17,7 +17,7 @@ import {
   WebPage
 } from '../models';
 
-import { loadPageContentFromCache, cachePageContent } from '../cache/firestore';
+import { FirestoreCache } from '../cache/FirestoreCache';
 import logger from '../logging';
 
 const config = require('config');
@@ -52,9 +52,9 @@ export class ScrapingService {
         try {
             const result = await cssValidator.validateText(`${selector.path} {}`);
             if (result.valid) {
-            selector.status = SelectorStatus.VALID;
+                selector.status = SelectorStatus.VALID;
             } else {
-            selector.status = SelectorStatus.INVALID;
+                selector.status = SelectorStatus.INVALID;
             }
             return Promise.resolve(new DataSelectorValidityResponse(selector, [`error parsing '${selector.path}'`]));
         } catch (err) {
@@ -74,9 +74,9 @@ export class ScrapingService {
             if (selector.language !== 'css' && selector.language !== undefined) {
                 return Promise.reject(
                     new ScrapingError(
-                    `Unsupported language ${selector.language}, only CSS is currently supported`,
-                    ScrapingStatus.ERROR,
-                    selector
+                        `Unsupported language ${selector.language}, only CSS is currently supported`,
+                        ScrapingStatus.ERROR,
+                        selector
                     )
                 );
             }
@@ -86,20 +86,20 @@ export class ScrapingService {
 
                 if (validityResponse.status === GenericResponseStatus.ERROR) {
                     return Promise.reject(
-                    new ScrapingError(
-                        `Error validating the selector ${selector}`,
-                        ScrapingStatus.ERROR,
-                        validityResponse.selector
-                    )
+                        new ScrapingError(
+                            `Error validating the selector ${selector}`,
+                            ScrapingStatus.ERROR,
+                            validityResponse.selector
+                        )
                     );
                 } else if (validityResponse?.selector?.status === SelectorStatus.INVALID) {
                     return Promise.reject(
-                    new ScrapingError(`Invalid selector ${selector}`, ScrapingStatus.INVALID_SELECTOR, validityResponse.selector)
+                        new ScrapingError(`Invalid selector ${selector}`, ScrapingStatus.INVALID_SELECTOR, validityResponse.selector)
                     );
                 }
-                } catch (err) {
-                    return Promise.reject(
-                        new ScrapingError(`Error validating the selector ${selector}`, ScrapingStatus.ERROR, selector)
+            } catch (err) {
+                return Promise.reject(
+                    new ScrapingError(`Error validating the selector ${selector}`, ScrapingStatus.ERROR, selector)
                 );
             }
 
@@ -147,7 +147,8 @@ export class ScrapingService {
         const key = createHash('sha256').update(url.pathname.toString()).digest('hex');
 
         try {
-            const cached = await loadPageContentFromCache(key);
+            const cacheService = new FirestoreCache();
+            const cached = await cacheService.loadPageContentFromCache(key);
 
             if (!cached || !cached.content) {
                 // store the page content into the cache
@@ -157,7 +158,7 @@ export class ScrapingService {
                 page = await context.newPage();
                 await page.goto(url.toString());
                 cachedHtml = await page.content();
-                await cachePageContent(key, cachedHtml);
+                await cacheService.cachePageContent(key, cachedHtml);
 
                 await page.close();
                 await browser.close();
@@ -210,17 +211,17 @@ export class ScrapingService {
             if (validityResponse.status === GenericResponseStatus.ERROR) {
                 return Promise.reject(
                     new ScrapingError(
-                    `Error validating the selector ${req.selector}`,
-                    ScrapingStatus.ERROR,
-                    validityResponse.selector
+                        `Error validating the selector ${req.selector}`,
+                        ScrapingStatus.ERROR,
+                        validityResponse.selector
                     )
                 );
             } else if (validityResponse?.selector?.status === SelectorStatus.INVALID) {
                 return Promise.reject(
                     new ScrapingError(
-                    `Invalid selector ${req.selector}`,
-                    ScrapingStatus.INVALID_SELECTOR,
-                    validityResponse.selector
+                        `Invalid selector ${req.selector}`,
+                        ScrapingStatus.INVALID_SELECTOR,
+                        validityResponse.selector
                     )
                 );
             }

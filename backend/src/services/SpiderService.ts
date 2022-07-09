@@ -6,9 +6,7 @@ import { upsert, get } from '../database';
 
 @Injectable()
 export class SpiderService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+
   /**
    *
    * @param organization

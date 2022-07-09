@@ -11,3 +11,5 @@ export interface IScrapingRequest {
   clickBefore?: Array<DataSelector | undefined>;
   useCache?: boolean;
 }
+
+

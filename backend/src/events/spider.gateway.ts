@@ -22,7 +22,7 @@ export class SpiderEventGateway  {
 
   @SubscribeMessage('get')
   async onSpiderGet(@MessageBody('name') name: string) {
-    console.log('get spider', name);
+    logger.info('get spider ' + name);
     try {
       return await this.spiderService.getSpider({}, name);
     } catch(err) {
@@ -33,12 +33,12 @@ export class SpiderEventGateway  {
 
   @SubscribeMessage('upsert')
   async onSpiderUpsert(@MessageBody('spider') spider: Spider) {
-    console.log('upsert spider', spider);
-    // try {
-    //   return await this.spiderService.getSpider({}, name);
-    // } catch(err) {
-    //   logger.error(err);
-    //   return err;
-    // }
+    logger.info('upsert spider ' + spider.name);
+    try {
+      return await this.spiderService.updateSpider({}, spider);
+    } catch(err) {
+      logger.error(err);
+      return err;
+    }
   }
 }
