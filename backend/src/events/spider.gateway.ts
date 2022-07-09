@@ -31,7 +31,7 @@ export class SpiderEventGateway implements OnGatewayConnection, OnGatewayDisconn
   }
 
   @SubscribeMessage('get')
-  async onGet(@MessageBody('name') name: string) {
+  async onSpiderGet(@MessageBody('name') name: string) {
     console.log('get spider', name);
     try {
       return await this.spiderService.getSpider({}, name);
