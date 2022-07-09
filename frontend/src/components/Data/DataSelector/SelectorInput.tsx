@@ -62,7 +62,7 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
   const validateSelector = (s: DataSelector) => {
     setIsBackendError(false);
 
-    backendProvider.scraping.validateCssSelector({}, s, (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
+    backendProvider.scraping.validateSelector({}, s, (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
       if (resp.status === GenericResponseStatus.ERROR) {
         setIsBackendError(true);
         setInputClass('error');

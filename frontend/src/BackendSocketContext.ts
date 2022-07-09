@@ -38,7 +38,7 @@ export interface IScrapingBackend {
     popupSelector: DataSelector | undefined,
     callback: (response: ScrapingResponse | ScrapingError) => void
   ) => void;
-  validateCssSelector: (
+  validateSelector: (
     user: unknown,
     p: DataSelector,
     callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void
@@ -50,8 +50,12 @@ export interface IBackendServicesProvider {
   scraping: IScrapingBackend;
 }
 
-interface BackendSpiderInterface {
+interface IGetSpider {
   name: string; // the spidername
+}
+
+interface IUpsertSpider {
+  spider: Spider; 
 }
 
 /**
@@ -75,7 +79,7 @@ function spiderBackend(): ISpiderBackend {
     // there is a trick
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
-      const params: BackendSpiderInterface =  {name: _name};
+      const params: IGetSpider =  {name: _name};
       spiderSocket.emit('get', params, (data: Spider | Error | undefined) => {
         if (isSpider(data)){
           callback(data, undefined);
@@ -104,14 +108,22 @@ function spiderBackend(): ISpiderBackend {
    * @param _name
    * @returns
    */
-  const upsert = (spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => {
-    if (spider.name === '' || spider.name === undefined) {
+  const upsert = (_spider: Spider, callback: (b: boolean, error: Error | undefined) => void) => {
+    if (_spider.name === '' || _spider.name === undefined) {
       throw new Error('cannot save a spider with a blank name');
     }
 
+    const params: IUpsertSpider =  {spider: _spider};
+
     debounce(() => {
-      spiderSocket.emit('upsert', {}, spider, (resp: boolean, error: Error | undefined) => {
-        callback(resp, error);
+      spiderSocket.emit('upsert',params, (resp: boolean | Error | undefined) => {
+        
+        if (resp instanceof Boolean) {
+          callback(resp as boolean, undefined);
+        } else {
+          callback(false, resp as Error);
+        }
+
       });
     }, 500)();
   };
@@ -148,7 +160,7 @@ function scrapingBackend(): IScrapingBackend {
       clickBefore: [popupSelector],
       useCache: true
     };
-    scrapingSocket.emit('scraping:get-content', evaluateConfig, (response: ScrapingResponse | ScrapingError) => {
+    scrapingSocket.emit('get-content', evaluateConfig, (response: ScrapingResponse | ScrapingError) => {
       callback(response);
     });
   };
@@ -159,14 +171,14 @@ function scrapingBackend(): IScrapingBackend {
    * so don't emit a socket message for the backend each time
    *
    */
-  const validateCssSelector = (
+  const validateSelector = (
     user: unknown,
     p: DataSelector,
     callback: (resp: DataSelectorValidityResponse | DataSelectorValidityError) => void
   ) => {
     debounce(() => {
       scrapingSocket.emit(
-        'scraping:validate-css-selector',
+        'validate-selector',
         p,
         (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
           callback(resp);
@@ -175,7 +187,7 @@ function scrapingBackend(): IScrapingBackend {
     }, 1000)();
   };
 
-  return { getContent, validateCssSelector };
+  return { getContent, validateSelector };
 }
 
 function useBackend(): IBackendServicesProvider {

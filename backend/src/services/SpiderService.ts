@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { Spider } from '../models';
-import { firestore, upsert, get, isFireStoreError } from '../database';
-import logger from '../logging';
+import { upsert, get } from '../database';
 
 
 @Injectable()
