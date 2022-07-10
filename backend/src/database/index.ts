@@ -23,15 +23,15 @@ export function isFireStoreError(obj: unknown): obj is FireStoreError {
 }
 
 /**
- * the document is stored / updated with the key `organization.name / data.constructor.name / docKey`
+ * the document is stored / updated with the key `organization.name/data.constructor.name.toLowerCase()+'s'/docKey`
  *
  * Example:
  *    upsert(new Organization('test'), new Spider(...), 'myspider')
- *    --> the doc will store under the path `test/spider/myspider`
+ *    --> the doc will store under the path `test/spiders/myspider`
  *
  * @param organization the organization's name is used in the doc path
- * @param data a generic object
- * @param docKey the document key
+ * @param data a typed object which extends the `Storable` class
+ * @param docKey a string, representing the document unique key
  * @returns
  */
 // @ts-ignore
@@ -64,10 +64,14 @@ export async function upsert<T extends Storable>(organization: Organization, dat
 }
 
 /**
- *
+ * retrieves a document identified by its `key` in the branch `${organization.name}/${dataType.name.toLowerCase()}s/${key}`
+ * 
+ * May the document not exist, the value `undefined is returned`.
+ * An error is only thrown in case of technical issue with the DB
+ * 
  * @param organization
- * @param dataType is required to build the document path in runtime
- * @param key
+ * @param dataType is required to build the document path in runtime, the type must extend the `Storable` class
+ * @param key the unique key string to retrieve the document
  * @returns
  */
 // @ts-ignore

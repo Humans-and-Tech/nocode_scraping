@@ -45,4 +45,15 @@ describe('SpiderEventGateway', () => {
       expect(response).toStrictEqual(expectedResponse);
     });
   });
+
+  // describe('upsert a spider', () => {
+  //   const expectedResponse: IWebSocketResponse = {
+  //     status: ResponseStatus.SUCCESS,
+  //     data: mockedSpider
+  //   };
+  //   it('should return the mocked spider', async () => {
+  //     const response = await controller.onSpiderGet('test-spider', 0);
+  //     expect(response).toStrictEqual(expectedResponse);
+  //   });
+  // });
 });
