@@ -1,4 +1,9 @@
-import { DataSelector } from '../models';
+import { DataSelector } from '.';
+
+export enum ResponseStatus {
+  SUCCESS = 'success',
+  ERROR = 'error'
+}
 
 export interface IScrapingRequest {
   selector: DataSelector;
@@ -10,6 +15,14 @@ export interface IScrapingRequest {
   // ex: cookie popup...
   clickBefore?: Array<DataSelector | undefined>;
   useCache?: boolean;
+  userId: number;
+  organizationName: string;
+}
+
+export interface IWebSocketResponse {
+  status: ResponseStatus;
+  message?: string;
+  data: unknown;
 }
 
 

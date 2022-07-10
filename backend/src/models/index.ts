@@ -1,3 +1,5 @@
+import {Storable} from './db';
+
 export enum ScrapingStatus {
   SUCCESS = 'success',
   NO_CONTENT = 'no_content', // there is no error, but no content could be scraped
@@ -16,6 +18,8 @@ export enum SelectorStatus {
   INVALID = 'invalid'
 }
 
+export type Class<T> = new (...args: any[]) => T
+
 export class DataSelector {
   path: string | undefined;
   language?: 'css' | 'xpath' | 'jsonld' | 'js';
@@ -27,6 +31,7 @@ export class DataSelector {
     this.status = status;
   }
 }
+
 
 export class WebPage {
   content: string;
@@ -80,7 +85,8 @@ export class DataSelectorValidityResponse {
 
 export type DataSweeperFunction = (input: string, ...args: (string | number | boolean)[]) => string;
 
-export class Data {
+export class Data implements Storable {
+  key: string;
   // the name is just a marker
   // of the element to be scraped
   // for example "price" or "stock"
@@ -104,6 +110,7 @@ export class Data {
     popupSelector?: DataSelector,
     sweepers?: Set<DataSweeperFunction>
   ) {
+    this.key = name;
     this.name = name;
     this.label = label;
     this.type = type;
@@ -118,7 +125,7 @@ export class Data {
  * an exportItem modelizes the way the data are going to be exported
  * for the user
  */
-export interface ExportItem {
+export class ExportItem  {
   name: string;
   dataSet: Set<Data>;
 }
@@ -128,12 +135,32 @@ export enum PageType {
   CategoryPage = 'CategoryPage'
 }
 
-export interface Website {
+export class Website {
   name?: string;
   baseUrl?: URL;
 }
 
-export interface Spider {
+export interface ISpider {
+    name: string;
+    website?: Website;
+    data?: Set<Data>;
+    pipelines?: Set<ExportPipeline>;
+    urlSet?: Set<URL>;
+    pageType?: PageType;
+    items?: Set<ExportItem>;
+    settings?: Settings; // will be typed later
+    headers?: unknown;
+    cookies?: unknown;
+
+    // to configure the spider (data selectors...)
+    // sample of URLs are required
+    // for instance, you can't validate a selector
+    // without a sample page
+    sampleURLs?: Array<URL>;
+}
+
+export class Spider implements Storable, ISpider {
+  key: string;
   name: string;
   website?: Website;
   data?: Set<Data>;
@@ -150,6 +177,28 @@ export interface Spider {
   // for instance, you can't validate a selector
   // without a sample page
   sampleURLs?: Array<URL>;
+
+  constructor(
+    obj: ISpider
+  ) {
+
+    const { name, website, sampleURLs, urlSet, pageType, data, pipelines, items, settings, headers, cookies} = obj
+    
+    // the key is the spider name
+    // acts as a storage id
+    this.key = name;
+    this.name = name;
+    this.website = website;
+    this.sampleURLs = sampleURLs;
+    this.urlSet = urlSet;
+    this.pageType = pageType;
+    this.data = data;
+    this.pipelines = pipelines;
+    this.items = items;
+    this.settings = settings;
+    this.headers = headers;
+    this.cookies = cookies;
+  }
 }
 
 /**
@@ -161,6 +210,6 @@ export interface ExportPipeline {
   [key: string]: unknown;
 }
 
-export interface Settings {
+export class Settings {
   proxy: unknown;
 }

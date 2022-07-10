@@ -4,10 +4,11 @@ import {
   SubscribeMessage,
   MessageBody
 } from '@nestjs/websockets';
-import { IScrapingRequest } from 'src/interfaces/scraping';
-import logger from 'src/logging';
-import { DataSelector } from 'src/models';
+
+import { IScrapingRequest, IWebSocketResponse, ResponseStatus } from '../models/api';
+import { DataSelector } from '../models';
 import { ScrapingService } from '../services/ScrapingService';
+import logger from '../logging';
 
 const config = require('config');
 
@@ -22,24 +23,36 @@ export class ScrapingEventGateway  {
   server;
 
   @SubscribeMessage('get-content')
-  async onGetContent(@MessageBody() req: IScrapingRequest) {
-    logger.info('get-content', req);
+  async onGetContent(@MessageBody() req: IScrapingRequest): Promise<IWebSocketResponse | Error> {
     try {
-        return await this.scrapingService.getContent(req);
+        const result = await this.scrapingService.getContent(req);
+        return Promise.resolve({
+          status: ResponseStatus.SUCCESS,
+          data: result
+        });
     } catch(err) {
         logger.error(err);
-        return err;
+        return Promise.reject({
+          'status': ResponseStatus.ERROR,
+          'message': err
+        });
     }
   }
 
   @SubscribeMessage('validate-selector')
-  async onValidateSelector(@MessageBody() s: DataSelector) {
-    logger.info('validate-selector');
+  async onValidateSelector(@MessageBody() s: DataSelector): Promise<IWebSocketResponse | Error> {
     try {
-        return await this.scrapingService.validateSelector(s);
+        const result = await this.scrapingService.validateSelector(s);
+        return Promise.resolve({
+          status: ResponseStatus.SUCCESS,
+          data: result
+        });
     } catch(err) {
         logger.error(err);
-        return err;
+        return Promise.reject({
+          'status': ResponseStatus.ERROR,
+          'message': err
+        });
     }
   }
 }

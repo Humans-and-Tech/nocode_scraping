@@ -16,6 +16,7 @@ export interface IScrapingRequest {
   // ex: cookie popup...
   clickBefore?: Array<DataSelector | undefined>;
   useCache?: boolean;
+  userId: 0;
 }
 
 export interface WebPage {

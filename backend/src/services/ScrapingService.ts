@@ -5,7 +5,7 @@ import { createHash } from 'crypto';
 import * as playwright from 'playwright-chromium';
 import cssValidator from 'w3c-css-validator';
 
-import { IScrapingRequest } from '../interfaces/scraping';
+import { IScrapingRequest } from '../models/api';
 import { DataSelectorValidityError, ScrapingError } from '../errors';
 import {
   ScrapedContent,
@@ -16,9 +16,11 @@ import {
   GenericResponseStatus,
   WebPage
 } from '../models';
+import {User, Organization} from '../models/auth';
 
 import { FirestoreCache } from '../cache/FirestoreCache';
 import logger from '../logging';
+
 
 const config = require('config');
 
@@ -133,7 +135,7 @@ export class ScrapingService {
      * @param url: URL
      * @returns Promise<WebPage>
      */
-    async loadWebPage (url: URL): Promise<WebPage> {
+    async loadWebPage (url: URL, organization: Organization): Promise<WebPage> {
         let isCached = false;
         let lastScrapedDate = new Date();
         let cachedHtml = undefined;
@@ -148,7 +150,7 @@ export class ScrapingService {
 
         try {
             const cacheService = new FirestoreCache();
-            const cached = await cacheService.loadPageContentFromCache(key);
+            const cached = await cacheService.loadPageContentFromCache(key, organization);
 
             if (!cached || !cached.content) {
                 // store the page content into the cache
@@ -158,7 +160,7 @@ export class ScrapingService {
                 page = await context.newPage();
                 await page.goto(url.toString());
                 cachedHtml = await page.content();
-                await cacheService.cachePageContent(key, cachedHtml);
+                await cacheService.cachePageContent(key, organization, cachedHtml);
 
                 await page.close();
                 await browser.close();
@@ -206,6 +208,9 @@ export class ScrapingService {
             return Promise.reject(new ScrapingError('invalid call', ScrapingStatus.ERROR, undefined));
         }
 
+        // TODO: getUserById
+        const user = new User(req.userId);
+
         try {
             const validityResponse = await this.validateSelector(req.selector);
             if (validityResponse.status === GenericResponseStatus.ERROR) {
@@ -245,7 +250,7 @@ export class ScrapingService {
         let page: playwright.Page | undefined = undefined;
 
         try {
-            const webPage = await this.loadWebPage(_url);
+            const webPage = await this.loadWebPage(_url, user.organization);
 
             // now launch a browser to click in it
             // and scrape content

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { Spider } from '../models';
 import { upsert, get } from '../database';
+import { User } from '../models/auth';
 
 
 @Injectable()
@@ -14,14 +15,11 @@ export class SpiderService {
    * @returns true if the document is created, false if updated
    */
   async updateSpider (
-    user: unknown,
+    user: User,
     spider: Spider,
-    // callback: (resp: boolean, error: Error | undefined) => void
   ): Promise<boolean> {
 
-    const organizationName = 'test';
-    const docName = `${organizationName}/spiders/${spider.name}`;
-    const b: boolean = await upsert<Spider>({ name: 'test' }, spider, docName);
+    const b: boolean = await upsert<Spider>(user.organization, spider);
     return Promise.resolve(b);
   };
 
@@ -32,18 +30,20 @@ export class SpiderService {
    * @returns the document if it is found else null
    */
   async getSpider (
-    user: unknown,
+    user: User,
     name: string,
-    // callback: (resp: Spider | undefined, error: Error | undefined) => void
   ): Promise<Spider> {
     
     if (name === '') {
       return Promise.reject('spider name cannot be blank');
     }
 
-    const organizationName = 'test';
-    const docName = `${organizationName}/spiders/${name}`;
-    const spider = await get<Spider>({ name: 'test' }, docName);
+    /**
+     * for the runtime constraints, we must pass the expected object class name
+     * so that the generic method get<> knows which object to return
+     * because TS get<Spider> is just for compilation, not for the runtime
+     */
+    const spider = await get<Spider>(user.organization, Spider, name);
     return Promise.resolve(spider);
     
   };

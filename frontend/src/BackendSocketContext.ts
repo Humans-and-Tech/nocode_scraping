@@ -2,9 +2,9 @@ import React from 'react';
 import { io } from 'socket.io-client';
 import debounce from 'lodash/debounce';
 
-import { DataSelector, DataSelectorValidityResponse, DataSelectorValidityError } from './interfaces/spider';
-import { IScrapingRequest, ScrapingError, ScrapingResponse } from './interfaces/scraping';
-import { Spider } from './interfaces/spider';
+import { Spider, DataSelector, DataSelectorValidityResponse, DataSelectorValidityError } from './interfaces/spider';
+import { IScrapingRequest, ScrapingError, ScrapingResponse, ScrapingStatus } from './interfaces/scraping';
+import { IWebSocketResponse, GenericResponseStatus } from './interfaces';
 
 /**
  * there is one socket per namespace
@@ -52,10 +52,12 @@ export interface IBackendServicesProvider {
 
 interface IGetSpider {
   name: string; // the spidername
+  userId: number;
 }
 
 interface IUpsertSpider {
   spider: Spider; 
+  userId: number;
 }
 
 /**
@@ -71,6 +73,7 @@ function isSpider(obj: unknown): obj is Spider {
 
 
 function spiderBackend(): ISpiderBackend {
+
   const get = (_name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
     if (_name === '') {
       throw new Error('cannot get a spider with a blank name');
@@ -79,12 +82,19 @@ function spiderBackend(): ISpiderBackend {
     // there is a trick
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
-      const params: IGetSpider =  {name: _name};
-      spiderSocket.emit('get', params, (data: Spider | Error | undefined) => {
-        if (isSpider(data)){
-          callback(data, undefined);
+      const params: IGetSpider =  {
+        name: _name,
+        // later
+        userId: 0
+      };
+      spiderSocket.emit('get', params, (resp: IWebSocketResponse) => {
+        console.log("got", resp);
+        if (resp.status==GenericResponseStatus.ERROR) {
+          callback(undefined, new Error(resp.message));
+        } else if (isSpider(resp.data)) {
+          callback(resp.data as Spider, undefined);
         } else {
-          callback(undefined, data);
+          callback(undefined, new Error("Unknown response type"));
         }
       });
     }, 500)();
@@ -113,15 +123,22 @@ function spiderBackend(): ISpiderBackend {
       throw new Error('cannot save a spider with a blank name');
     }
 
-    const params: IUpsertSpider =  {spider: _spider};
+    const params: IUpsertSpider =  {
+      spider: _spider,
+      // later
+      userId: 0
+    };
 
     debounce(() => {
-      spiderSocket.emit('upsert',params, (resp: boolean | Error | undefined) => {
+      spiderSocket.emit('upsert',params, (resp: IWebSocketResponse) => {
         
-        if (resp instanceof Boolean) {
-          callback(resp as boolean, undefined);
+        if (resp.status == GenericResponseStatus.ERROR) {
+          callback(false, new Error(resp.message));
+        } else if (resp.data) {
+          callback(resp.data as boolean, undefined);
         } else {
-          callback(false, resp as Error);
+          console.error("Spider upsert : Undefined response type");
+          callback(false, new Error("unknown response type"));
         }
 
       });
@@ -158,10 +175,20 @@ function scrapingBackend(): IScrapingBackend {
       selector: s,
       url: url,
       clickBefore: [popupSelector],
-      useCache: true
+      useCache: true,
+      // later
+      userId: 0,
     };
-    scrapingSocket.emit('get-content', evaluateConfig, (response: ScrapingResponse | ScrapingError) => {
-      callback(response);
+    scrapingSocket.emit('get-content', evaluateConfig, (resp: IWebSocketResponse) => {
+      if (resp.status==GenericResponseStatus.ERROR) {
+        callback({
+          message: resp.message || '',
+          status: ScrapingStatus.ERROR,
+          selector: s
+        })
+      } else {
+        callback(resp.data as ScrapingResponse);
+      }
     });
   };
 
@@ -180,8 +207,16 @@ function scrapingBackend(): IScrapingBackend {
       scrapingSocket.emit(
         'validate-selector',
         p,
-        (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
-          callback(resp);
+        (resp: IWebSocketResponse) => {
+          if (resp.status==GenericResponseStatus.ERROR) {
+            callback({
+              message: resp.message || '',
+              selector: p,
+              status: GenericResponseStatus.ERROR
+            });
+          } else {
+            callback(resp.data as DataSelectorValidityResponse);
+          }
         }
       );
     }, 1000)();

@@ -2,9 +2,10 @@ import { brotliCompress, brotliDecompress } from 'zlib';
 import { Buffer } from 'buffer';
 import { promisify } from 'util';
 
-import {ICachedContent} from '../interfaces/db';
+import {ICachedContent, CachedContent} from '../models/db';
 import { upsert, get } from '../database';
 import logger from '../logging';
+import { Organization } from 'src/models/auth';
 
 const config = require('config');
 
@@ -19,8 +20,8 @@ export class FirestoreCache {
      * @param content
      * @returns
      */
-    async cachePageContent (key: string,content: string): Promise<boolean | undefined> {
-        const organizationName = 'test';
+    async cachePageContent (key: string, organization: Organization, content: string): Promise<boolean | undefined> {
+
         try {
             // const configCollection: DocumentData = firestore.collection(`organizations`);
             // const document = configCollection.doc(`${organizationName}/cache/${key}`);
@@ -33,8 +34,11 @@ export class FirestoreCache {
                 }
                 try {
                     if (compressed) {
-                        const docName = `${organizationName}/cache/${key}`;
-                        await upsert<ICachedContent>({ name: 'test' }, { content: compressed.toString('base64') }, docName);
+                        const data: ICachedContent = {
+                            key: key,
+                            content: compressed.toString('base64') 
+                        };
+                        await upsert<ICachedContent>(organization, data);
                         return Promise.resolve(true);
                     } else {
                         logger.error(`undefined compressed content`);
@@ -59,21 +63,21 @@ export class FirestoreCache {
      * @param key
      * @returns Promise<ICachedContent>
      */
-    async loadPageContentFromCache (key: string): Promise<ICachedContent | undefined> {
+    async loadPageContentFromCache (key: string, organization: Organization): Promise<ICachedContent | undefined> {
 
         // by default brotliDecompress returns a callback
         // which breaks the awaited order : the callabck is called after an undefined Promise has resolved
         const asyncDecompress = promisify(brotliDecompress);
 
         try {
-            const organizationName = 'test';
-            const docName = `${organizationName}/cache/${key}`;
-            const data = await get<ICachedContent>({ name: 'test' }, docName);
+            const docName = `${organization.name}/cache/${key}`;
+            const data = await get<CachedContent>(organization, CachedContent, docName);
             
             if (data?.content) {
                 const uncompressed = await asyncDecompress(Buffer.from(data.content, 'base64'));
                 if (uncompressed) {
                     return Promise.resolve({
+                        key: key,
                         content: uncompressed.toString(),
                         updateTime: data.updateTime
                     });
