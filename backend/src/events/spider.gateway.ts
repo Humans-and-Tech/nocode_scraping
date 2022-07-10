@@ -25,7 +25,7 @@ export class SpiderEventGateway  {
   server;
 
   @SubscribeMessage('get')
-  async onSpiderGet(@MessageBody('name') name: string, @MessageBody('userId') userId: number): Promise<IWebSocketResponse | Error> {
+  async onSpiderGet(@MessageBody('name') name: string, @MessageBody('userId') userId: number): Promise<IWebSocketResponse> {
     try {
       const user = new User(userId);
       const result = await this.spiderService.getSpider(user, name);
@@ -43,8 +43,8 @@ export class SpiderEventGateway  {
   }
 
   @SubscribeMessage('upsert')
-  async onSpiderUpsert(@MessageBody('spider') spider: ISpider, @MessageBody('userId') userId: number): Promise<IWebSocketResponse | Error> {
-    logger.info('upsert spider ' + spider.name);
+  async onSpiderUpsert(@MessageBody('spider') spider: ISpider, @MessageBody('userId') userId: number): Promise<IWebSocketResponse> {
+
     try {
       const user = new User(userId);
       const typedSpider = new Spider(spider)
@@ -56,7 +56,7 @@ export class SpiderEventGateway  {
         'status': ResponseStatus.SUCCESS,
         'data': result
       });
-      
+
     } catch(err) {
       logger.error(err);
       return Promise.reject({

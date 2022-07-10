@@ -23,7 +23,7 @@ export class ScrapingEventGateway  {
   server;
 
   @SubscribeMessage('get-content')
-  async onGetContent(@MessageBody() req: IScrapingRequest): Promise<IWebSocketResponse | Error> {
+  async onGetContent(@MessageBody() req: IScrapingRequest): Promise<IWebSocketResponse> {
     try {
         const result = await this.scrapingService.getContent(req);
         return Promise.resolve({
@@ -40,7 +40,7 @@ export class ScrapingEventGateway  {
   }
 
   @SubscribeMessage('validate-selector')
-  async onValidateSelector(@MessageBody() s: DataSelector): Promise<IWebSocketResponse | Error> {
+  async onValidateSelector(@MessageBody() s: DataSelector): Promise<IWebSocketResponse> {
     try {
         const result = await this.scrapingService.validateSelector(s);
         return Promise.resolve({
