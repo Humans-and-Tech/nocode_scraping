@@ -1,10 +1,13 @@
-import { DataSelector } from '.';
+import { DataSelector } from './core';
 
 export enum ResponseStatus {
   SUCCESS = 'success',
   ERROR = 'error'
 }
 
+/**
+ * the shape of an incoming request (via websocket of REST API)
+ */
 export interface IScrapingRequest {
   selector: DataSelector;
   // although sent as type URL
@@ -19,10 +22,15 @@ export interface IScrapingRequest {
   organizationName: string;
 }
 
+/**
+ * the shape of a response to a websocket client
+ */
 export interface IWebSocketResponse {
   status: ResponseStatus;
   message?: string;
   data: unknown;
 }
+
+
 
 

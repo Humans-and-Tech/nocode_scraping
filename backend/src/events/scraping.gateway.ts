@@ -6,7 +6,7 @@ import {
 } from '@nestjs/websockets';
 
 import { IScrapingRequest, IWebSocketResponse, ResponseStatus } from '../models/api';
-import { DataSelector } from '../models';
+import { DataSelector } from '../models/core';
 import { ScrapingService } from '../services/ScrapingService';
 import logger from '../logging';
 

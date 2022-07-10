@@ -6,11 +6,11 @@ import {
 } from '@nestjs/websockets';
 
 
-import logger from '../logging';
-import { Spider, ISpider } from '../models';
+import { Spider, ISpider } from '../models/core';
 import {IWebSocketResponse, ResponseStatus} from '../models/api';
 import { User } from '../models/auth';
 import { SpiderService } from '../services/SpiderService';
+import logger from '../logging';
 
 const config = require('config');
 
@@ -28,7 +28,7 @@ export class SpiderEventGateway  {
   async onSpiderGet(@MessageBody('name') name: string, @MessageBody('userId') userId: number): Promise<IWebSocketResponse> {
     try {
       const user = new User(userId);
-      const result = await this.spiderService.getSpider(user, name);
+      const result: Spider = await this.spiderService.getSpider(user, name);
       return Promise.resolve({
         'status': ResponseStatus.SUCCESS,
         'data': result
@@ -51,7 +51,7 @@ export class SpiderEventGateway  {
 
       // need to pass a real typed spider object
       // because the class name is used to store / retrieve the object
-      const result = this.spiderService.updateSpider(user, typedSpider);
+      const result: boolean = await this.spiderService.updateSpider(user, typedSpider);
       return Promise.resolve({
         'status': ResponseStatus.SUCCESS,
         'data': result

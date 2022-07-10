@@ -9,10 +9,6 @@ const config = require('config');
 
 logger.info(config);
 
-// TODO
-// what's the point of having /models + /interfaces
-// why not having a single dir ?
-
 
 // adapter for cors with socket.io
 // @see https://stackoverflow.com/questions/65957386/cors-error-with-socket-io-connections-on-chrome-v88-and-nestjs-server

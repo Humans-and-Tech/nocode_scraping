@@ -15,7 +15,7 @@ import {
   ScrapingStatus,
   GenericResponseStatus,
   WebPage
-} from '../models';
+} from '../models/core';
 import {User, Organization} from '../models/auth';
 
 import { FirestoreCache } from '../cache/FirestoreCache';

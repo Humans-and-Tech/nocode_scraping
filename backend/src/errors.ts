@@ -1,4 +1,4 @@
-import { ScrapingStatus, GenericResponseStatus, DataSelector } from './models';
+import { ScrapingStatus, GenericResponseStatus, DataSelector } from './models/core';
 
 export class BaseError extends Error {
   constructor(message: string) {

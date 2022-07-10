@@ -2,7 +2,7 @@ import { Firestore } from '@google-cloud/firestore';
 import { DocumentData, DocumentSnapshot } from '@google-cloud/firestore';
 import {pickBy} from 'lodash';
 
-import {Class} from '../models';
+import {Class} from '../models/core';
 import {Storable} from '../models/db';
 import { Organization } from '../models/auth';
 import logger from '../logging';

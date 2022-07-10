@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { Spider } from '../models';
+import { Spider } from '../models/core';
 import { upsert, get } from '../database';
 import { User } from '../models/auth';
 
