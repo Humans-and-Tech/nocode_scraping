@@ -4,24 +4,18 @@ import { Spider } from '../models/core';
 import { upsert, get } from '../database';
 import { User } from '../models/auth';
 
-
 @Injectable()
 export class SpiderService {
-
   /**
    *
    * @param organization
    * @param data
    * @returns true if the document is created, false if updated
    */
-  async updateSpider (
-    user: User,
-    spider: Spider,
-  ): Promise<boolean> {
-
+  async updateSpider(user: User, spider: Spider): Promise<boolean> {
     const b: boolean = await upsert<Spider>(user.organization, spider);
     return Promise.resolve(b);
-  };
+  }
 
   /**
    *
@@ -29,11 +23,7 @@ export class SpiderService {
    * @param name
    * @returns the document if it is found else null
    */
-  async getSpider (
-    user: User,
-    name: string,
-  ): Promise<Spider> {
-    
+  async getSpider(user: User, name: string): Promise<Spider> {
     if (name === '') {
       return Promise.reject('spider name cannot be blank');
     }
@@ -45,6 +35,5 @@ export class SpiderService {
      */
     const spider = await get<Spider>(user.organization, Spider, name);
     return Promise.resolve(spider);
-    
-  };
+  }
 }

@@ -30,7 +30,3 @@ export interface IWebSocketResponse {
   message?: string;
   data: unknown;
 }
-
-
-
-

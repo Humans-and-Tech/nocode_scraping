@@ -30,5 +30,3 @@ export interface ISavePageContent extends ICachedContent {
 export interface IGetPageContent extends ICachedContent {
   (key: string): Promise<ICachedContent | undefined>;
 }
-
-

@@ -9,7 +9,6 @@ const config = require('config');
 
 logger.info(config);
 
-
 // adapter for cors with socket.io
 // @see https://stackoverflow.com/questions/65957386/cors-error-with-socket-io-connections-on-chrome-v88-and-nestjs-server
 class SocketAdapter extends IoAdapter {

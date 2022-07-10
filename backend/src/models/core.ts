@@ -1,4 +1,4 @@
-import {Storable} from './db';
+import { Storable } from './db';
 
 export enum ScrapingStatus {
   SUCCESS = 'success',
@@ -18,7 +18,7 @@ export enum SelectorStatus {
   INVALID = 'invalid'
 }
 
-export type Class<T> = new (...args: any[]) => T
+export type Class<T> = new (...args: any[]) => T;
 
 export class DataSelector {
   path: string | undefined;
@@ -31,7 +31,6 @@ export class DataSelector {
     this.status = status;
   }
 }
-
 
 export class WebPage {
   content: string;
@@ -125,7 +124,7 @@ export class Data implements Storable {
  * an exportItem modelizes the way the data are going to be exported
  * for the user
  */
-export class ExportItem  {
+export class ExportItem {
   name: string;
   dataSet: Set<Data>;
 }
@@ -141,22 +140,22 @@ export class Website {
 }
 
 export interface ISpider {
-    name: string;
-    website?: Website;
-    data?: Set<Data>;
-    pipelines?: Set<ExportPipeline>;
-    urlSet?: Set<URL>;
-    pageType?: PageType;
-    items?: Set<ExportItem>;
-    settings?: Settings; // will be typed later
-    headers?: unknown;
-    cookies?: unknown;
+  name: string;
+  website?: Website;
+  data?: Set<Data>;
+  pipelines?: Set<ExportPipeline>;
+  urlSet?: Set<URL>;
+  pageType?: PageType;
+  items?: Set<ExportItem>;
+  settings?: Settings; // will be typed later
+  headers?: unknown;
+  cookies?: unknown;
 
-    // to configure the spider (data selectors...)
-    // sample of URLs are required
-    // for instance, you can't validate a selector
-    // without a sample page
-    sampleURLs?: Array<URL>;
+  // to configure the spider (data selectors...)
+  // sample of URLs are required
+  // for instance, you can't validate a selector
+  // without a sample page
+  sampleURLs?: Array<URL>;
 }
 
 export class Spider implements Storable, ISpider {
@@ -178,12 +177,9 @@ export class Spider implements Storable, ISpider {
   // without a sample page
   sampleURLs?: Array<URL>;
 
-  constructor(
-    obj: ISpider
-  ) {
+  constructor(obj: ISpider) {
+    const { name, website, sampleURLs, urlSet, pageType, data, pipelines, items, settings, headers, cookies } = obj;
 
-    const { name, website, sampleURLs, urlSet, pageType, data, pipelines, items, settings, headers, cookies} = obj
-    
     // the key is the spider name
     // acts as a storage id
     this.key = name;

@@ -12,9 +12,10 @@
     "start:dev": "GOOGLE_APPLICATION_CREDENTIALS=./firestore-creds.json nest start --watch",
     "start:prod": "GOOGLE_APPLICATION_CREDENTIALS=./firestore-creds.json node dist/main",
     "test": "NODE_ENV= jest --verbose --watch",
-    "test:cov": "jest --coverage",
-    "test-watch": "jest --verbose --watchAll",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:cov": "NODE_ENV= jest --coverage",
+    "test-watch": "NODE_ENV= jest --verbose --watchAll",
+    "test:debug": "NODE_ENV= node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "NODE_ENV= jest --config ./test/jest-e2e.json",
     "lint": "yarn run eslint src/* --fix --no-error-on-unmatched-pattern",
     "format": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },

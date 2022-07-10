@@ -1,9 +1,4 @@
-import {
-  WebSocketGateway,
-  WebSocketServer,
-  SubscribeMessage,
-  MessageBody
-} from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
 
 import { IScrapingRequest, IWebSocketResponse, ResponseStatus } from '../models/api';
 import { DataSelector } from '../models/core';
@@ -15,8 +10,7 @@ const config = require('config');
 @WebSocketGateway({
   namespace: 'scraping'
 })
-export class ScrapingEventGateway  {
-
+export class ScrapingEventGateway {
   constructor(private readonly scrapingService: ScrapingService) {}
 
   @WebSocketServer()
@@ -25,34 +19,34 @@ export class ScrapingEventGateway  {
   @SubscribeMessage('get-content')
   async onGetContent(@MessageBody() req: IScrapingRequest): Promise<IWebSocketResponse> {
     try {
-        const result = await this.scrapingService.getContent(req);
-        return Promise.resolve({
-          status: ResponseStatus.SUCCESS,
-          data: result
-        });
-    } catch(err) {
-        logger.error(err);
-        return Promise.reject({
-          'status': ResponseStatus.ERROR,
-          'message': err
-        });
+      const result = await this.scrapingService.getContent(req);
+      return Promise.resolve({
+        status: ResponseStatus.SUCCESS,
+        data: result
+      });
+    } catch (err) {
+      logger.error(err);
+      return Promise.reject({
+        status: ResponseStatus.ERROR,
+        message: err
+      });
     }
   }
 
   @SubscribeMessage('validate-selector')
   async onValidateSelector(@MessageBody() s: DataSelector): Promise<IWebSocketResponse> {
     try {
-        const result = await this.scrapingService.validateSelector(s);
-        return Promise.resolve({
-          status: ResponseStatus.SUCCESS,
-          data: result
-        });
-    } catch(err) {
-        logger.error(err);
-        return Promise.reject({
-          'status': ResponseStatus.ERROR,
-          'message': err
-        });
+      const result = await this.scrapingService.validateSelector(s);
+      return Promise.resolve({
+        status: ResponseStatus.SUCCESS,
+        data: result
+      });
+    } catch (err) {
+      logger.error(err);
+      return Promise.reject({
+        status: ResponseStatus.ERROR,
+        message: err
+      });
     }
   }
 }
