@@ -28,5 +28,5 @@ export interface IScrapingRequest {
 export interface IWebSocketResponse {
   status: ResponseStatus;
   message?: string;
-  data: unknown;
+  data?: unknown;
 }

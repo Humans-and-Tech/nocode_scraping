@@ -31,9 +31,9 @@ export class SpiderEventGateway {
       });
     } catch (err) {
       logger.error(err);
-      return Promise.reject({
+      return Promise.resolve({
         status: ResponseStatus.ERROR,
-        message: err
+        message: JSON.stringify(err)
       });
     }
   }
@@ -55,10 +55,10 @@ export class SpiderEventGateway {
         data: result
       });
     } catch (err) {
-      logger.error(err);
-      return Promise.reject({
+      logger.error(`Catched error ${err}`);
+      return Promise.resolve({
         status: ResponseStatus.ERROR,
-        message: err
+        message: JSON.stringify(err)
       });
     }
   }

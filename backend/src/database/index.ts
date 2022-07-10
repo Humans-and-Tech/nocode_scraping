@@ -90,7 +90,7 @@ export async function get<T extends Storable>(organization: Organization, dataTy
       return Promise.resolve(undefined);
     } else {
       logger.error('Unhandled error', error);
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
   }
 }

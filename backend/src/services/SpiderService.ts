@@ -30,8 +30,8 @@ export class SpiderService {
 
     /**
      * for the runtime constraints, we must pass the expected object class name
-     * so that the generic method get<> knows which object to return
-     * because TS get<Spider> is just for compilation, not for the runtime
+     * so that the method knows which object to return
+     * because TS is just for the compile time, not for the runtime
      */
     const spider = await get<Spider>(user.organization, Spider, name);
     return Promise.resolve(spider);
