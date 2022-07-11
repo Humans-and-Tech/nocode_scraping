@@ -31,10 +31,7 @@ export class FirestoreCache {
         }
         try {
           if (compressed) {
-            const data: ICachedContent = {
-              key: key,
-              content: compressed.toString('base64')
-            };
+            const data: ICachedContent = new CachedContent(key, compressed.toString('base64'));
             await upsert<ICachedContent>(organization, data);
             return Promise.resolve(true);
           } else {
@@ -72,11 +69,7 @@ export class FirestoreCache {
       if (data?.content) {
         const uncompressed = await asyncDecompress(Buffer.from(data.content, 'base64'));
         if (uncompressed) {
-          return Promise.resolve({
-            key: key,
-            content: uncompressed.toString(),
-            updateTime: data.updateTime
-          });
+          return Promise.resolve(new CachedContent(key, uncompressed.toString(), data.updateTime));
         } else {
           logger.error('undefined cached content');
           return Promise.resolve(undefined);
