@@ -1,7 +1,7 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
 
 import { Spider, ISpider } from '../models/core';
-import { IWebSocketResponse, ResponseStatus } from '../models/api';
+import { IResponse, ResponseStatus } from '../models/api';
 import { User } from '../models/auth';
 import { SpiderService } from '../services/SpiderService';
 import logger from '../logging';
@@ -21,7 +21,7 @@ export class SpiderEventGateway {
   async onSpiderGet(
     @MessageBody('name') name: string,
     @MessageBody('userId') userId: number
-  ): Promise<IWebSocketResponse> {
+  ): Promise<IResponse> {
     try {
       const user = new User(userId);
       const result: Spider = await this.spiderService.getSpider(user, name);
@@ -42,7 +42,7 @@ export class SpiderEventGateway {
   async onSpiderUpsert(
     @MessageBody('spider') spider: ISpider,
     @MessageBody('userId') userId: number
-  ): Promise<IWebSocketResponse> {
+  ): Promise<IResponse> {
     try {
       const user = new User(userId);
       const typedSpider = new Spider(spider);

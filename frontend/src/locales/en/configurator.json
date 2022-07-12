@@ -5,6 +5,9 @@
     "error": "This URL is not valid",
     "success": "This is a valid URL"
   },
+  "spider": {
+    "title": "You are configuring the spider <em>{{ spider }}</em>"
+  },
   "field": {
     "title": "Configure the scraping",
     "selector": {

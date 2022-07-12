@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { Spider } from '../models/core';
 import { Organization } from '../models/auth';
-import { IWebSocketResponse, ResponseStatus } from '../models/api';
+import { IResponse, ResponseStatus } from '../models/api';
 
 import { SpiderService } from '../services/SpiderService';
 import { SpiderEventGateway } from './spider.gateway';
@@ -52,11 +52,11 @@ describe('SpiderEventGateway', () => {
 
   describe('get a spider', () => {
     
-    const expectedResponse: IWebSocketResponse = {
+    const expectedResponse: IResponse = {
       status: ResponseStatus.SUCCESS,
       data: mockedSpider
     };
-    const undefinedResponse: IWebSocketResponse = {
+    const undefinedResponse: IResponse = {
       status: ResponseStatus.SUCCESS,
       data: undefined
     };
@@ -78,7 +78,7 @@ describe('SpiderEventGateway', () => {
   });
 
   describe('upsert a spider', () => {
-    const expectedResponse: IWebSocketResponse = {
+    const expectedResponse: IResponse = {
       status: ResponseStatus.SUCCESS,
       data: mockedSpider
     };
@@ -87,7 +87,7 @@ describe('SpiderEventGateway', () => {
       const response = await controller.onSpiderUpsert({
         name: 'existing-spider'
       }, 0);
-      const expectedResponse: IWebSocketResponse = {
+      const expectedResponse: IResponse = {
         status: ResponseStatus.SUCCESS,
         data: true
       };
@@ -98,7 +98,7 @@ describe('SpiderEventGateway', () => {
       const response = await controller.onSpiderUpsert({
         name: 'non-existing-spider'
       }, 0);
-      const expectedResponse: IWebSocketResponse = {
+      const expectedResponse: IResponse = {
         status: ResponseStatus.SUCCESS,
         data: true
       };
@@ -109,7 +109,7 @@ describe('SpiderEventGateway', () => {
       const response = await controller.onSpiderUpsert({
         name: 'error-spider'
       }, 0);
-      const expectedResponse: IWebSocketResponse = {
+      const expectedResponse: IResponse = {
         status: ResponseStatus.ERROR,
         message: 'an error occured'
       };

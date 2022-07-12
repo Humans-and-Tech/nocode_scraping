@@ -22,7 +22,7 @@ export const OnBoardingLayout = ({ children }: { children: React.ReactNode }) =>
   );
 };
 
-export const ScraperLayout = ({ header, children }: { header: React.ReactNode; children: React.ReactNode }) => {
+export const ScrapingLayout = ({ header, children }: { header: React.ReactNode; children: React.ReactNode }) => {
   const { t } = useTranslation('layout');
 
   return (

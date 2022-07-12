@@ -1,7 +1,7 @@
 import React from 'react';
 import { io } from 'socket.io-client';
 import debounce from 'lodash/debounce';
-
+import {useQuery } from 'react-query';
 import { Spider, DataSelector, DataSelectorValidityResponse, DataSelectorValidityError } from './interfaces/spider';
 import { IScrapingRequest, ScrapingError, ScrapingResponse, ScrapingStatus } from './interfaces/scraping';
 import { IWebSocketResponse, GenericResponseStatus } from './interfaces';
@@ -74,6 +74,7 @@ function isSpider(obj: unknown): obj is Spider {
 
 function spiderBackend(): ISpiderBackend {
 
+
   const get = (_name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
     if (_name === '') {
       throw new Error('cannot get a spider with a blank name');
@@ -82,11 +83,13 @@ function spiderBackend(): ISpiderBackend {
     // there is a trick
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
+      
       const params: IGetSpider =  {
         name: _name,
         // later
         userId: 0
       };
+      
       spiderSocket.emit('get', params, (resp: IWebSocketResponse) => {
         console.log("got", resp);
         if (resp.status==GenericResponseStatus.ERROR) {
@@ -97,6 +100,7 @@ function spiderBackend(): ISpiderBackend {
           callback(undefined, new Error("Unknown response type"));
         }
       });
+
     }, 500)();
   };
 

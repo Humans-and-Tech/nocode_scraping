@@ -1,6 +1,6 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
 
-import { IScrapingRequest, IWebSocketResponse, ResponseStatus } from '../models/api';
+import { IScrapingRequest, IResponse, ResponseStatus } from '../models/api';
 import { DataSelector } from '../models/core';
 import { ScrapingService } from '../services/ScrapingService';
 import logger from '../logging';
@@ -17,7 +17,7 @@ export class ScrapingEventGateway {
   server;
 
   @SubscribeMessage('get-content')
-  async onGetContent(@MessageBody() req: IScrapingRequest): Promise<IWebSocketResponse> {
+  async onGetContent(@MessageBody() req: IScrapingRequest): Promise<IResponse> {
     try {
       const result = await this.scrapingService.getContent(req);
       return Promise.resolve({
@@ -34,7 +34,7 @@ export class ScrapingEventGateway {
   }
 
   @SubscribeMessage('validate-selector')
-  async onValidateSelector(@MessageBody() s: DataSelector): Promise<IWebSocketResponse> {
+  async onValidateSelector(@MessageBody() s: DataSelector): Promise<IResponse> {
     try {
       const result = await this.scrapingService.validateSelector(s);
       return Promise.resolve({

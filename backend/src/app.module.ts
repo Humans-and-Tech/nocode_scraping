@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-// import { SpiderController } from './controllers/spider.controller';
 
+import { SpiderController } from './controllers/spider.controller';
 import { SpiderEventGateway } from './events/spider.gateway';
 import { ScrapingEventGateway } from './events/scraping.gateway';
 
@@ -10,6 +10,6 @@ import { ScrapingService } from './services/ScrapingService';
 @Module({
   imports: [],
   controllers: [],
-  providers: [SpiderEventGateway, ScrapingEventGateway, SpiderService, ScrapingService]
+  providers: [SpiderEventGateway, SpiderController, ScrapingEventGateway, SpiderService, ScrapingService]
 })
 export class AppModule {}

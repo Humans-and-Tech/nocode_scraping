@@ -24,8 +24,6 @@ export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JS
 
   const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
-  // const socket = useContext<Socket>(ScrapingSocketContext);
-
   // keep track of the current data loaded in this component
   // so that the component states are re-init when the data change
   const dataName = useRef<string>('');

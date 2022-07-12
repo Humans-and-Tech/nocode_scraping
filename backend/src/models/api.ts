@@ -25,7 +25,7 @@ export interface IScrapingRequest {
 /**
  * the shape of a response to a websocket client
  */
-export interface IWebSocketResponse {
+export interface IResponse {
   status: ResponseStatus;
   message?: string;
   data?: unknown;

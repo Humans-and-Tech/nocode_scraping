@@ -4,12 +4,10 @@ import { HomeOutlined, FolderOpenOutlined, DollarOutlined } from '@ant-design/ic
 import { FiPackage } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 
-import { Data, Spider } from '../../interfaces/spider';
 import { IBackendServicesProvider, BackendContext } from '../../BackendSocketContext';
+import { Data, Spider } from '../../interfaces/spider';
 import { DataConfig } from '../../components/Data/DataConfig';
-
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
 
 import '../../style.css';
@@ -25,8 +23,6 @@ const ProductSheet: React.FC = () => {
   const spider = useRef<Spider | undefined>(undefined);
 
   const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
-
-  // const socket = useContext<Socket>(ScrapingSocketContext);
 
   const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
 

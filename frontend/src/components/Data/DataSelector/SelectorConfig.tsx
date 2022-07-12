@@ -49,7 +49,6 @@ interface ISelectorConfigPropsType {
 export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => {
   const { t } = useTranslation('configurator');
 
-  // const socket = useContext<Socket>(ScrapingSocketContext);
   const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
   const { data, onConfigured, sampleUrl, onError, onChange } = props;
