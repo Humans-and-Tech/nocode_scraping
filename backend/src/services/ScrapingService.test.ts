@@ -5,6 +5,7 @@ import { GenericResponseStatus, SelectorStatus, ScrapedContent } from '../models
 import { ScrapingError, DataSelectorValidityError } from '../errors';
 import { FirestoreCache } from '../cache/FirestoreCache';
 import { ICachedContent } from '../models/db';
+import {ScrapingService} from './ScrapingService';
 
 // timeout of 10 seconds
 // some tests with playwright are long
@@ -95,17 +96,18 @@ jest.mock('playwright-chromium', () => ({
 /**
  * mock the cache system, we don't really want to use firestore
  */
-jest.mock('../cache', () => ({
+// jest.mock('../cache', () => ({
 
-  loadPageContentFromCache: async (key: string) => {
-    console.log('loadPageContentFromCache for ', key);
-    return Promise.resolve({
-      content: 'bla',
-      updateTime: new Date()
-    } as ICachedContent);
-  }
+//   loadPageContentFromCache: async (key: string) => {
+//     console.log('loadPageContentFromCache for ', key);
+//     return Promise.resolve({
+//       content: 'bla',
+//       updateTime: new Date()
+//     } as ICachedContent);
+//   }
   
-}));
+// }));
+jest.mock('../cache/FirestoreCache');
 
 /**
  * mock the node fs functions
@@ -123,6 +125,8 @@ jest.mock('fs/promises', () => ({
 }));
 
 describe('Testing validateSelector response', () => {
+
+  
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -140,7 +144,9 @@ describe('Testing validateSelector response', () => {
   };
 
   test('when the validation is not successful, but no error is thrown', async () => {
-    const resp = undefined;//await validateSelector(testInvalidSelector);
+
+    const service = new ScrapingService();
+    const resp = await service.validateSelector(testInvalidSelector);
 
     // remove the errors messages which are complex and unused
     // don't want to couple the tests with these messages
@@ -151,7 +157,8 @@ describe('Testing validateSelector response', () => {
 
   test('when the validation throws an error', async () => {
     try {
-      const resp = undefined;//await validateSelector(testErrorSelector);
+      const service = new ScrapingService();
+      const resp = await service.validateSelector(testErrorSelector);
     } catch (err) {
       expect((err as DataSelectorValidityError).status).toEqual(GenericResponseStatus.ERROR);
       expect((err as DataSelectorValidityError).selector?.path).toEqual(undefined);
@@ -159,7 +166,9 @@ describe('Testing validateSelector response', () => {
   });
 
   test('when the validation is successful', async () => {
-    const resp = undefined;//await validateSelector(testValidSelector);
+
+    const service = new ScrapingService();
+    const resp = await service.validateSelector(testValidSelector);
 
     // remove the errors messages which are complex and unused
     // don't want to couple the tests with these messages
@@ -191,7 +200,9 @@ describe('Testing click Element', () => {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto('http://www.google.fr');
-    const result = false//await clickElement(page, testClickableElement);
+
+    const service = new ScrapingService();
+    const result = await service.clickElement(page, testClickableElement);
 
     expect(result).toBe(true);
   });
@@ -202,8 +213,9 @@ describe('Testing click Element', () => {
     const page = await context.newPage();
     await page.goto('http://www.google.fr');
 
-    // await expect(
-    //   clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
+    const service = new ScrapingService();
+    await expect(
+      service.clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
   });
 
   test('try to click on an element which cannot be found', async () => {
@@ -212,7 +224,9 @@ describe('Testing click Element', () => {
     const page = await context.newPage();
     await page.goto('http://www.google.fr');
 
-    // await expect(clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
+    const service = new ScrapingService();
+
+    await expect(service.clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
     // mocking the playwright.errors.TimeoutError is difficult
     // because playwright is mocked
     // TODO : later
