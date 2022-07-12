@@ -7,6 +7,8 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { IBackendServicesProvider, BackendContext } from '../../BackendSocketContext';
 import { Spider } from '../../interfaces/spider';
 
+import {ConfigSidebar} from '../Layout/ConfigSidebar';
+
 import './SpiderConfig.scoped.css';
 
 /**
@@ -21,6 +23,8 @@ export const SpiderConfigSummary = (): JSX.Element => {
   
   const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
+  const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
+
   // the spider name is fetched from the URL path !
   // it is NOT the data name !
   const { name } = useParams();
@@ -28,7 +32,13 @@ export const SpiderConfigSummary = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const configureSampleUrls = () => {
-    console.log("nothin")
+
+    // TODO : use the drawer to configure the sample URL
+    setIsSideBarOpen(true);
+  };
+
+  const closeSideBar = (): void => {
+    setIsSideBarOpen(false);
   };
 
 
@@ -53,37 +63,45 @@ export const SpiderConfigSummary = (): JSX.Element => {
 
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      {isLoading && (
-        
-          <Space direction="horizontal">
-            <Spin />
-            <span>{t('loading')}</span>
-          </Space>
-
+    <>
+      {isSideBarOpen && spider.current && (
+        <ConfigSidebar isVisible={isSideBarOpen} onClose={closeSideBar}>
+          <span>{t('toto')}</span>
+        </ConfigSidebar>
       )}
-      {!isLoading && (
 
-        <>
-        <h4 dangerouslySetInnerHTML={{ __html: t('spider.title', { spider: spider.current?.name }) }}></h4>
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        {isLoading && (
+          
+            <Space direction="horizontal">
+              <Spin />
+              <span>{t('loading')}</span>
+            </Space>
 
-        {
-          !spider.current?.sampleURLs &&
-          <Space direction="horizontal">
-            <CloseCircleOutlined className="error"></CloseCircleOutlined>
-            <span>{t('spider.cannot_start_scraping')}</span>
-            <a
-              onClick={configureSampleUrls}
-              title={t('spider.define_sample_urls')}
-            >
-              {t('spider.define_sample_urls')}
-            </a>
-          </Space>
-        }
-        </>
+        )}
+        {!isLoading && (
 
-      )}
-    </Space>
+          <>
+          <h4 dangerouslySetInnerHTML={{ __html: t('spider.title', { spider: spider.current?.name }) }}></h4>
+
+          {
+            !spider.current?.sampleURLs &&
+            <Space direction="horizontal">
+              <CloseCircleOutlined className="error"></CloseCircleOutlined>
+              <span>{t('spider.cannot_start_scraping')}</span>
+              <a
+                onClick={configureSampleUrls}
+                title={t('spider.define_sample_urls')}
+              >
+                {t('spider.define_sample_urls')}
+              </a>
+            </Space>
+          }
+          </>
+
+        )}
+      </Space>
+    </>
   )
   
 };

@@ -28,6 +28,7 @@ export const ConfigSidebar = ({ children, isVisible, onClose }: IConfigSidebarPr
       closable={false}
       onClose={onClose}
       visible={isVisible}
+      destroyOnClose={true}
     >
       {children}
     </Drawer>
