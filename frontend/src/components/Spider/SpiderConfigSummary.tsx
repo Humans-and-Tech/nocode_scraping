@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment, useContext, useRef } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Space, Spin } from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { IBackendServicesProvider, BackendContext } from '../../BackendSocketContext';
 import { Spider } from '../../interfaces/spider';
@@ -26,6 +27,10 @@ export const SpiderConfigSummary = (): JSX.Element => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const configureSampleUrls = () => {
+    console.log("nothin")
+  };
+
 
   useEffect(() => {
     if (spider.current?.name !== name && name !== undefined) {
@@ -48,21 +53,37 @@ export const SpiderConfigSummary = (): JSX.Element => {
 
 
   return (
-    <>
+    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       {isLoading && (
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        
           <Space direction="horizontal">
             <Spin />
             <span>{t('loading')}</span>
           </Space>
-        </Space>
+
       )}
       {!isLoading && (
 
+        <>
         <h4 dangerouslySetInnerHTML={{ __html: t('spider.title', { spider: spider.current?.name }) }}></h4>
 
+        {
+          !spider.current?.sampleURLs &&
+          <Space direction="horizontal">
+            <CloseCircleOutlined className="error"></CloseCircleOutlined>
+            <span>{t('spider.cannot_start_scraping')}</span>
+            <a
+              onClick={configureSampleUrls}
+              title={t('spider.define_sample_urls')}
+            >
+              {t('spider.define_sample_urls')}
+            </a>
+          </Space>
+        }
+        </>
+
       )}
-    </>
+    </Space>
   )
   
 };

@@ -6,7 +6,9 @@
     "success": "This is a valid URL"
   },
   "spider": {
-    "title": "You are configuring the spider <em>{{ spider }}</em>"
+    "title": "You are configuring the spider <em>{{ spider }}</em>",
+    "cannot_start_scraping": "You cannot start scraping",
+    "define_sample_urls": "Define sample URLs to start scraping"
   },
   "field": {
     "title": "Configure the scraping",

@@ -2,7 +2,7 @@ import React from 'react';
 import { Drawer } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import './Config.scoped.css';
+import './Layout.scoped.css';
 
 interface IConfigSidebarProps {
   children: JSX.Element;

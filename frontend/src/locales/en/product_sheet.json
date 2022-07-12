@@ -3,7 +3,8 @@
     "title": "Product sheet layout",
     "subtitle": "Use this layout to scrape details of a product",
     "scraping_available": "Click an element to configure the scraping",
-    "scraping_not_available": "this element cannot be scraped yet"
+    "scraping_not_available": "this element cannot be scraped yet",
+    "define_sample_urls": "Define sample URLs to start scraping"
   },
   "product": {
     "label": "Your Product label",

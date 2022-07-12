@@ -1,0 +1,28 @@
+
+.gus-layout-helper {
+    height: 100%;
+    width: 100%;
+    background-color: var(--gus-light-gray);
+    color: var(--gus-gray);
+    margin-bottom: 1em;
+}
+
+.gus-onboarding-layout-content {
+    background-color: var(--gus-white);
+    padding: 4em;
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+
+}
+
+.gus-scraping-layout-content {
+    background-color: var(--gus-white);
+}
+
+.gus-scraping-layout-header {
+    height: auto;
+    padding: 1em 50px;
+    background-color: var(--gus-broken-white);
+    line-height: normal;
+}

@@ -36,33 +36,6 @@ li[role="menuitem"] em {
   font-size: small;
 }
 
-.gus-layout-helper {
-  height: 100%;
-  width: 100%;
-  background-color: var(--gus-light-gray);
-  color: var(--gus-gray);
-  margin-bottom: 1em;
-}
-
-.gus-onboarding-layout-content {
-  background-color: var(--gus-white);
-  padding: 4em;
-  display: flex;
-  flex-grow: 1;
-  justify-content: center;
-
-}
-
-.gus-scraper-layout-content {
-  background-color: var(--gus-white);
-}
-
-.gus-scraper-layout-content-header {
-  height: auto;
-  padding: 1em;
-  background-color: var(--gus-broken-white);
-}
-
 .gus-main-content {
   width: 100vw;
   height: 100vh;

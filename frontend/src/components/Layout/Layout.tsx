@@ -2,7 +2,8 @@ import React from 'react';
 import { Layout } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import '../../i18n';
+
+import './Layout.scoped.css';
 
 const { Header, Content } = Layout;
 
@@ -32,8 +33,8 @@ export const ScrapingLayout = ({ header, children }: { header: React.ReactNode; 
         <p>{t('helper.content')}</p>
       </Header>
       <Layout>
-        <Content className="gus-scraper-layout-content">
-          <Header className="gus-scraper-layout-content-header">{header}</Header>
+        <Content className='.gus-scraping-layout-content'>
+          <Header className='gus-scraping-layout-header'>{header}</Header>
           {children}
         </Content>
       </Layout>

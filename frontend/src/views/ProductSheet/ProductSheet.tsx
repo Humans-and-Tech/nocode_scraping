@@ -72,6 +72,14 @@ const ProductSheet: React.FC = () => {
     setIsSideBarOpen(false);
   };
 
+  const scrapingAvailability = () => {
+    if (spider.current?.sampleURLs) {
+      return t('page.scraping_available');
+    } else {
+      return t('page.define_sample_urls');
+    }
+  };
+ 
   const priceElements: Array<IDataConfig> = [
     {
       name: 'price.discount',
@@ -197,10 +205,12 @@ const ProductSheet: React.FC = () => {
                             key={item.name}
                             className="gus-scraping-element"
                             onClick={() => {
-                              showSideBar(item);
+                              if (spider.current?.sampleURLs) {
+                                showSideBar(item);
+                              }
                             }}
                           >
-                            <Tooltip title={t('page.scraping_available')} color="geekblue">
+                            <Tooltip title={scrapingAvailability} color="geekblue">
                               {item.label}
                             </Tooltip>
                           </List.Item>
