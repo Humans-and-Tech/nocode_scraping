@@ -3,7 +3,6 @@ export enum GenericResponseStatus {
   ERROR = 'error' // a backend error
 }
 
-
 export interface IWebSocketResponse {
   status: GenericResponseStatus;
   message?: string;

@@ -79,7 +79,7 @@ const ProductSheet: React.FC = () => {
       return t('page.define_sample_urls');
     }
   };
- 
+
   const priceElements: Array<IDataConfig> = [
     {
       name: 'price.discount',
@@ -119,7 +119,6 @@ const ProductSheet: React.FC = () => {
 
   return (
     <Fragment>
-      {/* {element && spider && <DataConfig data={element} spider={spider} />} */}
       {data && spider.current && (
         <ConfigSidebar isVisible={isSideBarOpen} onClose={closeSideBar}>
           <DataConfig data={data} spider={spider.current} />

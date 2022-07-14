@@ -6,9 +6,25 @@
     "success": "This is a valid URL"
   },
   "spider": {
-    "title": "You are configuring the spider <em>{{ spider }}</em>",
+    "title": "You are working on the spider <em>{{ spider }}</em>",
+    "configuration_title": "Configuration of {{spider}}",
     "cannot_start_scraping": "You cannot start scraping",
-    "define_sample_urls": "Define sample URLs to start scraping"
+    "access_configuration": "Modify the configuration of the spider",
+    "define_sample_urls": "Define sample URLs to start scraping",
+    "sample_urls_title": "Sample URLs",
+    "sample_urls_intro": "To start scraping, you need to give some examples of URLs to be scraped",
+    "sample_url_input_placeholder": "Enter a valid URL",
+    "actions": {
+      "save_configuration": "Save",
+      "sample_urls_add_first_one": "Add your first sample URL",
+      "sample_urls_add_more": "Add another sample URL",
+      "sample_url_delete": "delete",
+      "update_success": "Spider updated",
+      "update_error": "Spider update failed"
+    },
+    "config_sidebar": {
+      "tab_sample_urls": "Sample URLs"
+    }
   },
   "field": {
     "title": "Configure the scraping",

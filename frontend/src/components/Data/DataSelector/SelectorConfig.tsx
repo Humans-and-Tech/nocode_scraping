@@ -138,45 +138,51 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
       // don't pass the cookiePopupPath if the switch button is not activated
       const _cookiePpSelector = isPopup ? popupSelector : undefined;
 
-      backendProvider.scraping.getContent({}, selector, sampleUrl, _cookiePpSelector, (response: ScrapingResponse | ScrapingError) => {
-        // whether the evaluation is successful or not
-        // send it to the PreviewContent component
-        // to display adequate information
-        setEvaluation(response);
+      backendProvider.scraping.getContent(
+        {},
+        selector,
+        sampleUrl,
+        _cookiePpSelector,
+        (response: ScrapingResponse | ScrapingError) => {
+          // whether the evaluation is successful or not
+          // send it to the PreviewContent component
+          // to display adequate information
+          setEvaluation(response);
 
-        // check the response status
-        if (response.status == ScrapingStatus.SUCCESS) {
-          // assign the response selector
-          // which is enriched with a status valid/invalid
-          localData.selector = response.selector;
-          localData.isPopup = isPopup;
+          // check the response status
+          if (response.status == ScrapingStatus.SUCCESS) {
+            // assign the response selector
+            // which is enriched with a status valid/invalid
+            localData.selector = response.selector;
+            localData.isPopup = isPopup;
 
-          if (response.clickBefore) {
-            localData.popupSelector = response.clickBefore[0];
+            if (response.clickBefore) {
+              localData.popupSelector = response.clickBefore[0];
+            } else {
+              console.debug('assuming an undefined value for the popupSelector');
+              localData.popupSelector = undefined;
+            }
+
+            setLocalData(localData);
+            onConfigured(localData);
           } else {
-            console.debug('assuming an undefined value for the popupSelector');
-            localData.popupSelector = undefined;
+            if (response.status === ScrapingStatus.ERROR) {
+              // there has been a technical error
+              // on the backend side
+              // notify the user by a special message
+              console.error('Error calling the backend', response.message);
+              setIsBackendError(true);
+            }
+
+            // this is a functional error
+            if (onError) {
+              onError();
+            }
           }
 
-          setLocalData(localData);
-          onConfigured(localData);
-        } else {
-          if (response.status === ScrapingStatus.ERROR) {
-            // there has been a technical error
-            // on the backend side
-            // notify the user by a special message
-            console.error('Error calling the backend', response.message);
-            setIsBackendError(true);
-          }
-
-          // this is a functional error
-          if (onError) {
-            onError();
-          }
+          setIsLoading(false);
         }
-
-        setIsLoading(false);
-      });
+      );
     }
   };
 

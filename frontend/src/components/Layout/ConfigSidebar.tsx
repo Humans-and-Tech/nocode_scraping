@@ -7,6 +7,7 @@ import './Layout.scoped.css';
 interface IConfigSidebarProps {
   children: JSX.Element;
   isVisible: boolean;
+  title?: string;
   onClose: () => void;
 }
 
@@ -17,12 +18,12 @@ interface IConfigSidebarProps {
  * by the isVisible function
  *
  */
-export const ConfigSidebar = ({ children, isVisible, onClose }: IConfigSidebarProps): JSX.Element => {
+export const ConfigSidebar = ({ children, isVisible, title, onClose }: IConfigSidebarProps): JSX.Element => {
   const { t } = useTranslation('configurator');
 
   return (
     <Drawer
-      title={t('field.title')}
+      title={title || t('field.title')}
       size="large"
       placement="right"
       closable={false}

@@ -62,23 +62,27 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
   const validateSelector = (s: DataSelector) => {
     setIsBackendError(false);
 
-    backendProvider.scraping.validateSelector({}, s, (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
-      if (resp.status === GenericResponseStatus.ERROR) {
-        setIsBackendError(true);
-        setInputClass('error');
-        s.status = SelectorStatus.INVALID;
-      } else {
-        s.status = resp.selector.status;
-
-        if (resp.selector.status === SelectorStatus.VALID) {
-          setInputClass('success');
-        } else {
+    backendProvider.scraping.validateSelector(
+      {},
+      s,
+      (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {
+        if (resp.status === GenericResponseStatus.ERROR) {
+          setIsBackendError(true);
           setInputClass('error');
-        }
+          s.status = SelectorStatus.INVALID;
+        } else {
+          s.status = resp.selector.status;
 
-        onChange(s);
+          if (resp.selector.status === SelectorStatus.VALID) {
+            setInputClass('success');
+          } else {
+            setInputClass('error');
+          }
+
+          onChange(s);
+        }
       }
-    });
+    );
   };
 
   /**
