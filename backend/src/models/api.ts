@@ -1,4 +1,4 @@
-import { DataSelector } from './core';
+import { DataSelector, ScrapingStatus } from './core';
 
 export enum ResponseStatus {
   SUCCESS = 'success',
@@ -22,11 +22,18 @@ export interface IScrapingRequest {
   organizationName: string;
 }
 
-/**
- * the shape of a response to a websocket client
- */
 export interface IResponse {
   status: ResponseStatus;
   message?: string;
-  data?: unknown;
 }
+
+/**
+ * the shape of a response to a websocket client
+ */
+export interface IScrapingResponse {
+  status: ScrapingStatus;
+  message?: string;
+  data?: unknown;
+  selector?: DataSelector;
+}
+

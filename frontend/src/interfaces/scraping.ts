@@ -36,7 +36,7 @@ export interface ScrapingResponse {
 }
 
 export interface ScrapingError {
-  message: string;
+  message?: string;
   status:
     | ScrapingStatus.ERROR
     | ScrapingStatus.NO_CONTENT

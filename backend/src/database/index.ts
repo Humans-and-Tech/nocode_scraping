@@ -49,12 +49,13 @@ export async function upsert<T extends Storable>(organization: Organization, dat
 
   try {
     await document.update(cleanData);
+    logger.info(`Updated doc with key ${data.key}`)
     return Promise.resolve(true);
   } catch (error: unknown) {
     if (isFireStoreError(error) && error.code === 5) {
       // this is a document not found error
-      logger.warn('Document not found, creating it');
       await document.create(cleanData);
+      logger.info(`Created doc with key ${data.key}`)
       return Promise.resolve(true);
     } else {
       logger.error('Unhandled error', error);
@@ -76,13 +77,15 @@ export async function upsert<T extends Storable>(organization: Organization, dat
  */
 // @ts-ignore
 export async function get<T extends Storable>(organization: Organization, dataType: Class<T>, key: string): Promise<T> {
+  
   const docPath = `${organization.name}/${dataType.name.toLowerCase()}s/${key}`;
   const configCollection: DocumentData = firestore.collection(`organizations`);
   const document = configCollection.doc(docPath);
 
+  logger.info('Looking for doc in Path ' + docPath);
+
   try {
     const snap: DocumentSnapshot<T> = await document.get();
-    logger.debug('got spider for docPath ' + docPath + ' => ' + snap.data());
     return Promise.resolve(snap.data());
   } catch (error) {
     if (isFireStoreError(error) && error.code === 5) {

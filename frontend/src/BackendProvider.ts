@@ -183,6 +183,13 @@ function scrapingBackend(): IScrapingBackend {
           status: ScrapingStatus.ERROR,
           selector: s
         });
+      } else if (resp.status!==GenericResponseStatus.SUCCESS) {
+        // this is a ScrapingError
+        // no content found or something similar
+        callback({
+          status: resp.status,
+          selector: resp.selector
+        } as ScrapingError);
       } else {
         callback(resp.data as ScrapingResponse);
       }

@@ -33,6 +33,7 @@ export class FirestoreCache {
           if (compressed) {
             const data: ICachedContent = new CachedContent(key, compressed.toString('base64'));
             await upsert<ICachedContent>(organization, data);
+            logger.info(`Cached content for key ${key}`);
             return Promise.resolve(true);
           } else {
             logger.error(`undefined compressed content`);
@@ -63,8 +64,7 @@ export class FirestoreCache {
     const asyncDecompress = promisify(brotliDecompress);
 
     try {
-      const docName = `${organization.name}/cache/${key}`;
-      const data = await get<CachedContent>(organization, CachedContent, docName);
+      const data = await get<CachedContent>(organization, CachedContent, key);
 
       if (data?.content) {
         const uncompressed = await asyncDecompress(Buffer.from(data.content, 'base64'));

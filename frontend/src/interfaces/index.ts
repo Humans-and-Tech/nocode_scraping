@@ -1,3 +1,5 @@
+import {DataSelector} from './spider';
+
 export enum GenericResponseStatus {
   SUCCESS = 'success',
   ERROR = 'error' // a backend error
@@ -6,5 +8,9 @@ export enum GenericResponseStatus {
 export interface IWebSocketResponse {
   status: GenericResponseStatus;
   message?: string;
-  data: unknown;
+  data?: unknown;
+  selector?: DataSelector;
 }
+
+
+

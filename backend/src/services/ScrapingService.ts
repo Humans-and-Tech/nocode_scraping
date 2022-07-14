@@ -149,11 +149,14 @@ export class ScrapingService {
     // to retrieve the cached version
     const key = createHash('sha256').update(url.pathname.toString()).digest('hex');
 
+    logger.info(`looking for key ${key} in cache`);
+
     try {
       const cacheService = new FirestoreCache();
       const cached = await cacheService.loadPageContentFromCache(key, organization);
 
       if (!cached || !cached.content) {
+        logger.info(`No content found in cache for key ${key}`);
         // store the page content into the cache
         // await cache.set(key, cachedHtml);
         browser = await playwright.chromium.launch();

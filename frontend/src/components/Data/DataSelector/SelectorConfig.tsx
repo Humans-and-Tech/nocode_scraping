@@ -157,6 +157,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
           // to display adequate information
           setEvaluation(response);
 
+          console.log(response);
+
           // check the response status
           if (response.status == ScrapingStatus.SUCCESS) {
             // assign the response selector
@@ -172,17 +174,18 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             setLocalData(localData);
             onConfigured(localData);
-          } else {
-            if (response.status === ScrapingStatus.ERROR) {
-              // there has been a technical error
-              // on the backend side
-              // notify the user by a special message
-              displayMessage(
-                NotificationLevel.ERROR,
-                t('field.evaluation.failure_unknown', { message: response.message })
-              );
-              setIsBackendError(true);
-            }
+          // } else if () {
+          } else if (response.status === ScrapingStatus.ERROR) {
+            
+            // there has been a technical error
+            // on the backend side
+            // notify the user by a special message
+            displayMessage(
+              NotificationLevel.ERROR,
+              t('field.evaluation.failure_unknown', { message: response.message })
+            );
+            setIsBackendError(true);
+            
 
             // this is a functional error
             if (onError) {
