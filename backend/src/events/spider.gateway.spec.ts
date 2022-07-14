@@ -18,27 +18,26 @@ const mockedSpider = new Spider({
  */
 jest.mock('../database', () => ({
   get: async (organization: Organization, Spider, key: string) => {
-    if (key==="found") {
+    if (key === 'found') {
       return Promise.resolve(mockedSpider);
-    } else if (key==="not-found") {
+    } else if (key === 'not-found') {
       return Promise.resolve(undefined);
-    } else if (key==="error") {
-      return Promise.reject(new Error("an error occured"));
+    } else if (key === 'error') {
+      return Promise.reject(new Error('an error occured'));
     }
   },
   upsert: async (organization: Organization, data: Spider) => {
-    if (data.name=="existing-spider") {
+    if (data.name == 'existing-spider') {
       return Promise.resolve(true);
-    } else if (data.name=="non-existing-spider") {
+    } else if (data.name == 'non-existing-spider') {
       return Promise.resolve(true);
-    } else if (data.name=="error-spider"){
-      return Promise.reject(new Error("an error occured"));
+    } else if (data.name == 'error-spider') {
+      return Promise.reject(new Error('an error occured'));
     }
   }
 }));
 
 describe('SpiderEventGateway', () => {
-
   let controller: SpiderEventGateway;
 
   beforeEach(async () => {
@@ -51,7 +50,6 @@ describe('SpiderEventGateway', () => {
   });
 
   describe('get a spider', () => {
-    
     const expectedResponse: IResponse = {
       status: ResponseStatus.SUCCESS,
       data: mockedSpider
@@ -74,7 +72,6 @@ describe('SpiderEventGateway', () => {
       // nevermind the message
       expect(response).toHaveProperty('status', ResponseStatus.ERROR);
     });
-
   });
 
   describe('upsert a spider', () => {
@@ -84,9 +81,12 @@ describe('SpiderEventGateway', () => {
     };
 
     it('should return true when existing', async () => {
-      const response = await controller.onSpiderUpsert({
-        name: 'existing-spider'
-      }, 0);
+      const response = await controller.onSpiderUpsert(
+        {
+          name: 'existing-spider'
+        },
+        0
+      );
       const expectedResponse: IResponse = {
         status: ResponseStatus.SUCCESS,
         data: true
@@ -95,9 +95,12 @@ describe('SpiderEventGateway', () => {
     });
 
     it('should return true when non existing', async () => {
-      const response = await controller.onSpiderUpsert({
-        name: 'non-existing-spider'
-      }, 0);
+      const response = await controller.onSpiderUpsert(
+        {
+          name: 'non-existing-spider'
+        },
+        0
+      );
       const expectedResponse: IResponse = {
         status: ResponseStatus.SUCCESS,
         data: true
@@ -106,9 +109,12 @@ describe('SpiderEventGateway', () => {
     });
 
     it('should return an error status in case of DB error', async () => {
-      const response = await controller.onSpiderUpsert({
-        name: 'error-spider'
-      }, 0);
+      const response = await controller.onSpiderUpsert(
+        {
+          name: 'error-spider'
+        },
+        0
+      );
       const expectedResponse: IResponse = {
         status: ResponseStatus.ERROR,
         message: 'an error occured'

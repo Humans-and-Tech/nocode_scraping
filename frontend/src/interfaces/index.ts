@@ -1,4 +1,4 @@
-import {DataSelector} from './spider';
+import { DataSelector } from './spider';
 
 export enum GenericResponseStatus {
   SUCCESS = 'success',
@@ -11,6 +11,3 @@ export interface IWebSocketResponse {
   data?: unknown;
   selector?: DataSelector;
 }
-
-
-

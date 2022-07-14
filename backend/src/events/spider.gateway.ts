@@ -18,10 +18,7 @@ export class SpiderEventGateway {
   server;
 
   @SubscribeMessage('get')
-  async onSpiderGet(
-    @MessageBody('name') name: string,
-    @MessageBody('userId') userId: number
-  ): Promise<IResponse> {
+  async onSpiderGet(@MessageBody('name') name: string, @MessageBody('userId') userId: number): Promise<IResponse> {
     try {
       const user = new User(userId);
       const result: Spider = await this.spiderService.getSpider(user, name);

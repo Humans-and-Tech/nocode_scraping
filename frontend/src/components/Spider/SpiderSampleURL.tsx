@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 
 import { Spider } from '../../interfaces/spider';
-import {BackendContext} from '../../BackendContext';
+import { BackendContext } from '../../BackendContext';
 import { IBackendServicesProvider } from '../../BackendProvider';
 import { displayMessage, NotificationLevel } from '../Layout/UserNotification';
 

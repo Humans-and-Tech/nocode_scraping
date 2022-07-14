@@ -49,13 +49,13 @@ export async function upsert<T extends Storable>(organization: Organization, dat
 
   try {
     await document.update(cleanData);
-    logger.info(`Updated doc with key ${data.key}`)
+    logger.info(`Updated doc with key ${data.key}`);
     return Promise.resolve(true);
   } catch (error: unknown) {
     if (isFireStoreError(error) && error.code === 5) {
       // this is a document not found error
       await document.create(cleanData);
-      logger.info(`Created doc with key ${data.key}`)
+      logger.info(`Created doc with key ${data.key}`);
       return Promise.resolve(true);
     } else {
       logger.error('Unhandled error', error);
@@ -66,10 +66,10 @@ export async function upsert<T extends Storable>(organization: Organization, dat
 
 /**
  * retrieves a document identified by its `key` in the branch `${organization.name}/${dataType.name.toLowerCase()}s/${key}`
- * 
+ *
  * May the document not exist, the value `undefined is returned`.
  * An error is only thrown in case of technical issue with the DB
- * 
+ *
  * @param organization
  * @param dataType is required to build the document path in runtime, the type must extend the `Storable` class
  * @param key the unique key string to retrieve the document
@@ -77,7 +77,6 @@ export async function upsert<T extends Storable>(organization: Organization, dat
  */
 // @ts-ignore
 export async function get<T extends Storable>(organization: Organization, dataType: Class<T>, key: string): Promise<T> {
-  
   const docPath = `${organization.name}/${dataType.name.toLowerCase()}s/${key}`;
   const configCollection: DocumentData = firestore.collection(`organizations`);
   const document = configCollection.doc(docPath);

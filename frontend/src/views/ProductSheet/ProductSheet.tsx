@@ -5,7 +5,7 @@ import { FiPackage } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import {BackendContext} from '../../BackendContext';
+import { BackendContext } from '../../BackendContext';
 import { IBackendServicesProvider } from '../../BackendProvider';
 import { Data, Spider } from '../../interfaces/spider';
 import { DataConfig } from '../../components/Data/DataConfig';
@@ -192,14 +192,16 @@ const ProductSheet: React.FC = () => {
                 <Col className="gus-col-breathe">
                   <Row className="gus-row-breathe">
                     <Col className="gus-col-breathe">
-
-                      <Collapse accordion style={{'width': '30em'}}>
-                        <Panel header={
+                      <Collapse accordion style={{ width: '30em' }}>
+                        <Panel
+                          header={
                             <>
                               <DollarOutlined />
                               {t('product.price.header')}
                             </>
-                          } key="1">
+                          }
+                          key="1"
+                        >
                           <List
                             size="default"
                             dataSource={priceElements}
@@ -220,12 +222,15 @@ const ProductSheet: React.FC = () => {
                             )}
                           />
                         </Panel>
-                        <Panel header={
-                                <>
-                                  <FiPackage />
-                                  {t('product.delivery.header')}
-                                </>
-                              } key="2">
+                        <Panel
+                          header={
+                            <>
+                              <FiPackage />
+                              {t('product.delivery.header')}
+                            </>
+                          }
+                          key="2"
+                        >
                           <List
                             size="default"
                             dataSource={[
@@ -242,11 +247,8 @@ const ProductSheet: React.FC = () => {
                               </List.Item>
                             )}
                           />
-
                         </Panel>
-
                       </Collapse>
-                      
                     </Col>
                   </Row>
                 </Col>

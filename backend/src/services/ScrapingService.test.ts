@@ -5,7 +5,7 @@ import { GenericResponseStatus, SelectorStatus, ScrapedContent } from '../models
 import { ScrapingError, DataSelectorValidityError } from '../errors';
 import { FirestoreCache } from '../cache/FirestoreCache';
 import { ICachedContent } from '../models/db';
-import {ScrapingService} from './ScrapingService';
+import { ScrapingService } from './ScrapingService';
 
 // timeout of 10 seconds
 // some tests with playwright are long
@@ -105,7 +105,7 @@ jest.mock('playwright-chromium', () => ({
 //       updateTime: new Date()
 //     } as ICachedContent);
 //   }
-  
+
 // }));
 jest.mock('../cache/FirestoreCache');
 
@@ -125,8 +125,6 @@ jest.mock('fs/promises', () => ({
 }));
 
 describe('Testing validateSelector response', () => {
-
-  
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -144,7 +142,6 @@ describe('Testing validateSelector response', () => {
   };
 
   test('when the validation is not successful, but no error is thrown', async () => {
-
     const service = new ScrapingService();
     const resp = await service.validateSelector(testInvalidSelector);
 
@@ -166,7 +163,6 @@ describe('Testing validateSelector response', () => {
   });
 
   test('when the validation is successful', async () => {
-
     const service = new ScrapingService();
     const resp = await service.validateSelector(testValidSelector);
 
@@ -214,8 +210,7 @@ describe('Testing click Element', () => {
     await page.goto('http://www.google.fr');
 
     const service = new ScrapingService();
-    await expect(
-      service.clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
+    await expect(service.clickElement(page, testInvalidClickableElement)).rejects.toBeInstanceOf(ScrapingError);
   });
 
   test('try to click on an element which cannot be found', async () => {

@@ -71,7 +71,6 @@ function isSpider(obj: unknown): obj is Spider {
 }
 
 function spiderBackend(): ISpiderBackend {
-
   const get = (_name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
     if (_name === '') {
       throw new Error('cannot get a spider with a blank name');
@@ -183,7 +182,7 @@ function scrapingBackend(): IScrapingBackend {
           status: ScrapingStatus.ERROR,
           selector: s
         });
-      } else if (resp.status!==GenericResponseStatus.SUCCESS) {
+      } else if (resp.status !== GenericResponseStatus.SUCCESS) {
         // this is a ScrapingError
         // no content found or something similar
         callback({
@@ -227,8 +226,8 @@ function scrapingBackend(): IScrapingBackend {
 
 /**
  * export this function for mocking facility in test cases
- * 
- * @returns 
+ *
+ * @returns
  */
 export function useBackend(): IBackendServicesProvider {
   return {
@@ -238,5 +237,3 @@ export function useBackend(): IBackendServicesProvider {
 }
 
 export const BackendServicesProvider: IBackendServicesProvider = useBackend();
-
-

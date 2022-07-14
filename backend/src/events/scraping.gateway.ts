@@ -52,9 +52,7 @@ export class ScrapingEventGateway {
     } catch (err) {
       logger.error(err);
       if (err instanceof DataSelectorValidityError) {
-
         // need to convey a status INVALID_SELECTOR to the frontend
-
       } else {
         return Promise.resolve({
           status: ScrapingStatus.ERROR,

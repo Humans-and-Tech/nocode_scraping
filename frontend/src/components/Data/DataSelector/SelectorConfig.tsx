@@ -4,7 +4,7 @@ import { CloseCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 
-import {BackendContext} from '../../../BackendContext';
+import { BackendContext } from '../../../BackendContext';
 import { IBackendServicesProvider } from '../../../BackendProvider';
 import { Data, DataSelector, SelectorStatus, Spider } from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
@@ -174,9 +174,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
             setLocalData(localData);
             onConfigured(localData);
-          // } else if () {
+            // } else if () {
           } else if (response.status === ScrapingStatus.ERROR) {
-            
             // there has been a technical error
             // on the backend side
             // notify the user by a special message
@@ -185,7 +184,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
               t('field.evaluation.failure_unknown', { message: response.message })
             );
             setIsBackendError(true);
-            
 
             // this is a functional error
             if (onError) {
