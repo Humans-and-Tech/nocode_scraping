@@ -8,7 +8,7 @@ import MockedSocket from 'socket.io-mock';
 
 import { getContent, validateCssSelector } from '../../../socket/scraping';
 import { SelectorConfig } from './SelectorConfig';
-import { SocketContext } from '../../../socket';
+import {BackendContext} from '../../BackendSocketContext';
 
 /**
  * mock socketio
@@ -19,6 +19,8 @@ import { SocketContext } from '../../../socket';
  */
 jest.mock('socket.io-client');
 
+const serviceProviderMock = jest.fn();
+
 /**
  * mock the evaluate function
  * so that it returns a correct ScrapingResponse
@@ -28,13 +30,7 @@ jest.mock('../../../socket/scraping', () => ({
   // for example a simple jest.fn()
   getContent: (socket, {}, selector, url, cookiePopupPath, callback) => {
     const responseMap = {
-      // return a ScrapingResponse {
-      //     screenshot: string;
-      //     content: string | null;
-      //     status: ScrapingStatus.SUCCESS;
-      //     selector: DataSelector;
-      //      clickBefore?: Array<DataSelector | undefined>;
-      // }
+
       '.a-good-selector': {
         screenshot: 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',
         content: 'yeah baby',

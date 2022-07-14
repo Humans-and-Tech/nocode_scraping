@@ -4,7 +4,8 @@ import { CloseCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 
-import { BackendContext, IBackendServicesProvider } from '../../../BackendSocketContext';
+import {BackendContext} from '../../../BackendContext';
+import { IBackendServicesProvider } from '../../../BackendProvider';
 import { Data, DataSelector, SelectorStatus, Spider } from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { SelectorInput } from './SelectorInput';

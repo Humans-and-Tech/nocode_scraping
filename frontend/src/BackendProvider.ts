@@ -1,4 +1,3 @@
-import React from 'react';
 import { io } from 'socket.io-client';
 import debounce from 'lodash/debounce';
 
@@ -72,6 +71,7 @@ function isSpider(obj: unknown): obj is Spider {
 }
 
 function spiderBackend(): ISpiderBackend {
+
   const get = (_name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
     if (_name === '') {
       throw new Error('cannot get a spider with a blank name');
@@ -218,7 +218,12 @@ function scrapingBackend(): IScrapingBackend {
   return { getContent, validateSelector };
 }
 
-function useBackend(): IBackendServicesProvider {
+/**
+ * export this function for mocking facility in test cases
+ * 
+ * @returns 
+ */
+export function useBackend(): IBackendServicesProvider {
   return {
     spider: spiderBackend(),
     scraping: scrapingBackend()
@@ -227,4 +232,4 @@ function useBackend(): IBackendServicesProvider {
 
 export const BackendServicesProvider: IBackendServicesProvider = useBackend();
 
-export const BackendContext = React.createContext<IBackendServicesProvider>(BackendServicesProvider);
+

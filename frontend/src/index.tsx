@@ -8,7 +8,8 @@ import './i18n';
 import ProductSheet from './views/ProductSheet/ProductSheet';
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScrapingLayout, OnBoardingLayout } from './components/Layout/Layout';
-import { BackendContext, BackendServicesProvider } from './BackendSocketContext';
+import { BackendServicesProvider } from './BackendProvider';
+import {BackendContext} from './BackendContext';
 import { SpiderConfigSummary } from './components/Spider/SpiderConfigSummary';
 
 const rootElement = document.getElementById('root');

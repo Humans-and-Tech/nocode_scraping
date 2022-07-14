@@ -5,7 +5,8 @@ import { CheckCircleOutlined } from '@ant-design/icons';
 
 import { PageType, Spider } from '../../interfaces/spider';
 import { useTranslation } from 'react-i18next';
-import { BackendContext, IBackendServicesProvider } from '../../BackendSocketContext';
+import {BackendContext} from '../../BackendContext';
+import { IBackendServicesProvider } from '../../BackendProvider';
 
 import '../../style.css';
 import './SpiderConfig.scoped.css';

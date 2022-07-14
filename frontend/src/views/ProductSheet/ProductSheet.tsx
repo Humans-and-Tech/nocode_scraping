@@ -5,7 +5,8 @@ import { FiPackage } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { IBackendServicesProvider, BackendContext } from '../../BackendSocketContext';
+import {BackendContext} from '../../BackendContext';
+import { IBackendServicesProvider } from '../../BackendProvider';
 import { Data, Spider } from '../../interfaces/spider';
 import { DataConfig } from '../../components/Data/DataConfig';
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';

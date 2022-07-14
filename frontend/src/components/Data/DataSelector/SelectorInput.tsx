@@ -3,7 +3,8 @@ import { Input, Space } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
-import { BackendContext, IBackendServicesProvider } from '../../../BackendSocketContext';
+import {BackendContext} from '../../../BackendContext';
+import { IBackendServicesProvider } from '../../../BackendProvider';
 import { GenericResponseStatus } from '../../../interfaces';
 import {
   DataSelector,

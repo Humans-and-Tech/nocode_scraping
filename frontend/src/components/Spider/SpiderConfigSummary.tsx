@@ -4,7 +4,8 @@ import { useParams } from 'react-router-dom';
 import { Space, Spin, Tabs, Button } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
-import { IBackendServicesProvider, BackendContext } from '../../BackendSocketContext';
+import {BackendContext} from '../../BackendContext';
+import { IBackendServicesProvider } from '../../BackendProvider';
 import { Spider } from '../../interfaces/spider';
 import { displayMessage, NotificationLevel } from '../Layout/UserNotification';
 

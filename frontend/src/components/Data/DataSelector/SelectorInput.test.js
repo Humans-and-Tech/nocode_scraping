@@ -6,9 +6,8 @@ import i18n from '../../../tests/i18n';
 import socketIOClient from 'socket.io-client';
 import MockedSocket from 'socket.io-mock';
 
-import { validateCssSelector } from '../../../socket/scraping';
 import { SelectorInput } from './SelectorInput';
-import { ScrapingSocketContext } from '../../../socket';
+import {BackendContext, BackendServicesProvider} from '../../BackendSocketContext';
 
 /**
  * mock socketio
@@ -86,11 +85,11 @@ describe('onSelectorChange is called when changing the input value', () => {
     const mockOnConchange = jest.fn();
 
     const { container } = render(
-      <SocketContext.Provider value={socket}>
+      <BackendContext.Provider value={BackendServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
         </I18nextProvider>
-      </SocketContext.Provider>
+      </BackendContext.Provider>
     );
 
     // access the textarea input DOM Element
@@ -125,11 +124,11 @@ describe('onSelectorChange is called when changing the input value', () => {
     const mockOnConchange = jest.fn();
 
     const { getByTestId, container } = render(
-      <SocketContext.Provider value={socket}>
+      <BackendContext.Provider value={BackendServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
         </I18nextProvider>
-      </SocketContext.Provider>
+      </BackendContext.Provider>
     );
 
     // access the textarea input DOM Element
@@ -164,11 +163,11 @@ describe('onSelectorChange is called when changing the input value', () => {
     const mockOnConchange = jest.fn();
 
     const { getByTestId, container } = render(
-      <SocketContext.Provider value={socket}>
+      <BackendContext.Provider value={BackendServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
         </I18nextProvider>
-      </SocketContext.Provider>
+      </BackendContext.Provider>
     );
 
     // access the textarea input DOM Element

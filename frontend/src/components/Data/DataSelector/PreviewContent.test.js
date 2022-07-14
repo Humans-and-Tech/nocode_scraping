@@ -6,6 +6,7 @@ import i18n from '../../../tests/i18n';
 
 import { PreviewContent } from './PreviewContent';
 
+
 describe('display the correct message', () => {
   test('when the ScrapingStatus is SUCCESS', async () => {
     const testSuccessfulContent = {

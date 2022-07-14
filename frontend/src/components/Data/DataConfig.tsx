@@ -3,7 +3,8 @@ import { Tabs, Space, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { Data, Spider, mergeSpiderData } from '../../interfaces/spider';
-import { BackendContext, IBackendServicesProvider } from '../../BackendSocketContext';
+import {BackendContext} from '../../BackendContext';
+import { IBackendServicesProvider } from '../../BackendProvider';
 
 import { SelectorConfig } from './DataSelector/SelectorConfig';
 
