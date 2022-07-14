@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, Fragment, useRef } from 'react';
-import { Row, Col, Breadcrumb, Rate, Image, List, Space, Divider, Tooltip, Spin } from 'antd';
+import { Row, Col, Breadcrumb, Rate, Image, List, Space, Divider, Tooltip, Spin, Collapse } from 'antd';
 import { HomeOutlined, FolderOpenOutlined, DollarOutlined } from '@ant-design/icons';
 import { FiPackage } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,8 @@ import { DataConfig } from '../../components/Data/DataConfig';
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
 
 import '../../style.css';
+
+const { Panel } = Collapse;
 
 interface IDataConfig {
   name: string;
@@ -190,58 +192,61 @@ const ProductSheet: React.FC = () => {
                 <Col className="gus-col-breathe">
                   <Row className="gus-row-breathe">
                     <Col className="gus-col-breathe">
-                      <List
-                        size="large"
-                        header={
-                          <div>
-                            <DollarOutlined />
-                            {t('product.price.header')}
-                          </div>
-                        }
-                        bordered
-                        dataSource={priceElements}
-                        renderItem={(item: IDataConfig) => (
-                          <List.Item
-                            key={item.name}
-                            className="gus-scraping-element"
-                            onClick={() => {
-                              if (spider.current?.sampleURLs) {
-                                showSideBar(item);
-                              }
-                            }}
-                          >
-                            <Tooltip title={scrapingAvailability} color="geekblue">
-                              {item.label}
-                            </Tooltip>
-                          </List.Item>
-                        )}
-                      />
 
-                      <Divider></Divider>
+                      <Collapse accordion style={{'width': '30em'}}>
+                        <Panel header={
+                            <>
+                              <DollarOutlined />
+                              {t('product.price.header')}
+                            </>
+                          } key="1">
+                          <List
+                            size="default"
+                            dataSource={priceElements}
+                            renderItem={(item: IDataConfig) => (
+                              <List.Item
+                                key={item.name}
+                                className="gus-scraping-element"
+                                onClick={() => {
+                                  if (spider.current?.sampleURLs) {
+                                    showSideBar(item);
+                                  }
+                                }}
+                              >
+                                <Tooltip title={scrapingAvailability} color="geekblue">
+                                  {item.label}
+                                </Tooltip>
+                              </List.Item>
+                            )}
+                          />
+                        </Panel>
+                        <Panel header={
+                                <>
+                                  <FiPackage />
+                                  {t('product.delivery.header')}
+                                </>
+                              } key="2">
+                          <List
+                            size="default"
+                            dataSource={[
+                              t('product.delivery.mode'),
+                              t('product.delivery.delay'),
+                              t('product.delivery.price'),
+                              t('product.delivery.currency')
+                            ]}
+                            renderItem={(item) => (
+                              <List.Item className="gus-scraping-element">
+                                <Tooltip title={t('page.scraping_not_available')} color="orange">
+                                  {item}
+                                </Tooltip>
+                              </List.Item>
+                            )}
+                          />
 
-                      <List
-                        size="large"
-                        header={
-                          <div>
-                            <FiPackage />
-                            {t('product.delivery.header')}
-                          </div>
-                        }
-                        bordered
-                        dataSource={[
-                          t('product.delivery.mode'),
-                          t('product.delivery.delay'),
-                          t('product.delivery.price'),
-                          t('product.delivery.currency')
-                        ]}
-                        renderItem={(item) => (
-                          <List.Item className="gus-scraping-element">
-                            <Tooltip title={t('page.scraping_not_available')} color="orange">
-                              {item}
-                            </Tooltip>
-                          </List.Item>
-                        )}
-                      />
+                        </Panel>
+
+                      </Collapse>
+                      
                     </Col>
                   </Row>
                 </Col>
