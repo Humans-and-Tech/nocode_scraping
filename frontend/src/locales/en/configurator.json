@@ -14,6 +14,7 @@
     "sample_urls_title": "Sample URLs",
     "sample_urls_intro": "To start scraping, you need to give some examples of URLs to be scraped",
     "sample_url_input_placeholder": "Enter a valid URL",
+    "sample_url_select_placeholder": "Select a sample URL",
     "actions": {
       "save_configuration": "Save",
       "sample_urls_add_first_one": "Add your first sample URL",

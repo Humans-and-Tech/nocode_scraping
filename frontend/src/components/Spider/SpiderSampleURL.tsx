@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Space, List, Button, Input } from 'antd';
+import React, { useState, useContext, useEffect, useRef, Fragment } from 'react';
+import { Space, List, Button, Input, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 
@@ -8,15 +8,65 @@ import { BackendContext, IBackendServicesProvider } from '../../BackendSocketCon
 import {displayMessage, NotificationLevel} from '../Layout/UserNotification';
 
 import './SpiderConfig.scoped.css';
+import { t } from 'i18next';
 
 const { TextArea } = Input;
 
+interface ISampleUrlSelectorProps {
+  spider: Spider;
+  onSelect: (url: URL)=>void;
+  initialSelectedUrl: URL|undefined;
+}
+
+
 /**
- * manages the sampleUrl prop of a spider
- *
- * @returns
+ * choose / select a sample url
+ * 
+ * @returns JSX.Element
  */
-export const SpiderSampleURL = ({ spider, ...rest }: { spider: Spider }): JSX.Element => {
+export const SampleUrlSelector = ({spider, onSelect, initialSelectedUrl}: ISampleUrlSelectorProps) : JSX.Element => {
+  const { t } = useTranslation('configurator');
+
+  const [selectedSampleUrl, setSelectedSampleUrl] = useState<string|undefined>(initialSelectedUrl?.toString());
+
+  const onChange = (value: string) => {
+    setSelectedSampleUrl(value);
+    onSelect(new URL(value));
+  };
+
+  return (
+    <>
+    {
+      spider.sampleURLs &&
+      <Select
+          style={{width: '100%'}}
+          size="middle"
+          placeholder={t('spider.sample_url_select_placeholder')}
+          onChange={onChange}
+          optionLabelProp="label"
+          defaultValue={spider.sampleURLs[0].toString()}
+          options={spider.sampleURLs?.map((urlString) => {
+            const url = new URL(urlString);
+            return {
+              label: `...${url.pathname}`,
+              value: url.toString()
+            };
+          })}
+          value={selectedSampleUrl}
+        >
+      </Select>
+    }
+    </>
+  );
+};
+
+
+/**
+ * Add / delete a sample url
+ *
+ * @returns JSX.Element
+ */
+export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.Element => {
   const { t } = useTranslation('configurator');
 
   const backendProvider = useContext<IBackendServicesProvider>(BackendContext);

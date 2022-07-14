@@ -93,14 +93,10 @@ export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JS
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {
             //spider.sampleURLs && spider.sampleURLs.length > 0 &&
-            localData && (
+            localData && localSpider && (
               <SelectorConfig
                 data={localData}
-                sampleUrl={
-                  new URL(
-                    'https://www.manomano.fr/p/piscine-tubulaire-ronde-366-x-122m-summer-waves-avec-pompe-32127122?product_id=31948595'
-                  )
-                }
+                spider={localSpider}
                 onConfigured={onConfigured}
                 onChange={onDataChange}
               />

@@ -8,7 +8,7 @@ import { IBackendServicesProvider, BackendContext } from '../../BackendSocketCon
 import { Spider } from '../../interfaces/spider';
 import {displayMessage, NotificationLevel} from '../Layout/UserNotification';
 
-import { SpiderSampleURL } from './SpiderSampleURL';
+import { SampleURLManager } from './SpiderSampleURL';
 import { ConfigSidebar } from '../Layout/ConfigSidebar';
 
 import './SpiderConfig.scoped.css';
@@ -92,7 +92,7 @@ export const SpiderConfigSummary = (): JSX.Element => {
             <TabPane tab={t('spider.config_sidebar.tab_sample_urls')} key="1">
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <p>{t('spider.sample_urls_intro')}</p>
-                <SpiderSampleURL spider={spider.current} />
+                <SampleURLManager spider={spider.current} />
               </Space>
             </TabPane>
           </Tabs>

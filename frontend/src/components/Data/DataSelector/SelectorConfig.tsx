@@ -5,10 +5,11 @@ import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 
 import { BackendContext, IBackendServicesProvider } from '../../../BackendSocketContext';
-import { Data, DataSelector, SelectorStatus } from '../../../interfaces/spider';
+import { Data, DataSelector, SelectorStatus, Spider } from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { SelectorInput } from './SelectorInput';
 import { PreviewContent } from './PreviewContent';
+import {SampleUrlSelector} from '../../Spider/SpiderSampleURL';
 
 import '../Data.scoped.css';
 
@@ -20,6 +21,7 @@ const createSelector = (): DataSelector => {
 
 interface ISelectorConfigPropsType {
   data: Data;
+  spider: Spider;
   onConfigured: (data: Data) => void;
 
   // the onError is just there
@@ -27,9 +29,6 @@ interface ISelectorConfigPropsType {
   // to let the parent know of an error
   onError?: () => void;
   onChange: (d: Data) => void;
-
-  // sample of pages to test / validate the selector
-  sampleUrl?: URL | undefined;
 }
 
 /**
@@ -51,7 +50,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
   const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
 
-  const { data, onConfigured, sampleUrl, onError, onChange } = props;
+  const { data, spider, onConfigured, onError, onChange } = props;
 
   const [localData, setLocalData] = useState<Data | undefined>(undefined);
 
@@ -65,6 +64,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
   // indeed, passing the [selector] in the dependency array of useEffect won't work
   const [selector, setSelector] = useState<DataSelector | undefined>(undefined);
   const [selectorStatus, setSelectorStatus] = useState<SelectorStatus | undefined>(undefined);
+  
+  const [sampleUrl, setSampleUrl] = useState<URL|undefined>(undefined);
 
   /**
    * optionnally, the user may want to configure
@@ -107,6 +108,11 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
     setPopupSelectorStatus(s.status);
   };
 
+  const changeSampleUrl = (url: URL) => {
+    setSampleUrl(url);
+    setEvaluation(undefined);
+  }
+
   /**
    * evaluates the CSS selector path, which means gets the content
    * of this selector
@@ -118,6 +124,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
    * @param event
    */
   const evaluateSelectorPath = (event: React.MouseEvent<HTMLButtonElement>): void => {
+
     event.preventDefault();
 
     // reset evaluation
@@ -128,7 +135,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
     // reset backend error
     setIsBackendError(false);
 
-    if (localData && selector?.path !== undefined && sampleUrl !== undefined) {
+    if (localData && selector?.path !== undefined && sampleUrl) {
       // for testing purpose
       // re-assign the path which might not be up-to-date
       // when calling the evaluateSelectorPath after calling the onChange
@@ -243,6 +250,10 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
       // by the rest of the application
       setLocalData(data);
 
+      if (spider.sampleURLs) {
+        setSampleUrl(spider.sampleURLs[0]);
+      }
+
       // these objects have their own lifecycle
       setIsPopup(data.isPopup);
 
@@ -343,9 +354,13 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
       {!isLoading && (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          
+          {t('field.action.select_sample_url')}
+          <SampleUrlSelector spider={spider} onSelect={changeSampleUrl} initialSelectedUrl={sampleUrl} />
+          
           <Space direction="horizontal" size="middle">
             <Tooltip title={evaluationHelperMessage}>
-              <Button onClick={evaluateSelectorPath} disabled={!isEvaluationEnabled} data-testid="evaluation-button">
+              <Button onClick={evaluateSelectorPath} type="primary" disabled={!isEvaluationEnabled} data-testid="evaluation-button">
                 <span data-testid="evaluate_selector">{t('field.action.evaluate_selector')}</span>
               </Button>
             </Tooltip>
