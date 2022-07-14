@@ -1,7 +1,7 @@
 import React from 'react';
 import { io } from 'socket.io-client';
 import debounce from 'lodash/debounce';
-import { useQuery } from 'react-query';
+
 import { Spider, DataSelector, DataSelectorValidityResponse, DataSelectorValidityError } from './interfaces/spider';
 import { IScrapingRequest, ScrapingError, ScrapingResponse, ScrapingStatus } from './interfaces/scraping';
 import { IWebSocketResponse, GenericResponseStatus } from './interfaces';

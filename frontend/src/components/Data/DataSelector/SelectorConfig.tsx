@@ -9,7 +9,8 @@ import { Data, DataSelector, SelectorStatus, Spider } from '../../../interfaces/
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { SelectorInput } from './SelectorInput';
 import { PreviewContent } from './PreviewContent';
-import {SampleUrlSelector} from '../../Spider/SpiderSampleURL';
+import { SampleUrlSelector } from '../../Spider/SpiderSampleURL';
+import { displayMessage, NotificationLevel } from '../../Layout/UserNotification';
 
 import '../Data.scoped.css';
 
@@ -64,8 +65,8 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
   // indeed, passing the [selector] in the dependency array of useEffect won't work
   const [selector, setSelector] = useState<DataSelector | undefined>(undefined);
   const [selectorStatus, setSelectorStatus] = useState<SelectorStatus | undefined>(undefined);
-  
-  const [sampleUrl, setSampleUrl] = useState<URL|undefined>(undefined);
+
+  const [sampleUrl, setSampleUrl] = useState<URL | undefined>(undefined);
 
   /**
    * optionnally, the user may want to configure
@@ -111,7 +112,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
   const changeSampleUrl = (url: URL) => {
     setSampleUrl(url);
     setEvaluation(undefined);
-  }
+  };
 
   /**
    * evaluates the CSS selector path, which means gets the content
@@ -124,7 +125,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
    * @param event
    */
   const evaluateSelectorPath = (event: React.MouseEvent<HTMLButtonElement>): void => {
-
     event.preventDefault();
 
     // reset evaluation
@@ -166,7 +166,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             if (response.clickBefore) {
               localData.popupSelector = response.clickBefore[0];
             } else {
-              console.debug('assuming an undefined value for the popupSelector');
               localData.popupSelector = undefined;
             }
 
@@ -177,7 +176,10 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
               // there has been a technical error
               // on the backend side
               // notify the user by a special message
-              console.error('Error calling the backend', response.message);
+              displayMessage(
+                NotificationLevel.ERROR,
+                t('field.evaluation.failure_unknown', { message: response.message })
+              );
               setIsBackendError(true);
             }
 
@@ -354,13 +356,17 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
       {!isLoading && (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          
           {t('field.action.select_sample_url')}
           <SampleUrlSelector spider={spider} onSelect={changeSampleUrl} initialSelectedUrl={sampleUrl} />
-          
+
           <Space direction="horizontal" size="middle">
             <Tooltip title={evaluationHelperMessage}>
-              <Button onClick={evaluateSelectorPath} type="primary" disabled={!isEvaluationEnabled} data-testid="evaluation-button">
+              <Button
+                onClick={evaluateSelectorPath}
+                type="primary"
+                disabled={!isEvaluationEnabled}
+                data-testid="evaluation-button"
+              >
                 <span data-testid="evaluate_selector">{t('field.action.evaluate_selector')}</span>
               </Button>
             </Tooltip>

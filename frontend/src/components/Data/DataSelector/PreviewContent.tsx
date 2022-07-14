@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Space, Image } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -25,10 +25,6 @@ export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
   const { t } = useTranslation('configurator');
 
   const { content } = props;
-
-  useEffect(() => {
-    console.log('PreviewContent with content', content);
-  }, []);
 
   return (
     <>

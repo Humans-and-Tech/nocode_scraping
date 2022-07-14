@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Space, Spin, Tabs, Button } from 'antd';
@@ -6,7 +6,7 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { IBackendServicesProvider, BackendContext } from '../../BackendSocketContext';
 import { Spider } from '../../interfaces/spider';
-import {displayMessage, NotificationLevel} from '../Layout/UserNotification';
+import { displayMessage, NotificationLevel } from '../Layout/UserNotification';
 
 import { SampleURLManager } from './SpiderSampleURL';
 import { ConfigSidebar } from '../Layout/ConfigSidebar';
@@ -54,7 +54,6 @@ export const SpiderConfigSummary = (): JSX.Element => {
         }
       });
     }
-    
   };
   const onTabChange = (key: string) => {
     console.log(key);
@@ -120,9 +119,9 @@ export const SpiderConfigSummary = (): JSX.Element => {
               </Space>
             )}
             {spider.current?.sampleURLs && (
-                <a onClick={configureSampleUrls} title={t('spider.define_sample_urls')}>
-                  {t('spider.access_configuration')}
-                </a>
+              <a onClick={configureSampleUrls} title={t('spider.define_sample_urls')}>
+                {t('spider.access_configuration')}
+              </a>
             )}
           </>
         )}
