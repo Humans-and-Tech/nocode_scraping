@@ -26,7 +26,7 @@
     "config_sidebar": {
       "tab_sample_urls": "Sample URLs",
       "tab_selector_config": "Selector",
-      "tab_sweepers": "Sweepers"
+      "tab_sweepers": "Data Cleaning"
     }
   },
   "field": {

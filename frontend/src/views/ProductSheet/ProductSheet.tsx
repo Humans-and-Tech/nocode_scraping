@@ -124,13 +124,8 @@ const ProductSheet: React.FC = () => {
     spider.current?.data?.forEach((d: Data) => {
       if (d.name === dataName) {
         if (d.selector && d.selector.status == SelectorStatus.VALID) {
-          if (d.isPopup && d.popupSelector && d.popupSelector.status == SelectorStatus.VALID) {
-            isConfigured = true;
-          } else if (!d.isPopup) {
-            isConfigured = true;
-          }
+          isConfigured = true;
         }
-
         return;
       }
     });
@@ -180,17 +175,10 @@ const ProductSheet: React.FC = () => {
           <DataConfig data={data} spider={spider.current} onSave={closeSideBar} />
         </ConfigSidebar>
       )}
-      {isLoading && (
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <Space direction="horizontal">
-            <Spin />
-            <span>{t('loading')}</span>
-          </Space>
-        </Space>
-      )}
-      {!isLoading && (
+      {(
         <Space size={['large', 0]} direction="vertical" className="gus-main-content">
-          <Row className="gus-main-row">
+          <Spin spinning={isLoading} size="large" style={{'width': '100%', 'marginTop': '3em',  'marginBottom': '3em'}}/>
+          <Row className="gus-main-row" style={{'visibility': (!isLoading?'visible': 'hidden')}}>
             <Col>
               <Row className="gus-row-breathe">
                 <Col style={{'width': '100%'}}>

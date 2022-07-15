@@ -101,9 +101,9 @@ export const SpiderConfigSummary = (): JSX.Element => {
 
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {isLoading && (
-          <Space direction="horizontal">
-            <Spin />
-            <span>{t('loading')}</span>
+          <Space direction="horizontal" size="middle">
+              <Spin />
+              <span>{t('loading')}</span>
           </Space>
         )}
         {!isLoading && (

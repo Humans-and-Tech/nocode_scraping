@@ -1,8 +1,10 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Tabs, Space, Button } from 'antd';
+import { GiBroom } from 'react-icons/gi';
+import {BiTargetLock} from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
 
-import { Data, Spider, mergeSpiderData } from '../../interfaces/spider';
+import { Data, Spider, mergeSpiderData, SelectorStatus } from '../../interfaces/spider';
 import { SpiderContext } from '../../BackendContext';
 import { ISpiderBackend } from '../../BackendProvider';
 import {displayMessage, NotificationLevel} from '../../components/Layout/UserNotification'
@@ -37,10 +39,12 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
 
   const [localData, setLocalData] = useState<Data | undefined>(undefined);
   const [localSpider, setLocalSpider] = useState<Spider | undefined>(undefined);
+  const [isSelectorConfigured, setIsSelectorConfigured] = useState<boolean>(false);
 
   const onConfigured = (_data: Data): void => {
     setLocalData(_data);
     saveSpiderData(_data);
+    setIsSelectorConfigured(true);
   };
 
   const onDataChange = (_data: Data): void => {
@@ -89,18 +93,29 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
 
     if (localSpider === undefined) {
       setLocalSpider(spider);
+      
+      // activate the tab if the selector is oK
+      if (data.selector?.status==SelectorStatus.VALID) {
+        console.log("data is configured")
+        setIsSelectorConfigured(true);
+      }
     }
+
   }, [data, spider]);
 
   const saveBtn = <Button type="primary" onClick={triggerSave}>{t('field.action.save_data_configuration')}</Button>;
 
   return (
     <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>
-      <TabPane tab={t('spider.config_sidebar.tab_selector_config')} key="1">
+      <TabPane tab={
+              <Space>
+                <BiTargetLock />
+                {t('spider.config_sidebar.tab_selector_config')}
+              </Space>  
+              } key="1">
         <h2>{data.label}</h2>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {
-            //spider.sampleURLs && spider.sampleURLs.length > 0 &&
             localData && localSpider && (
               <SelectorConfig
                 data={localData}
@@ -110,18 +125,31 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
               />
             )
           }
-
-          {/* {isConfigured &&
-            <Space direction="vertical" size="middle" style={{ 'width': '100%' }}>
-              <h2>{t('field.alterators_title')}</h2>
-              <DataAlterators />
-            </Space>
-          } */}
+          {
+            isSelectorConfigured &&
+            <Button
+                
+                type="primary"
+      
+                data-testid="evaluation-button"
+              >
+                <span data-testid="evaluate_selector">{t('field.action.evaluate_selector')}</span>
+              </Button>
+          }
         </Space>
       </TabPane>
-      <TabPane tab={t('spider.config_sidebar.tab_sweepers')} key="2">
+      {
+        isSelectorConfigured && 
+<TabPane tab={
+                <Space>
+                  <GiBroom />
+                  {t('spider.config_sidebar.tab_sweepers')}
+                </Space>  
+                } key="2">
         Sweepers
       </TabPane>
+      }
+      
 
     </Tabs>
   );
