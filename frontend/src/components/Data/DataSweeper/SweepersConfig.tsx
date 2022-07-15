@@ -6,8 +6,8 @@ import { RemoveCharSweeper } from './RemoveCharSweeper';
 import './Sweepers.scoped.css';
 
 /**
- * Alterators are meant to slightly transform
- * data scraped
+ * Sweepers are meant to slightly cleanup the data scraped.
+ * They are not meant to "change" the data, but to make them more readable / standard
  *
  * @returns a JSX.Element
  */
