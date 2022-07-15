@@ -107,7 +107,8 @@ export class ScrapingService {
       }
 
       try {
-        await page.click(selector.path);
+        const TIMEOUT = parseInt(config.get('playwright.clickTimeout'));
+        await page.click(selector.path, {timeout: TIMEOUT}); 
         return Promise.resolve(true);
       } catch (err) {
         if (err instanceof playwright.errors.TimeoutError) {
@@ -245,7 +246,7 @@ export class ScrapingService {
     // but we need to decompose it (for the caching mecanism)
     const _url = new URL(req.url);
 
-    const SCREENSHOTS_DIR = config.get('scraping.screenshotsDir') || '.';
+    const SCREENSHOTS_DIR = config.get('playwright.screenshotsDir') || '.';
     const baseName = _url.toString().substring(_url.toString().lastIndexOf('/') + 1);
     const screenshotPath = `${SCREENSHOTS_DIR}/${_url.hostname}-${baseName}.png`;
 
@@ -263,7 +264,10 @@ export class ScrapingService {
       page = await context.newPage();
       await page.setContent(webPage.content);
 
-      const WAIT = parseInt(config.get('scraping.waitForTimeout')) || 500;
+      const TIMEOUT = parseInt(config.get('playwright.defaultTimeout'));
+      context.setDefaultTimeout(TIMEOUT);
+
+      const WAIT = parseInt(config.get('playwright.waitForTimeout'));
       await page.waitForTimeout(WAIT);
 
       // eventually click elements

@@ -8,8 +8,10 @@
             ]
         }
     },
-    "scraping": {
+    "playwright": {
         "screenshotsDir": "./screenshots",
-        "waitForTimeout": 300
+        "waitForTimeout": 300,
+        "defaultTimeout": 1000,
+        "clickTimeout": 300
     }
 }
