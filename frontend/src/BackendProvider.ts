@@ -44,11 +44,6 @@ export interface IScrapingBackend {
   ) => void;
 }
 
-export interface IBackendServicesProvider {
-  spider: ISpiderBackend;
-  scraping: IScrapingBackend;
-}
-
 interface IGetSpider {
   name: string; // the spidername
   userId: number;
@@ -70,15 +65,17 @@ function isSpider(obj: unknown): obj is Spider {
   return typeof obj === 'object' && obj !== null && 'name' in obj;
 }
 
-function spiderBackend(): ISpiderBackend {
+function useSpiderBackend(): ISpiderBackend {
+
   const get = (_name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
+    
     if (_name === '') {
       throw new Error('cannot get a spider with a blank name');
     }
-    // debounce does not work in anonymous functions
-    // there is a trick
+    // debounce in anonymous functions
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
+      
       const params: IGetSpider = {
         name: _name,
         // later
@@ -159,7 +156,8 @@ function spiderBackend(): ISpiderBackend {
   return { get, upsert, remove, create };
 }
 
-function scrapingBackend(): IScrapingBackend {
+function useScrapingBackend(): IScrapingBackend {
+  
   const getContent = (
     user: unknown,
     s: DataSelector,
@@ -224,16 +222,5 @@ function scrapingBackend(): IScrapingBackend {
   return { getContent, validateSelector };
 }
 
-/**
- * export this function for mocking facility in test cases
- *
- * @returns
- */
-export function useBackend(): IBackendServicesProvider {
-  return {
-    spider: spiderBackend(),
-    scraping: scrapingBackend()
-  };
-}
-
-export const BackendServicesProvider: IBackendServicesProvider = useBackend();
+export const ScrapingServicesProvider: IScrapingBackend = useScrapingBackend();
+export const SpiderServicesProvider: ISpiderBackend = useSpiderBackend();

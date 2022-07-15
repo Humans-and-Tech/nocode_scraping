@@ -7,7 +7,8 @@ import socketIOClient from 'socket.io-client';
 import MockedSocket from 'socket.io-mock';
 
 import { SelectorInput } from './SelectorInput';
-import {BackendContext, BackendServicesProvider} from '../../BackendSocketContext';
+import {ScrapingContext} from '../../../BackendContext';
+import {ScrapingServicesProvider} from '../../../BackendProvider';
 
 /**
  * mock socketio
@@ -18,48 +19,56 @@ import {BackendContext, BackendServicesProvider} from '../../BackendSocketContex
  */
 jest.mock('socket.io-client');
 
+
 /**
  * mock the evaluate function
  * so that it returns a correct ScrapingResponse
  */
-jest.mock('../../../socket/scraping', () => ({
-  // callback would be a jest mock
-  // for example a simple jest.fn()
-  validateCssSelector: (socket, {}, s, callback) => {
-    // the response can be DataSelectorValidityResponse | DataSelectorValidityError
-    const pathToCallback = {
-      '.a-good-selector': {
-        selector: {
-          path: '.a-good-selector',
-          status: 'valid'
-        },
-        status: 'success'
-      },
+jest.mock('../../../BackendProvider', () => ({
 
-      // a selector which is invalid
-      // but no error on the backend side
-      '.a-bad-selector': {
-        message: 'a message',
-        selector: {
-          path: '.a-bad-selector',
-          status: 'invalid'
-        },
-        status: 'success'
-      },
+  ScrapingServicesProvider: {
 
-      // a selector which caused
-      // a backend error
-      '.a-error-selector': {
-        message: 'a message',
-        selector: {
-          path: '.a-error-selector',
-          status: 'invalid'
+    // callback would be a jest mock
+    // for example a simple jest.fn()
+    validateSelector: ({}, s, callback) => {
+      
+      // the response can be DataSelectorValidityResponse | DataSelectorValidityError
+      const pathToCallback = {
+        '.a-good-selector': {
+          selector: {
+            path: '.a-good-selector',
+            status: 'valid'
+          },
+          status: 'success'
         },
-        status: 'error'
-      }
-    };
-    return callback(pathToCallback[s.path]);
+
+        // a selector which is invalid
+        // but no error on the backend side
+        '.a-bad-selector': {
+          message: 'a message',
+          selector: {
+            path: '.a-bad-selector',
+            status: 'invalid'
+          },
+          status: 'success'
+        },
+
+        // a selector which caused
+        // a backend error
+        '.a-error-selector': {
+          message: 'a message',
+          selector: {
+            path: '.a-error-selector',
+            status: 'invalid'
+          },
+          status: 'error'
+        }
+      };
+      callback(pathToCallback[s.path]);
+    }
+    
   }
+
 }));
 
 const testSelectorProp = {
@@ -85,11 +94,11 @@ describe('onSelectorChange is called when changing the input value', () => {
     const mockOnConchange = jest.fn();
 
     const { container } = render(
-      <BackendContext.Provider value={BackendServicesProvider}>
+      <ScrapingContext.Provider value={ScrapingServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
         </I18nextProvider>
-      </BackendContext.Provider>
+      </ScrapingContext.Provider>
     );
 
     // access the textarea input DOM Element
@@ -124,11 +133,11 @@ describe('onSelectorChange is called when changing the input value', () => {
     const mockOnConchange = jest.fn();
 
     const { getByTestId, container } = render(
-      <BackendContext.Provider value={BackendServicesProvider}>
+      <ScrapingContext.Provider value={ScrapingServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
         </I18nextProvider>
-      </BackendContext.Provider>
+      </ScrapingContext.Provider>
     );
 
     // access the textarea input DOM Element
@@ -163,11 +172,11 @@ describe('onSelectorChange is called when changing the input value', () => {
     const mockOnConchange = jest.fn();
 
     const { getByTestId, container } = render(
-      <BackendContext.Provider value={BackendServicesProvider}>
+      <ScrapingContext.Provider value={ScrapingServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorInput selector={testSelectorProp} onChange={mockOnConchange} />
         </I18nextProvider>
-      </BackendContext.Provider>
+      </ScrapingContext.Provider>
     );
 
     // access the textarea input DOM Element

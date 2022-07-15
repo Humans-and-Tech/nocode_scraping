@@ -4,8 +4,8 @@ import { CloseCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 
-import { BackendContext } from '../../../BackendContext';
-import { IBackendServicesProvider } from '../../../BackendProvider';
+import { ScrapingContext } from '../../../BackendContext';
+import { IScrapingBackend } from '../../../BackendProvider';
 import { Data, DataSelector, SelectorStatus, Spider } from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { SelectorInput } from './SelectorInput';
@@ -50,7 +50,7 @@ interface ISelectorConfigPropsType {
 export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => {
   const { t } = useTranslation('configurator');
 
-  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
+  const backendProvider = useContext<IScrapingBackend>(ScrapingContext);
 
   const { data, spider, onConfigured, onError, onChange } = props;
 
@@ -146,7 +146,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
       // don't pass the cookiePopupPath if the switch button is not activated
       const _cookiePpSelector = isPopup ? popupSelector : undefined;
 
-      backendProvider.scraping.getContent(
+      backendProvider.getContent(
         {},
         selector,
         sampleUrl,

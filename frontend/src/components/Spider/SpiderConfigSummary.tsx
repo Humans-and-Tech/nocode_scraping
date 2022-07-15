@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 import { Space, Spin, Tabs, Button } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
-import { BackendContext } from '../../BackendContext';
-import { IBackendServicesProvider } from '../../BackendProvider';
+import { SpiderContext } from '../../BackendContext';
+import { ISpiderBackend } from '../../BackendProvider';
 import { Spider } from '../../interfaces/spider';
 import { displayMessage, NotificationLevel } from '../Layout/UserNotification';
 
@@ -25,7 +25,7 @@ export const SpiderConfigSummary = (): JSX.Element => {
 
   const spider = useRef<Spider | undefined>(undefined);
 
-  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
+  const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
   const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
 
@@ -45,7 +45,7 @@ export const SpiderConfigSummary = (): JSX.Element => {
 
   const triggerSave = () => {
     if (spider.current) {
-      backendProvider.spider.upsert(spider.current, (b: boolean, err: Error | undefined) => {
+      backendProvider.upsert(spider.current, (b: boolean, err: Error | undefined) => {
         if (b) {
           displayMessage(NotificationLevel.SUCCESS, t('spider.actions.update_success'));
           closeSideBar();
@@ -65,7 +65,7 @@ export const SpiderConfigSummary = (): JSX.Element => {
   useEffect(() => {
     if (spider.current?.name !== name && name !== undefined) {
       setIsLoading(true);
-      backendProvider.spider.get(name, (_spider: Spider | undefined) => {
+      backendProvider.get(name, (_spider: Spider | undefined) => {
         if (_spider) {
           spider.current = _spider;
         } else {

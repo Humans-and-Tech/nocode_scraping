@@ -1,4 +1,5 @@
 import React from 'react';
-import { IBackendServicesProvider, BackendServicesProvider } from './BackendProvider';
+import { ISpiderBackend, IScrapingBackend, ScrapingServicesProvider, SpiderServicesProvider } from './BackendProvider';
 
-export const BackendContext = React.createContext<IBackendServicesProvider>(BackendServicesProvider);
+export const ScrapingContext = React.createContext<IScrapingBackend>(ScrapingServicesProvider);
+export const SpiderContext = React.createContext<ISpiderBackend>(SpiderServicesProvider);

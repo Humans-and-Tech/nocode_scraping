@@ -5,8 +5,8 @@ import { CheckCircleOutlined } from '@ant-design/icons';
 
 import { PageType, Spider } from '../../interfaces/spider';
 import { useTranslation } from 'react-i18next';
-import { BackendContext } from '../../BackendContext';
-import { IBackendServicesProvider } from '../../BackendProvider';
+import { SpiderContext } from '../../BackendContext';
+import { ISpiderBackend } from '../../BackendProvider';
 
 import '../../style.css';
 import './SpiderConfig.scoped.css';
@@ -23,7 +23,7 @@ export const SpiderPageType = (props: SpiderPageTyperProps): JSX.Element => {
 
   const { spider, onChange } = props;
 
-  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
+  const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
   // const socket = useContext<Socket>(SpiderSocketContext);
 
@@ -33,7 +33,7 @@ export const SpiderPageType = (props: SpiderPageTyperProps): JSX.Element => {
 
   const saveSpider = () => {
     if (spider !== undefined) {
-      backendProvider.spider.upsert(spider, (b: boolean) => {
+      backendProvider.upsert(spider, (b: boolean) => {
         // TODO notify the user
         if (b) {
           onChange(spider);

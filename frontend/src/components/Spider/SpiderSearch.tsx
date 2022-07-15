@@ -3,8 +3,8 @@ import { Space, Input, Spin, Anchor } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { Spider } from '../../interfaces/spider';
-import { BackendContext } from '../../BackendContext';
-import { IBackendServicesProvider } from '../../BackendProvider';
+import { SpiderContext } from '../../BackendContext';
+import { ISpiderBackend } from '../../BackendProvider';
 
 import './SpiderConfig.scoped.css';
 
@@ -19,7 +19,7 @@ export const SpiderSearch = (props: SeachSpiderProps): JSX.Element => {
 
   const { onLoaded } = props;
 
-  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
+  const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
   const [isProposalAccepted, setIsProposalAccepted] = useState<boolean | undefined>(undefined);
 
@@ -49,7 +49,8 @@ export const SpiderSearch = (props: SeachSpiderProps): JSX.Element => {
     setIsProposalFound(undefined);
 
     if (val !== '') {
-      backendProvider.spider.get(val, (data: Spider | undefined) => {
+
+      backendProvider.get(val, (data: Spider | undefined) => {
         setIsLoading(false);
         if (data !== null && data !== undefined) {
           setIsProposalFound(true);
@@ -73,7 +74,7 @@ export const SpiderSearch = (props: SeachSpiderProps): JSX.Element => {
 
   const createNewSpider = () => {
     if (name !== '' && name !== undefined) {
-      const s = backendProvider.spider.create(name);
+      const s = backendProvider.create(name);
       onLoaded(s);
     }
   };

@@ -8,8 +8,8 @@ import './i18n';
 import ProductSheet from './views/ProductSheet/ProductSheet';
 import OnBoarding from './views/OnBoarding/OnBoarding';
 import { ScrapingLayout, OnBoardingLayout } from './components/Layout/Layout';
-import { BackendServicesProvider } from './BackendProvider';
-import { BackendContext } from './BackendContext';
+import { ScrapingServicesProvider, SpiderServicesProvider } from './BackendProvider';
+import { ScrapingContext, SpiderContext } from './BackendContext';
 import { SpiderConfigSummary } from './components/Spider/SpiderConfigSummary';
 
 const rootElement = document.getElementById('root');
@@ -28,7 +28,7 @@ const queryClient = new QueryClient();
 root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BackendContext.Provider value={BackendServicesProvider}>
+
         <Router>
           <Routes>
             <Route
@@ -44,7 +44,11 @@ root.render(
               path="/spider/:name/product-sheet"
               element={
                 <ScrapingLayout header={<SpiderConfigSummary />}>
-                  <ProductSheet />
+                  <SpiderContext.Provider value={SpiderServicesProvider}>
+                    <ScrapingContext.Provider value={ScrapingServicesProvider}>
+                      <ProductSheet />
+                    </ScrapingContext.Provider>
+                  </SpiderContext.Provider>
                 </ScrapingLayout>
               }
             />
@@ -52,7 +56,7 @@ root.render(
             <Route path="*" element={<Navigate to="/onboarding" replace />} />
           </Routes>
         </Router>
-      </BackendContext.Provider>
+
     </QueryClientProvider>
   </StrictMode>
 );

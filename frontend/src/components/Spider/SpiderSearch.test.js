@@ -6,10 +6,10 @@ import i18n from '../../tests/i18n';
 import socketIOClient from 'socket.io-client';
 import MockedSocket from 'socket.io-mock';
 
-import {BackendContext} from '../../BackendContext';
+import {SpiderContext} from '../../BackendContext';
 import { SpiderSearch } from './SpiderSearch';
 
-import * as BackendProvider from '../../BackendProvider';
+import {SpiderServicesProvider} from '../../BackendProvider';
 
 /**
  * mock socketio
@@ -20,9 +20,11 @@ import * as BackendProvider from '../../BackendProvider';
  */
 jest.mock('socket.io-client');
 
-jest.spyOn(BackendProvider, 'useBackend').mockImplementation(() => {
-  return { 
-    spider: () => {
+jest.mock('../../BackendProvider', () => ({
+
+  SpiderServicesProvider: {
+    get: (_name, callback) => {
+      
       const returnValue = {
         'my-spider': {
           name: 'existing spider'
@@ -30,17 +32,11 @@ jest.spyOn(BackendProvider, 'useBackend').mockImplementation(() => {
         'new-spider': undefined
       };
 
-      const get = (_name, callback) => {
-        // mock a ScrapingResponse object
-        // made up of content + screenshot
-        console.log("get", _name, '-->', returnValue[_name])
-        callback(returnValue[_name]);
-      };
-      return {get}
-    },
-    scraping: jest.fn()
+      callback(returnValue[_name]);
+    }
   }
-});
+
+}));
 
 
 describe('Search results', () => {
@@ -58,12 +54,12 @@ describe('Search results', () => {
   test('search returns no spider', async () => {
     const onLoadedMock = jest.fn();
 
-    const { getByTestId, queryByTestId } = render(
-      <BackendContext.Provider value={BackendProvider.BackendServicesProvider}>
+    const { queryByTestId } = render(
+      <SpiderContext.Provider value={SpiderServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SpiderSearch onLoaded={onLoadedMock} />
         </I18nextProvider>
-      </BackendContext.Provider>
+      </SpiderContext.Provider>
     );
 
     const input = queryByTestId('spiderSearchInput');
@@ -80,12 +76,12 @@ describe('Search results', () => {
   test('search returns an existing spider', async () => {
     const onLoadedMock = jest.fn();
 
-    const { getByTestId, queryByTestId } = render(
-      <BackendContext.Provider value={BackendProvider.BackendServicesProvider}>
+    const { queryByTestId } = render(
+      <SpiderContext.Provider value={SpiderServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SpiderSearch onLoaded={onLoadedMock} />
         </I18nextProvider>
-      </BackendContext.Provider>
+      </SpiderContext.Provider>
     );
 
     const input = queryByTestId('spiderSearchInput');

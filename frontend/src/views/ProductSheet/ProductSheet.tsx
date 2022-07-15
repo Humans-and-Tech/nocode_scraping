@@ -5,8 +5,8 @@ import { FiPackage } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { BackendContext } from '../../BackendContext';
-import { IBackendServicesProvider } from '../../BackendProvider';
+import { SpiderContext } from '../../BackendContext';
+import { ISpiderBackend } from '../../BackendProvider';
 import { Data, Spider } from '../../interfaces/spider';
 import { DataConfig } from '../../components/Data/DataConfig';
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
@@ -25,7 +25,7 @@ const ProductSheet: React.FC = () => {
 
   const spider = useRef<Spider | undefined>(undefined);
 
-  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
+  const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
   const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
 
@@ -105,7 +105,7 @@ const ProductSheet: React.FC = () => {
   useEffect(() => {
     if (spider.current?.name !== name && name !== undefined) {
       setIsLoading(true);
-      backendProvider.spider.get(name, (_spider: Spider | undefined) => {
+      backendProvider.get(name, (_spider: Spider | undefined) => {
         if (_spider) {
           spider.current = _spider;
         } else {

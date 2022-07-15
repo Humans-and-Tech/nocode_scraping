@@ -3,8 +3,8 @@ import { Input, Space } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
-import { BackendContext } from '../../../BackendContext';
-import { IBackendServicesProvider } from '../../../BackendProvider';
+import { ScrapingContext } from '../../../BackendContext';
+import { IScrapingBackend } from '../../../BackendProvider';
 import { GenericResponseStatus } from '../../../interfaces';
 import {
   DataSelector,
@@ -38,8 +38,7 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
 
   const { selector, onChange, ...rest } = props;
 
-  // const socket = useContext<Socket>(ScrapingSocketContext);
-  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
+  const backendProvider = useContext<IScrapingBackend>(ScrapingContext);
 
   /**
    * the textare input path
@@ -63,7 +62,7 @@ export const SelectorInput = (props: ISelectorInputPropsType): JSX.Element => {
   const validateSelector = (s: DataSelector) => {
     setIsBackendError(false);
 
-    backendProvider.scraping.validateSelector(
+    backendProvider.validateSelector(
       {},
       s,
       (resp: DataSelectorValidityResponse | DataSelectorValidityError) => {

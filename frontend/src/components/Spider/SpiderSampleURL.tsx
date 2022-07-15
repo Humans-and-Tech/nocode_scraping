@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
 
 import { Spider } from '../../interfaces/spider';
-import { BackendContext } from '../../BackendContext';
-import { IBackendServicesProvider } from '../../BackendProvider';
+import { SpiderContext } from '../../BackendContext';
+import { ISpiderBackend } from '../../BackendProvider';
 import { displayMessage, NotificationLevel } from '../Layout/UserNotification';
 
 import './SpiderConfig.scoped.css';
@@ -65,7 +65,7 @@ export const SampleUrlSelector = ({ spider, onSelect, initialSelectedUrl }: ISam
 export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.Element => {
   const { t } = useTranslation('configurator');
 
-  const backendProvider = useContext<IBackendServicesProvider>(BackendContext);
+  const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
   const spiderName = useRef<string>('');
 
@@ -89,7 +89,7 @@ export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.E
   };
 
   const updateSpider = (_spider: Spider) => {
-    backendProvider.spider.upsert(_spider, (b: boolean, err: Error | undefined) => {
+    backendProvider.upsert(_spider, (b: boolean, err: Error | undefined) => {
       if (b) {
         setLocalSpider(_spider);
         setListLength(_spider.sampleURLs?.length);
