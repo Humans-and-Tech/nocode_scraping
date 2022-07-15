@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Space, Switch, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import './Alterators.scoped.css';
+import { Data } from '../../../interfaces/spider';
 
-export const RemoveCharSweeper = (): JSX.Element => {
+import './Sweepers.scoped.css';
+
+export const RemoveCharSweeper = ({ data }: { data: Data }): JSX.Element => {
   const { t } = useTranslation('alterators');
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -23,6 +25,7 @@ export const RemoveCharSweeper = (): JSX.Element => {
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <p>{data.name}</p>
       <Space direction="horizontal" size="middle">
         <Switch onChange={onSelection} checked={isChecked} />
         <h4>{t('remove_char.title')}</h4>

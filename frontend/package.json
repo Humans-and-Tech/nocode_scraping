@@ -11,7 +11,7 @@
     "test": "craco test",
     "eject": "craco eject",
     "lint": "yarn run eslint src/* --fix --no-error-on-unmatched-pattern",
-    "format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "format": "prettier --config .prettierrc 'src/**/*.tsx' --write"
   },
   "dependencies": {
     "@craco/craco": "^6.4.3",

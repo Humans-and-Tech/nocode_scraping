@@ -26,7 +26,9 @@
     "config_sidebar": {
       "tab_sample_urls": "Sample URLs",
       "tab_selector_config": "Selector",
-      "tab_sweepers": "Data Cleaning"
+      "tab_sweepers": "Data Cleaning",
+      "sweep_data_cta_intro": "Your selector is now configured, you can optionnally clean the scraped data",
+      "sweep_data_cta": "clean the scraped data"
     }
   },
   "field": {

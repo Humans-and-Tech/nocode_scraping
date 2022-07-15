@@ -31,7 +31,7 @@ export const ScrapingLayout = ({ header, children }: { header: React.ReactNode; 
         <h2>{t('helper.title')}</h2>
         <p>{t('helper.content')}</p>
       </Header>
-      <Layout className='gus-scraping-layout'>
+      <Layout className="gus-scraping-layout">
         <Content className=".gus-scraping-layout-content">
           <Header className="gus-scraping-layout-header">{header}</Header>
           {children}

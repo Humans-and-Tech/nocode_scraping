@@ -365,7 +365,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
             <Tooltip title={evaluationHelperMessage}>
               <Button
                 onClick={evaluateSelectorPath}
-                type="primary"
+                type="dashed"
                 disabled={!isEvaluationEnabled}
                 data-testid="evaluation-button"
               >

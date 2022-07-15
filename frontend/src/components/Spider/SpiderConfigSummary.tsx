@@ -60,7 +60,11 @@ export const SpiderConfigSummary = (): JSX.Element => {
     console.log(key);
   };
 
-  const saveBtn = <Button type="primary" onClick={triggerSave}>{t('spider.actions.save_configuration')}</Button>;
+  const saveBtn = (
+    <Button type="primary" onClick={triggerSave}>
+      {t('spider.actions.save_configuration')}
+    </Button>
+  );
 
   useEffect(() => {
     if (spider.current?.name !== name && name !== undefined) {
@@ -102,8 +106,8 @@ export const SpiderConfigSummary = (): JSX.Element => {
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {isLoading && (
           <Space direction="horizontal" size="middle">
-              <Spin />
-              <span>{t('loading')}</span>
+            <Spin />
+            <span>{t('loading')}</span>
           </Space>
         )}
         {!isLoading && (

@@ -175,13 +175,13 @@ const ProductSheet: React.FC = () => {
           <DataConfig data={data} spider={spider.current} onSave={closeSideBar} />
         </ConfigSidebar>
       )}
-      {(
+      {
         <Space size={['large', 0]} direction="vertical" className="gus-main-content">
-          <Spin spinning={isLoading} size="large" style={{'width': '100%', 'marginTop': '3em',  'marginBottom': '3em'}}/>
-          <Row className="gus-main-row" style={{'visibility': (!isLoading?'visible': 'hidden')}}>
+          <Spin spinning={isLoading} size="large" style={{ width: '100%', marginTop: '3em', marginBottom: '3em' }} />
+          <Row className="gus-main-row" style={{ visibility: !isLoading ? 'visible' : 'hidden' }}>
             <Col>
               <Row className="gus-row-breathe">
-                <Col style={{'width': '100%'}}>
+                <Col style={{ width: '100%' }}>
                   <Card title={t('scraping_groups.breadcrumb')}>
                     <Space direction="vertical" size="small">
                       <Breadcrumb>
@@ -204,7 +204,7 @@ const ProductSheet: React.FC = () => {
                 </Col>
               </Row>
               <Row className="gus-row-breathe">
-                <Col style={{'width': '100%'}}>
+                <Col style={{ width: '100%' }}>
                   <Card title={t('scraping_groups.product_text')}>
                     <Space direction="vertical" size="middle">
                       <Tooltip title={t('tooltips.scraping_not_available')} color="orange">
@@ -218,24 +218,20 @@ const ProductSheet: React.FC = () => {
                 </Col>
               </Row>
               <Row className="gus-row-breathe">
-                <Col style={{'width': '100%'}}>
-
-                  <Card 
-                      title={t('scraping_groups.ratings')}
-                      >
-                    <Space direction="horizontal" align="start"> 
+                <Col style={{ width: '100%' }}>
+                  <Card title={t('scraping_groups.ratings')}>
+                    <Space direction="horizontal" align="start">
                       <Rate allowHalf defaultValue={2.5} />
                       <Tooltip title={t('tooltips.scraping_not_available')} color="orange">
                         <span>{t('product.ratings_count')}</span>
                       </Tooltip>
                     </Space>
                   </Card>
-                  
                 </Col>
               </Row>
               <Row className="gus-row-breathe">
                 <Col className="gus-col-breathe">
-                  <Card 
+                  <Card
                     title={t('scraping_groups.media')}
                     cover={
                       <Image
@@ -443,7 +439,7 @@ const ProductSheet: React.FC = () => {
             </Col>
           </Row>
         </Space>
-      )}
+      }
     </>
   );
 };
