@@ -96,7 +96,7 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
 
   return (
     <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>
-      <TabPane tab={t('tab.selector_config')} key="1">
+      <TabPane tab={t('spider.config_sidebar.tab_selector_config')} key="1">
         <h2>{data.label}</h2>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {
@@ -119,12 +119,10 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
           } */}
         </Space>
       </TabPane>
-      <TabPane tab={t('tab.sweepers_config')} key="2">
+      <TabPane tab={t('spider.config_sidebar.tab_sweepers')} key="2">
         Sweepers
       </TabPane>
-      <TabPane tab={t('tab.exporters_config')} key="3">
-        Exporters
-      </TabPane>
+
     </Tabs>
   );
 };

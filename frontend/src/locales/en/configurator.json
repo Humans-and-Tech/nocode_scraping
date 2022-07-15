@@ -24,7 +24,9 @@
       "update_error": "Spider update failed"
     },
     "config_sidebar": {
-      "tab_sample_urls": "Sample URLs"
+      "tab_sample_urls": "Sample URLs",
+      "tab_selector_config": "Selector",
+      "tab_sweepers": "Sweepers"
     }
   },
   "field": {
