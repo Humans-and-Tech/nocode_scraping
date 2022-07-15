@@ -93,20 +93,7 @@ jest.mock('playwright-chromium', () => ({
   }
 }));
 
-/**
- * mock the cache system, we don't really want to use firestore
- */
-// jest.mock('../cache', () => ({
 
-//   loadPageContentFromCache: async (key: string) => {
-//     console.log('loadPageContentFromCache for ', key);
-//     return Promise.resolve({
-//       content: 'bla',
-//       updateTime: new Date()
-//     } as ICachedContent);
-//   }
-
-// }));
 jest.mock('../cache/FirestoreCache');
 
 /**
