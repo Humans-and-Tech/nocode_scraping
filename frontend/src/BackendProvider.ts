@@ -83,7 +83,7 @@ function useSpiderBackend(): ISpiderBackend {
       };
 
       spiderSocket.emit('get', params, (resp: IWebSocketResponse) => {
-        console.log('got', resp);
+
         if (resp.status == GenericResponseStatus.ERROR) {
           callback(undefined, new Error(resp.message));
         } else if (isSpider(resp.data)) {
@@ -158,6 +158,24 @@ function useSpiderBackend(): ISpiderBackend {
 
 function useScrapingBackend(): IScrapingBackend {
   
+  /**
+   * calls the backend socket `get-content` on the namespace `scraping`, and calls back
+   * the given function in param with the following logic:
+   * 
+   * - if the socket response `status` property is `GenericResponseStatus.ERROR`, consider it's a technical error, 
+   *    executes the callback with a `ScrapingError` conveying the selector passed in param (s)
+   * 
+   * - else, if the socket response `status` property is not `GenericResponseStatus.SUCCESS`, consider it's a functional error (content not found...), 
+   *    executes the callback with a `ScrapingError`converying the selector which is problematic
+   * 
+   * - else, executes the callback with the argument `data` coming from the response `data` property
+   * 
+   * @param user 
+   * @param s  DataSelector
+   * @param url  URL
+   * @param popupSelector DataSelector
+   * @param callback (response: ScrapingResponse | ScrapingError) => void
+   */
   const getContent = (
     user: unknown,
     s: DataSelector,
@@ -179,7 +197,7 @@ function useScrapingBackend(): IScrapingBackend {
           message: resp.message || '',
           status: ScrapingStatus.ERROR,
           selector: s
-        });
+        } as ScrapingError);
       } else if (resp.status !== GenericResponseStatus.SUCCESS) {
         // this is a ScrapingError
         // no content found or something similar

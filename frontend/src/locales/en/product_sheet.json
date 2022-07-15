@@ -2,8 +2,6 @@
   "page": {
     "title": "Product sheet layout",
     "subtitle": "Use this layout to scrape details of a product",
-    "scraping_available": "Click an element to configure the scraping",
-    "scraping_not_available": "this element cannot be scraped yet",
     "define_sample_urls": "Define sample URLs to start scraping"
   },
   "product": {
@@ -23,6 +21,11 @@
       "delay": "Delay to deliver",
       "mode": "Delivery mode (pick-up, at home...)"
     }
+  },
+  "tooltips" : {
+    "data_properly_configured": "This data is ready to be scraped",
+    "data_improperly_configured": "This data is not correctly configured",
+    "scraping_not_available": "this element cannot be scraped"
   },
   "breadcrumb": {
     "category_level_0": "Parent Category",

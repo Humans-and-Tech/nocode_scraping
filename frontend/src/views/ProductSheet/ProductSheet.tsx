@@ -1,13 +1,13 @@
 import React, { useState, useContext, useEffect, Fragment, useRef } from 'react';
-import { Row, Col, Breadcrumb, Rate, Image, List, Space, Divider, Tooltip, Spin, Collapse } from 'antd';
-import { HomeOutlined, FolderOpenOutlined, DollarOutlined } from '@ant-design/icons';
+import { Row, Col, Breadcrumb, Rate, Image, List, Space, Tooltip, Spin, Collapse } from 'antd';
+import { HomeOutlined, FolderOpenOutlined, DollarOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { FiPackage } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import { SpiderContext } from '../../BackendContext';
 import { ISpiderBackend } from '../../BackendProvider';
-import { Data, Spider } from '../../interfaces/spider';
+import { Data, Spider, SelectorStatus } from '../../interfaces/spider';
 import { DataConfig } from '../../components/Data/DataConfig';
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
 
@@ -102,6 +102,35 @@ const ProductSheet: React.FC = () => {
     }
   ];
 
+  /**
+   * checks wether the selector is properly configured for the given data
+   * identified by its name, meaning:
+   * - checks if the selector is valid
+   * - if a popupSelector is used, checks if it is valid
+   * 
+   * @param item 
+   * @returns boolean
+   */
+  const isSelectorValid = (dataName: string): boolean => {
+
+    let isConfigured = false;
+    spider.current?.data?.forEach((d: Data) => {
+      if (d.name === dataName) {
+
+        if (d.selector && d.selector.status==SelectorStatus.VALID) {
+          if (d.isPopup && d.popupSelector && d.popupSelector.status==SelectorStatus.VALID) {
+            isConfigured = true;
+          } else if (!d.isPopup) {
+            isConfigured = true;
+          }
+        }
+      
+        return;
+      }
+    });
+    return isConfigured;
+  };
+
   useEffect(() => {
     if (spider.current?.name !== name && name !== undefined) {
       setIsLoading(true);
@@ -118,7 +147,7 @@ const ProductSheet: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [backendProvider, name]);
+  }, [name]);
 
   return (
     <Fragment>
@@ -192,63 +221,72 @@ const ProductSheet: React.FC = () => {
                 <Col className="gus-col-breathe">
                   <Row className="gus-row-breathe">
                     <Col className="gus-col-breathe">
-                      <Collapse accordion style={{ width: '30em' }}>
-                        <Panel
-                          header={
-                            <>
-                              <DollarOutlined />
-                              {t('product.price.header')}
-                            </>
-                          }
-                          key="1"
-                        >
-                          <List
-                            size="default"
-                            dataSource={priceElements}
-                            renderItem={(item: IDataConfig) => (
-                              <List.Item
-                                key={item.name}
-                                className="gus-scraping-element"
-                                onClick={() => {
-                                  if (spider.current?.sampleURLs) {
-                                    showSideBar(item);
+                      <Space direction="vertical" size="large">
+
+                        <Collapse accordion style={{ width: '30em' }}>
+                          <Panel
+                            header={
+                              <Space direction='horizontal' size="middle">
+                                <DollarOutlined />
+                                {t('product.price.header')}
+                              </Space>
+                            }
+                            key="1"
+                          >
+                            <List
+                              size="default"
+                              dataSource={priceElements}
+                              renderItem={(item: IDataConfig) => (
+                                <List.Item
+                                  key={item.name}
+                                  className="gus-scraping-element"
+                                  onClick={() => {
+                                    if (spider.current?.sampleURLs) {
+                                      showSideBar(item);
+                                    }
+                                  }}
+                                >
+                                  {
+                                    isSelectorValid(item.name) 
+                                    ? <Space direction='horizontal' size="middle"><CheckOutlined /> <Tooltip title={t('tooltips.data_properly_configured')} align={{targetOffset: [-80,0],}} placement="right" color="geekblue">{item.label}</Tooltip> </Space>
+                                    : <Space direction='horizontal' size="middle"><CloseOutlined /> <Tooltip title={t('tooltips.data_improperly_configured')} align={{targetOffset: [-80,0],}} placement="right" color="orange">{item.label}</Tooltip> </Space>
                                   }
-                                }}
-                              >
-                                <Tooltip title={scrapingAvailability} color="geekblue">
-                                  {item.label}
-                                </Tooltip>
-                              </List.Item>
-                            )}
-                          />
-                        </Panel>
-                        <Panel
-                          header={
-                            <>
-                              <FiPackage />
-                              {t('product.delivery.header')}
-                            </>
-                          }
-                          key="2"
-                        >
-                          <List
-                            size="default"
-                            dataSource={[
-                              t('product.delivery.mode'),
-                              t('product.delivery.delay'),
-                              t('product.delivery.price'),
-                              t('product.delivery.currency')
-                            ]}
-                            renderItem={(item) => (
-                              <List.Item className="gus-scraping-element">
-                                <Tooltip title={t('page.scraping_not_available')} color="orange">
-                                  {item}
-                                </Tooltip>
-                              </List.Item>
-                            )}
-                          />
-                        </Panel>
-                      </Collapse>
+                                      
+                                </List.Item>
+                              )}
+                            />
+                          </Panel>
+                        </Collapse>
+                        <Collapse accordion style={{ width: '30em' }}>
+                          <Panel
+                            header={
+                              <Space direction='horizontal' size="middle">
+                                <FiPackage />
+                                {t('product.delivery.header')}
+                              </Space>
+                            }
+                            key="2"
+                          >
+                            <List
+                              size="default"
+                              dataSource={[
+                                t('product.delivery.mode'),
+                                t('product.delivery.delay'),
+                                t('product.delivery.price'),
+                                t('product.delivery.currency')
+                              ]}
+                              renderItem={(item) => (
+                                <List.Item className="gus-scraping-element">
+                                  <Tooltip title={t('tooltips.scraping_not_available')} color="orange" align={{targetOffset: [-80,0],}} placement="right">
+                                    {item}
+                                  </Tooltip>
+                                </List.Item>
+                              )}
+                            />
+                          </Panel>
+                        </Collapse>
+
+                      </Space>
                     </Col>
                   </Row>
                 </Col>
