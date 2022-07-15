@@ -1,12 +1,10 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
 
-import { IScrapingRequest, IResponse, ResponseStatus, IScrapingResponse } from '../models/api';
+import { IScrapingRequest, IScrapingResponse } from '../models/api';
 import { DataSelector, ScrapingStatus } from '../models/core';
 import { ScrapingService } from '../services/ScrapingService';
 import { DataSelectorValidityError, ScrapingError } from '../errors';
 import logger from '../logging';
-
-const config = require('config');
 
 @WebSocketGateway({
   namespace: 'scraping'

@@ -43,7 +43,7 @@ export async function upsert<T extends Storable>(organization: Organization, dat
   // cleanup undefined values
   // which cause an error on firestore
   // error is: Unhandled error Update() requires either a single JavaScript object or an alternating list of field/value pairs that can be followed by an optional precondition
-  const cleanData = pickBy(data, function (value, key) {
+  const cleanData = pickBy(data, function (value) {
     return !(value === undefined);
   });
 

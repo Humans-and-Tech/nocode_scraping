@@ -4,6 +4,7 @@ import { readFile, unlink } from 'fs/promises';
 import { createHash } from 'crypto';
 import * as playwright from 'playwright-chromium';
 import cssValidator from 'w3c-css-validator';
+import config from 'config';
 
 import { IScrapingRequest } from '../models/api';
 import { DataSelectorValidityError, ScrapingError } from '../errors';
@@ -20,8 +21,6 @@ import { User, Organization } from '../models/auth';
 
 import { FirestoreCache } from '../cache/FirestoreCache';
 import logger from '../logging';
-
-const config = require('config');
 
 @Injectable()
 export class ScrapingService {
@@ -108,7 +107,7 @@ export class ScrapingService {
 
       try {
         const TIMEOUT = parseInt(config.get('playwright.clickTimeout'));
-        await page.click(selector.path, {timeout: TIMEOUT}); 
+        await page.click(selector.path, { timeout: TIMEOUT });
         return Promise.resolve(true);
       } catch (err) {
         if (err instanceof playwright.errors.TimeoutError) {

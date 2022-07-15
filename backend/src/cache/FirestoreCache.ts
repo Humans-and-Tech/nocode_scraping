@@ -7,8 +7,6 @@ import { upsert, get } from '../database';
 import logger from '../logging';
 import { Organization } from 'src/models/auth';
 
-const config = require('config');
-
 export class FirestoreCache {
   /**
    * stores brorli compressed (HTML) content, encoded in base64,
@@ -20,9 +18,6 @@ export class FirestoreCache {
    */
   async cachePageContent(key: string, organization: Organization, content: string): Promise<boolean | undefined> {
     try {
-      // const configCollection: DocumentData = firestore.collection(`organizations`);
-      // const document = configCollection.doc(`${organizationName}/cache/${key}`);
-
       // compress the content and store it
       brotliCompress(Buffer.from(content), async function (err: Error | null, compressed: Buffer) {
         if (err) {

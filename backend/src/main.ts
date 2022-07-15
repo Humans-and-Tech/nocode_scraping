@@ -2,10 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ServerOptions } from 'socket.io';
+import config from 'config';
 
 import logger from './logging';
-
-const config = require('config');
 
 logger.info(config);
 

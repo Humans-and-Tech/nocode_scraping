@@ -6,8 +6,6 @@ import { User } from '../models/auth';
 import { SpiderService } from '../services/SpiderService';
 import logger from '../logging';
 
-const config = require('config');
-
 @WebSocketGateway({
   namespace: 'spider'
 })

@@ -85,7 +85,7 @@ export class DataSelectorValidityResponse {
 export type DataSweeperFunction = (input: string, ...args: (string | number | boolean)[]) => string;
 
 export enum DataGroup {
-  PRICE = "price",
+  PRICE = 'price'
 }
 
 export class Data implements Storable {
@@ -94,7 +94,7 @@ export class Data implements Storable {
   // of the element to be scraped
   // for example "price" or "stock"
   name: string;
-  group?: DataGroup; 
+  group?: DataGroup;
   label?: string;
   type?: string | number | boolean;
   selector?: DataSelector;

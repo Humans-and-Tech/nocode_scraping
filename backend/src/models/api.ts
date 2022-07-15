@@ -25,6 +25,7 @@ export interface IScrapingRequest {
 export interface IResponse {
   status: ResponseStatus;
   message?: string;
+  data?: unknown;
 }
 
 /**
