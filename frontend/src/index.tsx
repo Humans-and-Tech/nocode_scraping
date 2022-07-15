@@ -28,35 +28,33 @@ const queryClient = new QueryClient();
 root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route
+            path="/onboarding"
+            element={
+              <OnBoardingLayout>
+                <OnBoarding />
+              </OnBoardingLayout>
+            }
+          />
 
-        <Router>
-          <Routes>
-            <Route
-              path="/onboarding"
-              element={
-                <OnBoardingLayout>
-                  <OnBoarding />
-                </OnBoardingLayout>
-              }
-            />
+          <Route
+            path="/spider/:name/product-sheet"
+            element={
+              <ScrapingLayout header={<SpiderConfigSummary />}>
+                <SpiderContext.Provider value={SpiderServicesProvider}>
+                  <ScrapingContext.Provider value={ScrapingServicesProvider}>
+                    <ProductSheet />
+                  </ScrapingContext.Provider>
+                </SpiderContext.Provider>
+              </ScrapingLayout>
+            }
+          />
 
-            <Route
-              path="/spider/:name/product-sheet"
-              element={
-                <ScrapingLayout header={<SpiderConfigSummary />}>
-                  <SpiderContext.Provider value={SpiderServicesProvider}>
-                    <ScrapingContext.Provider value={ScrapingServicesProvider}>
-                      <ProductSheet />
-                    </ScrapingContext.Provider>
-                  </SpiderContext.Provider>
-                </ScrapingLayout>
-              }
-            />
-
-            <Route path="*" element={<Navigate to="/onboarding" replace />} />
-          </Routes>
-        </Router>
-
+          <Route path="*" element={<Navigate to="/onboarding" replace />} />
+        </Routes>
+      </Router>
     </QueryClientProvider>
   </StrictMode>
 );

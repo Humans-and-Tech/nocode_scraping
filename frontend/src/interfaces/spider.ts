@@ -11,10 +11,15 @@ export interface DataSelector {
   status?: SelectorStatus;
 }
 
+export enum DataGroup {
+  PRICE = 'price'
+}
+
 export interface Data {
   // the name is just a marker
   // of the element to be scraped
   // for example "price" or "stock"
+  group?: DataGroup;
   name: string;
   label?: string;
   type?: string | number | boolean;

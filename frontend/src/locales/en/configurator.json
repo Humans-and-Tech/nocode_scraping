@@ -6,7 +6,7 @@
     "success": "This is a valid URL"
   },
   "spider": {
-    "title": "You are working on the spider <em>{{ spider }}</em>",
+    "title": "<img src='/assets/spider-icon.png' class='icon' />You are working on the spider <em>{{ spider }}</em>",
     "configuration_title": "Configuration of {{spider}}",
     "cannot_start_scraping": "You cannot start scraping",
     "access_configuration": "Modify the configuration of the spider",

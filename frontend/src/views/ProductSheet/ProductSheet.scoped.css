@@ -1,0 +1,22 @@
+.gus-main-content {
+    width: 100vw;
+    height: 100vh;
+}
+
+.gus-main-row {
+    padding: 1em 2em;
+}
+
+.gus-row-breathe {
+    margin-bottom: 1em;
+}
+
+.gus-col-breathe {
+    margin-right: 1em;
+}
+/* 
+* buggy
+* cannot make this rule work, the scoped CSS doesn't seem to be merged 
+li.ant-list-item.gus-scrapable:hover {
+    cursor: pointer;
+} */

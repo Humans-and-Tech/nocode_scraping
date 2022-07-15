@@ -49,7 +49,6 @@ export const SpiderSearch = (props: SeachSpiderProps): JSX.Element => {
     setIsProposalFound(undefined);
 
     if (val !== '') {
-
       backendProvider.get(val, (data: Spider | undefined) => {
         setIsLoading(false);
         if (data !== null && data !== undefined) {

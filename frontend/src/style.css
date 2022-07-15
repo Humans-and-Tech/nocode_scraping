@@ -36,28 +36,11 @@ li[role="menuitem"] em {
   font-size: small;
 }
 
-.gus-main-content {
-  width: 100vw;
-  height: 100vh;
+img.icon {
+  width: 30px;
+  margin-right: 0.5em;
 }
 
-.gus-main-row {
-  padding: 1em 2em;
-}
-
-.gus-row-breathe {
-  margin: 1em 0;
-}
-
-.gus-col-breathe {
-  margin: 0 1em;
-}
-
-.gus-scraping-element {
-  margin: 0 1em;
-}
-
-.gus-scraping-element:hover {
-  border: 1px solid var(--gus-dark-blue);
+li.ant-list-item.gus-scrapable:hover {
   cursor: pointer;
 }

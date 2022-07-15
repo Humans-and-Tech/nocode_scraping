@@ -66,16 +66,13 @@ function isSpider(obj: unknown): obj is Spider {
 }
 
 function useSpiderBackend(): ISpiderBackend {
-
   const get = (_name: string, callback: (data: Spider | undefined, error: Error | undefined) => void) => {
-    
     if (_name === '') {
       throw new Error('cannot get a spider with a blank name');
     }
     // debounce in anonymous functions
     // https://thewebdev.info/2022/06/12/how-to-fix-lodash-debounce-not-working-in-anonymous-function-with-javascript/
     debounce(() => {
-      
       const params: IGetSpider = {
         name: _name,
         // later
@@ -83,7 +80,6 @@ function useSpiderBackend(): ISpiderBackend {
       };
 
       spiderSocket.emit('get', params, (resp: IWebSocketResponse) => {
-
         if (resp.status == GenericResponseStatus.ERROR) {
           callback(undefined, new Error(resp.message));
         } else if (isSpider(resp.data)) {
@@ -157,20 +153,19 @@ function useSpiderBackend(): ISpiderBackend {
 }
 
 function useScrapingBackend(): IScrapingBackend {
-  
   /**
    * calls the backend socket `get-content` on the namespace `scraping`, and calls back
    * the given function in param with the following logic:
-   * 
-   * - if the socket response `status` property is `GenericResponseStatus.ERROR`, consider it's a technical error, 
+   *
+   * - if the socket response `status` property is `GenericResponseStatus.ERROR`, consider it's a technical error,
    *    executes the callback with a `ScrapingError` conveying the selector passed in param (s)
-   * 
-   * - else, if the socket response `status` property is not `GenericResponseStatus.SUCCESS`, consider it's a functional error (content not found...), 
+   *
+   * - else, if the socket response `status` property is not `GenericResponseStatus.SUCCESS`, consider it's a functional error (content not found...),
    *    executes the callback with a `ScrapingError`converying the selector which is problematic
-   * 
+   *
    * - else, executes the callback with the argument `data` coming from the response `data` property
-   * 
-   * @param user 
+   *
+   * @param user
    * @param s  DataSelector
    * @param url  URL
    * @param popupSelector DataSelector

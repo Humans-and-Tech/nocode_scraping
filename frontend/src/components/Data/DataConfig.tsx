@@ -5,12 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { Data, Spider, mergeSpiderData } from '../../interfaces/spider';
 import { SpiderContext } from '../../BackendContext';
 import { ISpiderBackend } from '../../BackendProvider';
-
+import {displayMessage, NotificationLevel} from '../../components/Layout/UserNotification'
 import { SelectorConfig } from './DataSelector/SelectorConfig';
 
 import './Data.scoped.css';
 
 const { TabPane } = Tabs;
+
+interface IDataConfigProps {
+  data: Data;
+  spider: Spider;
+  onSave: () => void;
+}
 
 /**
  * Builds a UI to configure a Selector for the given scraping element
@@ -20,7 +26,7 @@ const { TabPane } = Tabs;
  * - export config
  * - data definition (name, type)
  */
-export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JSX.Element => {
+export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Element => {
   const { t } = useTranslation('configurator');
 
   const backendProvider = useContext<ISpiderBackend>(SpiderContext);
@@ -49,7 +55,9 @@ export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JS
   const triggerSave = () => {
     if (localData) {
       saveSpiderData(localData);
-    }
+      onSave();
+      displayMessage(NotificationLevel.SUCCESS, t('spider.actions.update_success'));
+    };
   };
 
   const saveSpiderData = (_data: Data) => {
@@ -63,7 +71,6 @@ export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JS
       // sync the DB
       backendProvider.upsert(_spider, (b: boolean, err: Error | undefined) => {
         if (b) {
-          console.log('data is synced');
           // and update the local state accordingly
           setLocalSpider(_spider);
         } else {
@@ -85,7 +92,7 @@ export const DataConfig = ({ data, spider }: { data: Data; spider: Spider }): JS
     }
   }, [data, spider]);
 
-  const saveBtn = <Button onClick={triggerSave}>{t('field.action.save_data_configuration')}</Button>;
+  const saveBtn = <Button type="primary" onClick={triggerSave}>{t('field.action.save_data_configuration')}</Button>;
 
   return (
     <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>

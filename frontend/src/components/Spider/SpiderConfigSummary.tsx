@@ -60,7 +60,7 @@ export const SpiderConfigSummary = (): JSX.Element => {
     console.log(key);
   };
 
-  const saveBtn = <Button onClick={triggerSave}>{t('spider.actions.save_configuration')}</Button>;
+  const saveBtn = <Button type="primary" onClick={triggerSave}>{t('spider.actions.save_configuration')}</Button>;
 
   useEffect(() => {
     if (spider.current?.name !== name && name !== undefined) {
