@@ -44,3 +44,9 @@ img.icon {
 li.ant-list-item.gus-scrapable:hover {
   cursor: pointer;
 }
+
+.scraping-preview {
+  background-color: var(--gus-green);
+  color: var(--gus-white);
+  padding: 0.3em;
+}

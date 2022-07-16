@@ -43,7 +43,7 @@
       "enabled": "Click to verify the content scraped",
       "disabled": "The selector {{ value }} is not valid",
       "no_url": "Configure the URL to be scraped to evaluate this selector",
-      "result": "We fetched the following data with this selector: {{ value }}",
+      "result": "We fetched the following data with this selector: <em class='scraping-preview'>{{ value }}</em>",
       "no_selector_path": "Enter a valid  CSS path to evaluate the selector",
       "no_content": "No content could be found using the path <code>{{ selector }}</code>",
       "invalid_selector": "The selector {{ selector }} is invalid",

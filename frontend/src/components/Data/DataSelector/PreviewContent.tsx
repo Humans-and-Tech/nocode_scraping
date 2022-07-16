@@ -32,7 +32,7 @@ export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
         <Space data-testid="preview-success-message" direction="vertical" size="middle" style={{ width: '100%' }}>
           <Space direction="horizontal">
             <CheckCircleOutlined className="success"></CheckCircleOutlined>
-            <span>{t('field.evaluation.result', { value: content.content })}</span>
+            <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.result', { value: content.content }) }}></span>
           </Space>
           {content.screenshot !== undefined && (
             <>

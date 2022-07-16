@@ -6,9 +6,9 @@ import i18n from '../../../tests/i18n';
 import socketIOClient from 'socket.io-client';
 import MockedSocket from 'socket.io-mock';
 
-import { getContent, validateCssSelector } from '../../../socket/scraping';
 import { SelectorConfig } from './SelectorConfig';
-import {BackendContext} from '../../BackendSocketContext';
+import {ScrapingContext} from '../../../BackendContext';
+import {ScrapingServicesProvider} from '../../../BackendProvider';
 
 /**
  * mock socketio
@@ -21,107 +21,122 @@ jest.mock('socket.io-client');
 
 const serviceProviderMock = jest.fn();
 
-/**
- * mock the evaluate function
- * so that it returns a correct ScrapingResponse
- */
-jest.mock('../../../socket/scraping', () => ({
-  // callback would be a jest mock
-  // for example a simple jest.fn()
-  getContent: (socket, {}, selector, url, cookiePopupPath, callback) => {
-    const responseMap = {
+jest.mock('../../../BackendProvider', () => ({
 
-      '.a-good-selector': {
-        screenshot: 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',
-        content: 'yeah baby',
-        status: 'success',
-        selector: {
-          // DataSelector {
-          //     path: string | undefined;
-          //     language?: 'css' | 'xpath' | 'jsonld' | 'js';
-          //     status?: SelectorStatus
-          // }
-          path: '.a-good-selector',
-          status: 'valid'
-        }
-      },
-      '.a-good-selector-with-popup': {
-        screenshot: 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',
-        content: 'yeah baby',
-        status: 'success',
-        selector: {
-          // DataSelector {
-          //     path: string | undefined;
-          //     language?: 'css' | 'xpath' | 'jsonld' | 'js';
-          //     status?: SelectorStatus
-          // }
-          path: '.a-good-selector-with-popup',
-          status: 'valid'
-        },
-        clickBefore: [
-          {
+  ScrapingServicesProvider: {
+
+    // need to mock the validateCssSelector
+    // as well because of the pop up selector input
+    // which we'll activate or not depending on the test
+    // callback would be a jest mock
+    // for example a simple jest.fn()
+    validateSelector: ({}, s, callback) => {
+      // the response can be DataSelectorValidityResponse | DataSelectorValidityError
+      const pathToCallback = {
+        '.a-popup-selector': {
+          selector: {
             path: '.a-popup-selector',
             status: 'valid'
-          }
-        ]
-      },
-      '.a-bad-selector': {
-        screenshot: undefined,
-        content: undefined,
-        status: 'success',
-        selector: {
-          // DataSelector {
-          //     path: string | undefined;
-          //     language?: 'css' | 'xpath' | 'jsonld' | 'js';
-          //     status?: SelectorStatus
-          // }
-          path: '.a-bad-selector',
-          status: 'invalid'
+          },
+          status: 'success'
         }
-      },
-      '.a-error-selector': {
-        // ScrapingError {
-        //     message: string;
-        //     status: ScrapingStatus.ERROR | ScrapingStatus.NO_CONTENT | ScrapingStatus.ELEMENT_NOT_FOUND | ScrapingStatus.INVALID_SELECTOR;
-        //     selector: DataSelector
-        // }
-        message: 'an backend error occured',
-        status: 'error',
-        selector: {
-          // DataSelector {
-          //     path: string | undefined;
-          //     language?: 'css' | 'xpath' | 'jsonld' | 'js';
-          //     status?: SelectorStatus
-          // }
-          path: '.a-error-selector',
-          status: 'invalid'
-        }
-      }
-    };
-    // mock a ScrapingResponse object
-    // made up of content + screenshot
-    return callback(responseMap[selector.path]);
-  },
+      };
+      callback(pathToCallback[s.path]);
+    },
 
-  // need to mock the validateCssSelector
-  // as well because of the pop up selector input
-  // which we'll activate or not depending on the test
-  // callback would be a jest mock
-  // for example a simple jest.fn()
-  validateCssSelector: (socket, {}, s, callback) => {
-    // the response can be DataSelectorValidityResponse | DataSelectorValidityError
-    const pathToCallback = {
-      '.a-popup-selector': {
-        selector: {
-          path: '.a-popup-selector',
-          status: 'valid'
+    getContent: ({}, selector, url, cookiePopupPath, callback) => {
+
+      // the response has the shape of a 
+      // ScrapingResponse | ScrapingError
+      // 
+      // interface ScrapingResponse {
+      //   screenshot: string;
+      //   content: string | null;
+      //   status: ScrapingStatus.SUCCESS;
+      //   selector: DataSelector;
+      //   clickBefore?: Array<DataSelector | undefined>;
+      //   parentPage: WebPage;
+      // }
+      // 
+      //  interface ScrapingError {
+      //   message?: string;
+      //   status:
+      //     | ScrapingStatus.ERROR
+      //     | ScrapingStatus.NO_CONTENT
+      //     | ScrapingStatus.ELEMENT_NOT_FOUND
+      //     | ScrapingStatus.INVALID_SELECTOR;
+      //   selector: DataSelector;
+      // }
+
+      const responseMap = {
+
+        '.a-good-selector': {
+          screenshot: 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',
+          content: 'yeah baby',
+          status: 'success',
+          selector: {
+            // DataSelector {
+            //     path: string | undefined;
+            //     language?: 'css' | 'xpath' | 'jsonld' | 'js';
+            //     status?: SelectorStatus
+            // }
+            path: '.a-good-selector',
+            status: 'valid'
+          },
+          parentPage: {
+            iscached: true
+          }
         },
-        status: 'success'
-      }
-    };
-    return callback(pathToCallback[s.path]);
+        '.a-good-selector-with-popup': {
+          screenshot: 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',
+          content: 'yeah baby',
+          status: 'success',
+          selector: {
+            path: '.a-good-selector-with-popup',
+            status: 'valid'
+          },
+          clickBefore: [
+            {
+              path: '.a-popup-selector',
+              status: 'valid'
+            }
+          ],
+          parentPage: {
+            iscached: true
+          }
+        },
+        '.a-bad-selector': {
+          screenshot: undefined,
+          content: undefined,
+          status: 'success',
+          selector: {
+            path: '.a-bad-selector',
+            status: 'invalid'
+          },
+          parentPage: {
+            iscached: true
+          }
+        },
+        '.a-error-selector': {
+          message: 'an backend error occured',
+          status: 'error',
+          selector: {
+            path: '.a-error-selector',
+            status: 'invalid'
+          },
+        }
+      };
+
+      // mock a ScrapingResponse object
+      // made up of content + screenshot
+      callback(responseMap[selector.path]);
+    
+    }
   }
+
 }));
+
+
 
 const onConfigured = (selector) => {};
 const onError = () => {};
@@ -139,9 +154,12 @@ const testData = {
   }
 };
 
-const undefinedSelector = undefined;
+const testSpider = {
+  name: 'test-spider',
+  sampleURLs:['http://www.google.fr']
+};
 
-const sampleURL = new URL('https://developer.mozilla.org');
+const undefinedSelector = undefined;
 
 describe('Component initiation', () => {
   let socket;
@@ -157,17 +175,17 @@ describe('Component initiation', () => {
 
   test('the component is correctly initiated with an undefined selector', async () => {
     const { getByTestId, queryByTestId } = render(
-      <SocketContext.Provider value={socket}>
+      <ScrapingContext.Provider value={ScrapingServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorConfig
             data={testDataUndefinedSelector}
-            sampleUrl={sampleURL}
+            spider={testSpider}
             onConfigured={onConfigured}
             onError={onError}
             onChange={onChange}
           />
         </I18nextProvider>
-      </SocketContext.Provider>
+      </ScrapingContext.Provider>
     );
 
     // access the textarea input DOM Element
@@ -187,19 +205,19 @@ describe('Component initiation', () => {
     expect(preview).not.toBeInTheDocument();
   });
 
-  test('the component is correctly initiated when a selector with a valid status is passed', async () => {
+  test('the component is correctly initiated when a valid selector is passed', async () => {
     const { getByTestId, queryByTestId } = render(
-      <SocketContext.Provider value={socket}>
+      <ScrapingContext.Provider value={ScrapingServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorConfig
             data={testData}
-            sampleUrl={sampleURL}
+            spider={testSpider}
             onConfigured={onConfigured}
             onError={onError}
             onChange={onChange}
           />
         </I18nextProvider>
-      </SocketContext.Provider>
+      </ScrapingContext.Provider>
     );
 
     // access the textarea input DOM Element
@@ -243,21 +261,21 @@ describe('When the user evaluates the content scraping', () => {
     };
 
     const { getByTestId, queryByTestId } = render(
-      <SocketContext.Provider value={socket}>
+      <ScrapingContext.Provider value={ScrapingServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorConfig
             data={testData}
-            sampleUrl={sampleURL}
+            spider={testSpider}
             onConfigured={onConfigured}
             onError={onError}
             onChange={mockOnChange}
           />
         </I18nextProvider>
-      </SocketContext.Provider>
+      </ScrapingContext.Provider>
     );
 
     // simulate a user click on the evaluation button
-    const evaluateBtn = getByTestId('evaluate_selector');
+    const evaluateBtn = getByTestId('evaluation-button');
     fireEvent.click(evaluateBtn);
 
     // evaluation is supposed to be displayed
@@ -287,11 +305,11 @@ describe('When the popup selector is activated', () => {
     jest.restoreAllMocks();
   });
 
-  test('when the switch button is activated', async () => {
+  test('click on the switch button', async () => {
     const mockOnChange = jest.fn();
     const onConfigured = jest.fn();
 
-    const testData = {
+    const popupData = {
       name: 'test-data',
       selector: {
         path: '.a-good-selector-with-popup',
@@ -300,17 +318,17 @@ describe('When the popup selector is activated', () => {
     };
 
     const { getByTestId, getByRole } = render(
-      <SocketContext.Provider value={socket}>
+      <ScrapingContext.Provider value={ScrapingServicesProvider}>
         <I18nextProvider i18n={i18n}>
           <SelectorConfig
-            data={testData}
-            sampleUrl={sampleURL}
+            data={popupData}
+            spider={testSpider}
             onConfigured={onConfigured}
             onError={onError}
             onChange={mockOnChange}
           />
         </I18nextProvider>
-      </SocketContext.Provider>
+      </ScrapingContext.Provider>
     );
 
     const switchbtn = getByRole('switch');
@@ -325,7 +343,7 @@ describe('When the popup selector is activated', () => {
     expect(ppInput).toBeInTheDocument();
     fireEvent.change(ppInput, { target: { value: '.a-popup-selector' } });
 
-    const evaluateBtn = getByTestId('evaluate_selector');
+    const evaluateBtn = getByTestId('evaluation-button');
     fireEvent.click(evaluateBtn);
 
     // the "clickBefore" prop is not conveyed to the data

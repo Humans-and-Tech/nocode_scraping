@@ -146,6 +146,10 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
       // don't pass the cookiePopupPath if the switch button is not activated
       const _cookiePpSelector = isPopup ? popupSelector : undefined;
 
+      console.log('selector',selector )
+      console.log('sampleUrl',sampleUrl )
+      console.log('_cookiePpSelector',_cookiePpSelector )
+
       backendProvider.getContent(
         {},
         selector,
@@ -156,8 +160,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
           // send it to the PreviewContent component
           // to display adequate information
           setEvaluation(response);
-
-          console.log(response);
 
           // check the response status
           if (response.status == ScrapingStatus.SUCCESS) {
@@ -369,7 +371,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
                 disabled={!isEvaluationEnabled}
                 data-testid="evaluation-button"
               >
-                <span data-testid="evaluate_selector">{t('field.action.evaluate_selector')}</span>
+                <span>{t('field.action.evaluate_selector')}</span>
               </Button>
             </Tooltip>
           </Space>

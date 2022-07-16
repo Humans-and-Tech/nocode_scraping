@@ -1,0 +1,9 @@
+{
+    "remove_char": {
+        "title": "Remove a character",
+        "sample_data_label": "sample_data_label",
+        "remove_at_index_label": "remove_at_index_label",
+        "placeholder": "placeholder",
+        "result": "Removing char leads to <em class='scraping-preview'>{{ value }}</em>"
+    }
+}

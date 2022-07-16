@@ -5,7 +5,7 @@ import layoutTranslations from './locales/en/layout.json';
 import onboardingTranslations from './locales/en/onboarding.json';
 import productSheetTranslations from './locales/en/product_sheet.json';
 import configuratorTranslations from './locales/en/configurator.json';
-import alteratorsTranslations from './locales/en/alterators.json';
+import sweepersTranslations from './locales/en/sweepers.json';
 
 // the translations
 // (tip move them in a JSON file and import them,
@@ -16,7 +16,7 @@ const resources = {
     onboarding: onboardingTranslations,
     product_sheet: productSheetTranslations,
     configurator: configuratorTranslations,
-    alterators: alteratorsTranslations
+    sweepers: sweepersTranslations
   }
 };
 

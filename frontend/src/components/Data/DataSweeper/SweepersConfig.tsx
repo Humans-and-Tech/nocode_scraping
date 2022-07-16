@@ -4,6 +4,7 @@ import { Data } from '../../../interfaces/spider';
 import { RemoveCharSweeper } from './RemoveCharSweeper';
 
 import './Sweepers.scoped.css';
+import { PreviewContent } from '../DataSelector/PreviewContent';
 
 /**
  * Sweepers are meant to slightly cleanup the data scraped.
@@ -15,6 +16,7 @@ export const DataSweepersConfig = ({data}: {data: Data}): JSX.Element => {
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <RemoveCharSweeper data={data} />
+      {/* <PreviewContent></PreviewContent> */}
     </Space>
   );
 };
