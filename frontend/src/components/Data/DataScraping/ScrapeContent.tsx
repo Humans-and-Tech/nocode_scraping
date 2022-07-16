@@ -138,8 +138,6 @@ export const ScrapeContent = (props: IScrapingPropsType): JSX.Element => {
 
     useEffect(() => {
 
-        console.log("ScrapeContent:useEffect", data.selector?.status)
-
         const _isEvaluationEnabled = (
             spider: Spider, data: Data
             ): boolean => {

@@ -1,32 +1,47 @@
 import React, { useState } from 'react';
 import { Space, Switch, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
-
+import isNumeric from 'validator/lib/isNumeric';
 
 import { Data } from '../../../interfaces/spider';
 
 import './Sweepers.scoped.css';
 
-export const RemoveCharSweeper = ({ data }: { data: Data }): JSX.Element => {
+
+interface IRemoveCharSweeperProps {
+  onConfigured: (value: number) => void;
+}
+
+
+export const RemoveCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
-  const [nameStatus, setNameStatus] = useState<'' | 'error'>('');
+  const [characterIndex, setCharacterIndex] = useState<string|undefined>('');
 
-  const [character, setCharacter] = useState<string>('');
+  const [validationStatus, setValidationStatus] = useState<'error' |''>('')
 
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
   };
 
-  const onChangeCharacter = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    console.log('onChangeCharacter', e.target.value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+
+    const val = e.target.value;
+    if (!isNumeric(e.target.value)) {
+      setValidationStatus('error');
+      setCharacterIndex('');
+    } else {
+      setCharacterIndex(val);
+      setValidationStatus('');
+      onConfigured(parseInt(e.target.value));
+    }
   };
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <p>{data.name}</p>
       <Space direction="horizontal" size="middle">
         <Switch onChange={onSelection} checked={isChecked} />
         <h4>{t('remove_char.title')}</h4>
@@ -36,13 +51,11 @@ export const RemoveCharSweeper = ({ data }: { data: Data }): JSX.Element => {
           <span>{t('remove_char.remove_at_index_label')}</span>
           <Input
             size="large"
-            status={nameStatus}
-            onChange={onChangeCharacter}
-            value={character}
+            status={validationStatus}
+            onChange={handleChange}
+            value={characterIndex}
             placeholder={t('remove_char.placeholder')}
           />
-          {/* <span dangerouslySetInnerHTML={{ __html: t('remove_char.result', { value: '3' }) }}></span> */}
-
         </>
       )}
     </Space>
