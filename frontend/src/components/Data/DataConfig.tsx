@@ -53,6 +53,12 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
     setIsSelectorConfigured(true);
   };
 
+  const onConfigurationError = (_data: Data): void => {
+    setLocalData(_data);
+    saveSpiderData(_data);
+    setIsSelectorConfigured(false);
+  }
+
   const onDataChange = (_data: Data): void => {
     setLocalData(_data);
     saveSpiderData(_data);
@@ -124,14 +130,11 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
         <h2>{data.label}</h2>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {localData && localSpider && (
-            <SelectorConfig data={localData} spider={localSpider} onConfigured={onConfigured} onChange={onDataChange} />
+            <SelectorConfig data={localData} spider={localSpider} onConfigured={onConfigured} onConfigurationError={onConfigurationError} onChange={onDataChange} />
           )}
           {isSelectorConfigured && (
             <>
-              <span>{t('spider.config_sidebar.sweep_data_cta_intro')}</span>
-              {/* <Button onClick={goToSweepersTab} type="primary" data-testid="evaluation-button">
-                {t('spider.config_sidebar.sweep_data_cta')}
-              </Button> */}
+              <span className='highlight'>{t('spider.config_sidebar.sweep_data_cta_intro')}</span>
             </>
           )}
         </Space>
@@ -146,7 +149,7 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
           }
           key="2"
         >
-          {localData && <DataSweepersConfig data={localData} />}
+          {localData && <DataSweepersConfig data={localData} spider={spider} />}
         </TabPane>
       )}
     </Tabs>

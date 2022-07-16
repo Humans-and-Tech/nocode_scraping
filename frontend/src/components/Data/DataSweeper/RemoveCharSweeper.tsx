@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Space, Switch, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+
 import { Data } from '../../../interfaces/spider';
 
 import './Sweepers.scoped.css';
@@ -32,14 +33,6 @@ export const RemoveCharSweeper = ({ data }: { data: Data }): JSX.Element => {
       </Space>
       {isChecked && (
         <>
-          <span>{t('remove_char.sample_data_label')}</span>
-          <Input
-            size="large"
-            status={nameStatus}
-            onChange={onChangeCharacter}
-            value={character}
-            placeholder={t('remove_char.placeholder')}
-          />
           <span>{t('remove_char.remove_at_index_label')}</span>
           <Input
             size="large"
@@ -48,7 +41,8 @@ export const RemoveCharSweeper = ({ data }: { data: Data }): JSX.Element => {
             value={character}
             placeholder={t('remove_char.placeholder')}
           />
-          <span dangerouslySetInnerHTML={{ __html: t('remove_char.result', { value: '3' }) }}></span>
+          {/* <span dangerouslySetInnerHTML={{ __html: t('remove_char.result', { value: '3' }) }}></span> */}
+
         </>
       )}
     </Space>

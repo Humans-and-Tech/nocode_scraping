@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Space, Image } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import '../Data.scoped.css';
 
 interface ISelectorEvalPropsType {
   content: ScrapingResponse | ScrapingError | undefined;
+  showScreenshot: boolean;
 }
 
 /**
@@ -24,7 +25,7 @@ interface ISelectorEvalPropsType {
 export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
   const { t } = useTranslation('configurator');
 
-  const { content } = props;
+  const { content, showScreenshot } = props;
 
   return (
     <>
@@ -34,7 +35,7 @@ export const PreviewContent = (props: ISelectorEvalPropsType): JSX.Element => {
             <CheckCircleOutlined className="success"></CheckCircleOutlined>
             <span dangerouslySetInnerHTML={{ __html: t('field.evaluation.result', { value: content.content }) }}></span>
           </Space>
-          {content.screenshot !== undefined && (
+          {content.screenshot !== undefined && showScreenshot && (
             <>
               <h4>{t('field.evaluation.screenshot')}</h4>
               <Image data-testid="preview-screenshot" width={200} src={content.screenshot}></Image>

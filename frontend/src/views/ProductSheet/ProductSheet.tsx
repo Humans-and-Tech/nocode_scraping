@@ -146,8 +146,7 @@ const ProductSheet: React.FC = () => {
         }
       }
     });
-    console.log('validDataCount', count);
-    return 3;
+    return count;
   };
 
   useEffect(() => {
