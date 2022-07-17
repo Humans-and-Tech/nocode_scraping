@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Space, Switch, Input } from 'antd';
+import { Space, Switch, Input, Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
@@ -19,7 +19,8 @@ export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): J
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
     if (!checked) {
-      onConfigured(undefined, undefined);
+      setReplaced(undefined);
+      setReplacedBy(undefined);
     }
   };
 
@@ -44,22 +45,26 @@ export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): J
         <h4>{t('replace_char.title')}</h4>
       </Space>
       {isChecked && (
-        <>
-          <span>{t('replace_char.replace_input_label')}</span>
-          <Input
-            size="large"
-            onChange={handleReplacedChange}
-            value={replaced}
-            placeholder={t('replace_char.replace_placeholder')}
-          />
-          <span>{t('replace_char.replace_by_input_label')}</span>
-          <Input
-            size="large"
-            onChange={handleReplacedByChange}
-            value={replacedBy}
-            placeholder={t('replace_char.replace_by_placeholder')}
-          />
-        </>
+        <Space direction="horizontal" style={{'justifyContent': 'center', 'width': "100%", 'textAlign': 'center'}} split={<Divider type="vertical" style={{ height: '40px' }} />}>
+          <Space direction="vertical" size="middle" >
+            <span>{t('replace_char.replaced_input_label')}</span>
+            <Input
+              size="large"
+              onChange={handleReplacedChange}
+              value={replaced}
+              placeholder={t('replace_char.replaced_placeholder')}
+            />
+          </Space>
+          <Space direction="vertical" size="middle" >
+            <span>{t('replace_char.replaced_by_input_label')}</span>
+            <Input
+              size="large"
+              onChange={handleReplacedByChange}
+              value={replacedBy}
+              placeholder={t('replace_char.replaced_by_placeholder')}
+            />
+          </Space>
+        </Space>
       )}
     </Space>
   );

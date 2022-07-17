@@ -60,17 +60,21 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   useEffect(() => {
     let finalString = contentBefore;
     if (contentBefore) {
+
       if (removeCharIndex) {
         finalString =
           contentBefore.substring(0, removeCharIndex - 1) +
           contentBefore.substring(removeCharIndex, contentBefore.length);
       }
+
       if (finalString && replaceCharBy) {
         finalString = finalString.replace(replaceCharBy[0], replaceCharBy[1]);
       }
+
     }
     setContentAfter(finalString);
   }, [removeCharIndex, contentBefore, replaceCharBy]);
+
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>

@@ -6,8 +6,10 @@
     },
     "replace_char": {
         "title": "Replace a character",
-        "replace_at_index_label": "What is the place of the character to be replaced ?",
-        "placeholder": "Enter an number"
+        "replaced_input_label": "What is the character you want to replace ?",
+        "replaced_placeholder": "Enter any character",
+        "replaced_by_input_label": "What is the character to put instead?",
+        "replaced_by_placeholder": "Enter any character"
     },
     "result_title": "Data cleaning result:",
     "divider_try_on_real_data": "Try to clean real data",
