@@ -57,7 +57,7 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
     setLocalData(_data);
     saveSpiderData(_data);
     setIsSelectorConfigured(false);
-  }
+  };
 
   const onDataChange = (_data: Data): void => {
     setLocalData(_data);
@@ -130,11 +130,17 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
         <h2>{data.label}</h2>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {localData && localSpider && (
-            <SelectorConfig data={localData} spider={localSpider} onConfigured={onConfigured} onConfigurationError={onConfigurationError} onChange={onDataChange} />
+            <SelectorConfig
+              data={localData}
+              spider={localSpider}
+              onConfigured={onConfigured}
+              onConfigurationError={onConfigurationError}
+              onChange={onDataChange}
+            />
           )}
           {isSelectorConfigured && (
             <>
-              <span className='highlight'>{t('spider.config_sidebar.sweep_data_cta_intro')}</span>
+              <span className="highlight">{t('spider.config_sidebar.sweep_data_cta_intro')}</span>
             </>
           )}
         </Space>

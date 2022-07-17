@@ -31,6 +31,9 @@
       "sweep_data_cta": "clean the scraped data"
     }
   },
+  "sweepers": {
+    "result_title": "Data cleaning result:"
+  },
   "field": {
     "title": "Configure the scraping",
     "selector": {

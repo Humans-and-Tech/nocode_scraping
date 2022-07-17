@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Space, Switch } from 'antd';
-import {  QuestionCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 import { Data, DataSelector, SelectorStatus, Spider } from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse } from '../../../interfaces/scraping';
 import { SelectorInput } from './SelectorInput';
-import {ScrapeContent } from '../DataScraping/ScrapeContent';
+import { ScrapeContent } from '../DataScraping/ScrapeContent';
 
 import '../Data.scoped.css';
 
@@ -92,17 +92,14 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
 
   const onScraped = (evaluation: ScrapingResponse | ScrapingError | undefined) => {
     setEvaluation(evaluation);
-  }
-
+  };
 
   const switchCookiePopupSelector = (): void => {
-    const _isPopup = !isPopup
+    const _isPopup = !isPopup;
     setIsPopup(_isPopup);
   };
 
-
   useEffect(() => {
-
     // reset only the component state when data name changes
     // because data is a complet ovject, its inner value change
     if (localData === undefined || data.name !== dataName.current) {
@@ -128,7 +125,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         setPopupSelector(createSelector());
       }
     } else {
-
       const _data = localData;
       _data.selector = selector;
       _data.isPopup = isPopup;
@@ -136,28 +132,26 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
       setLocalData(_data);
 
       // callback the parent to let him know
-      if (_data.selector?.status==SelectorStatus.VALID) {
-        if (_data.isPopup && _data.popupSelector?.status==SelectorStatus.VALID) {
+      if (_data.selector?.status == SelectorStatus.VALID) {
+        if (_data.isPopup && _data.popupSelector?.status == SelectorStatus.VALID) {
           onConfigured(_data);
-        } else if (_data.isPopup && _data.popupSelector?.status==SelectorStatus.INVALID) {
+        } else if (_data.isPopup && _data.popupSelector?.status == SelectorStatus.INVALID) {
           if (onConfigurationError) {
             onConfigurationError(_data);
           }
         } else {
           onConfigured(_data);
         }
-      } else if (_data.selector?.status==SelectorStatus.INVALID) {
+      } else if (_data.selector?.status == SelectorStatus.INVALID) {
         if (onConfigurationError) {
           onConfigurationError(_data);
         }
       }
     }
-
   }, [data, selectorStatus, popupSelectorStatus, isPopup]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      
       {selector && (
         <>
           <span>{t('field.selector.intro')}</span>
@@ -187,7 +181,7 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         </Space>
       }
 
-      {localData && <ScrapeContent spider={spider} data={localData} showScreenshot={true} onScraped={onScraped}/>}
+      {localData && <ScrapeContent spider={spider} data={localData} showScreenshot={true} onScraped={onScraped} />}
 
       {evaluation && !isPopup && (
         <Space direction="horizontal">
@@ -202,7 +196,6 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
           </a>
         </Space>
       )}
-
     </Space>
   );
 };
