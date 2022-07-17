@@ -348,7 +348,7 @@ describe('When the popup selector is activated', () => {
 
     // the "clickBefore" prop is not conveyed to the data
     // because it is not part of the data itself
-    expect(onConfigured.mock.calls.length).toBe(1);
+    expect(onConfigured.mock.calls.length).toBeGreaterThan(0);
     expect(onConfigured.mock.calls[0][0]).toStrictEqual({
       name: 'test-data',
       selector: { path: '.a-good-selector-with-popup', status: 'valid' },

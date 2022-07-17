@@ -23,19 +23,19 @@ describe('display the correct message', () => {
       }
     };
 
-    const { getByTestId, queryByTestId } = render(
+    const { queryByTestId } = render(
       <I18nextProvider i18n={i18n}>
-        <PreviewContent content={testSuccessfulContent} />
+        <PreviewContent content={testSuccessfulContent} showScreenshot={true} />
       </I18nextProvider>
     );
 
-    const message = getByTestId('preview-success-message');
+    const message = queryByTestId('preview-success-message');
     expect(message).toBeInTheDocument();
 
     // the Image element of Ant Design
     // generates an image wrapped with a div
     // thus we need to query the <img /> DOM element contained within the getByTestId('preview-screenshot')
-    const screenshot = getByTestId('preview-screenshot').querySelector('img');
+    const screenshot = queryByTestId('preview-screenshot').querySelector('img');
     expect(screenshot).toHaveAttribute('src', testSuccessfulContent[screenshot]);
 
     // assert other messages are not present !
@@ -58,7 +58,7 @@ describe('display the correct message', () => {
 
     const { getByTestId, queryByTestId } = render(
       <I18nextProvider i18n={i18n}>
-        <PreviewContent content={testNotContent} />
+        <PreviewContent content={testNotContent} showScreenshot={true} />
       </I18nextProvider>
     );
 
@@ -85,7 +85,7 @@ describe('display the correct message', () => {
 
     const { getByTestId, queryByTestId } = render(
       <I18nextProvider i18n={i18n}>
-        <PreviewContent content={testNotFound} />
+        <PreviewContent content={testNotFound} showScreenshot={true} />
       </I18nextProvider>
     );
 
@@ -112,7 +112,7 @@ describe('display the correct message', () => {
 
     const { getByTestId, queryByTestId } = render(
       <I18nextProvider i18n={i18n}>
-        <PreviewContent content={testError} />
+        <PreviewContent content={testError} showScreenshot={true} />
       </I18nextProvider>
     );
 
