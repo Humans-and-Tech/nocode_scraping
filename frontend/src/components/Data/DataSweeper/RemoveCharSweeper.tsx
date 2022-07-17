@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Space, Switch, Input } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Space, Switch, Form, InputNumber } from 'antd';
 import { useTranslation } from 'react-i18next';
-import isNumeric from 'validator/lib/isNumeric';
 
 import './Sweepers.scoped.css';
 
@@ -9,34 +8,30 @@ interface IRemoveCharSweeperProps {
   onConfigured: (value: number | undefined) => void;
 }
 
+const layout = {
+  labelCol: { span: 10 },
+  wrapperCol: { span: 12 }
+};
+
 export const RemoveCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
-  const [characterIndex, setCharacterIndex] = useState<string | undefined>('');
+  const [form] = Form.useForm<{ charIndex: number }>();
 
-  const [validationStatus, setValidationStatus] = useState<'error' | ''>('');
+  const charIndexValue = Form.useWatch('charIndex', form);
 
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
     if (!checked) {
-      setCharacterIndex('');
       onConfigured(undefined);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const val = e.target.value;
-    if (!isNumeric(e.target.value)) {
-      setValidationStatus('error');
-      setCharacterIndex('');
-    } else {
-      setCharacterIndex(val);
-      setValidationStatus('');
-      onConfigured(parseInt(e.target.value));
-    }
-  };
+  useEffect(() => {
+    onConfigured(charIndexValue);
+  }, [charIndexValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
@@ -45,16 +40,11 @@ export const RemoveCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): JS
         <h4>{t('remove_char.title')}</h4>
       </Space>
       {isChecked && (
-        <>
-          <span>{t('remove_char.remove_at_index_label')}</span>
-          <Input
-            size="large"
-            status={validationStatus}
-            onChange={handleChange}
-            value={characterIndex}
-            placeholder={t('remove_char.placeholder')}
-          />
-        </>
+        <Form form={form} {...layout} autoComplete="off">
+          <Form.Item label={t('remove_char.remove_at_index_label')} name="charIndex">
+            <InputNumber />
+          </Form.Item>
+        </Form>
       )}
     </Space>
   );

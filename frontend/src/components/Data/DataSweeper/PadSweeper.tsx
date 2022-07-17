@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Space, Switch, Form, Input } from 'antd';
+import { Space, Switch, Input, Form } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
 
-interface IRemoveCharSweeperProps {
-  onConfigured: (replaced: string | undefined, replacedBy: string | undefined) => void;
+interface IPadSweeperProps {
+  onConfigured: (append: string | undefined, prepend: string | undefined) => void;
 }
 
 const layout = {
@@ -13,15 +13,16 @@ const layout = {
   wrapperCol: { span: 12 }
 };
 
-export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): JSX.Element => {
+export const PadSweeper = ({ onConfigured }: IPadSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
-  const [form] = Form.useForm<{ replaced: string; replacedBy: string }>();
+  const [form] = Form.useForm<{ append: string; prepend: string }>();
 
-  const replacedValue = Form.useWatch('replaced', form);
-  const replacedByValue = Form.useWatch('replacedBy', form);
+  const appendValue = Form.useWatch('append', form);
+
+  const prependValue = Form.useWatch('prepend', form);
 
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
@@ -31,22 +32,22 @@ export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): J
   };
 
   useEffect(() => {
-    onConfigured(replacedValue, replacedByValue);
-  }, [isChecked, replacedValue, replacedByValue]);
+    onConfigured(appendValue, prependValue);
+  }, [appendValue, prependValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <Space direction="horizontal" size="middle">
         <Switch onChange={onSelection} checked={isChecked} />
-        <h4>{t('replace_char.title')}</h4>
+        <h4>{t('pad_chars.title')}</h4>
       </Space>
       {isChecked && (
         <Form form={form} {...layout} autoComplete="off">
-          <Form.Item label={t('replace_char.replaced_placeholder')} name="replaced">
+          <Form.Item label={t('pad_chars.prepend_label')} name="prepend">
             <Input />
           </Form.Item>
 
-          <Form.Item label={t('replace_char.replaced_by_input_label')} name="replacedBy">
+          <Form.Item label={t('pad_chars.append_label')} name="append">
             <Input />
           </Form.Item>
         </Form>

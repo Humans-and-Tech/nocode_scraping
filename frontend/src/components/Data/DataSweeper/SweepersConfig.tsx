@@ -7,6 +7,7 @@ import { Data, Spider } from '../../../interfaces/spider';
 import { RemoveCharSweeper } from './RemoveCharSweeper';
 import { ReplaceCharSweeper } from './ReplaceCharSweeper';
 import { SweepersResult } from './SweepersResult';
+import { PadSweeper } from './PadSweeper';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 
 import './Sweepers.scoped.css';
@@ -22,6 +23,8 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   const [removeCharIndex, setRemoveCharIndex] = useState<number | undefined>(undefined);
 
   const [replaceCharBy, setReplaceCharBy] = useState<Array<string> | undefined>(undefined);
+
+  const [padChars, setPadChars] = useState<Array<string | undefined> | undefined>(undefined);
 
   const [contentBefore, setContentBefore] = useState<string | undefined>(undefined);
 
@@ -44,6 +47,14 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
     }
   };
 
+  const setPadSweeper = (append: string | undefined, prepend: string | undefined) => {
+    if (append || prepend) {
+      setPadChars([append, prepend]);
+    } else {
+      setPadChars(undefined);
+    }
+  };
+
   /**
    * the `raw` content scraped
    *
@@ -60,7 +71,6 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   useEffect(() => {
     let finalString = contentBefore;
     if (contentBefore) {
-
       if (removeCharIndex) {
         finalString =
           contentBefore.substring(0, removeCharIndex - 1) +
@@ -71,15 +81,23 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
         finalString = finalString.replace(replaceCharBy[0], replaceCharBy[1]);
       }
 
+      if (finalString && padChars) {
+        if (padChars[1]) {
+          finalString = padChars[1].concat(finalString);
+        }
+        if (padChars[0]) {
+          finalString = finalString.concat(padChars[0]);
+        }
+      }
     }
     setContentAfter(finalString);
-  }, [removeCharIndex, contentBefore, replaceCharBy]);
-
+  }, [removeCharIndex, contentBefore, replaceCharBy, padChars]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <RemoveCharSweeper onConfigured={removeChar} />
       <ReplaceCharSweeper onConfigured={replaceChar} />
+      <PadSweeper onConfigured={setPadSweeper} />
       <Divider orientation="left">{t('divider_try_on_real_data') as ReactNode}</Divider>
       <ScrapeContent spider={spider} data={data} showScreenshot={false} onScraped={getContentBefore} />
       {contentBefore && contentAfter && (

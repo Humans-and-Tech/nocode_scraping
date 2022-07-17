@@ -11,6 +11,11 @@
         "replaced_by_input_label": "What is the character to put instead?",
         "replaced_by_placeholder": "Enter any character"
     },
+    "pad_chars": {
+        "title": "Prefix / Suffix data",
+        "prepend_label": "Prefix data with",
+        "append_label": "Suffix data with"
+    },
     "result_title": "Data cleaning result:",
     "divider_try_on_real_data": "Try to clean real data",
     "divider_cleaning_preview": "Preview of cleaned data"
