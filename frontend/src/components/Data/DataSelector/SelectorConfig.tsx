@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Space, Switch } from 'antd';
+import React, { useState, useEffect, useRef, ReactNode } from 'react';
+import { Space, Switch, Divider } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -181,7 +181,12 @@ export const SelectorConfig = (props: ISelectorConfigPropsType): JSX.Element => 
         </Space>
       }
 
-      {localData && <ScrapeContent spider={spider} data={localData} showScreenshot={true} onScraped={onScraped} />}
+      {localData && (
+        <>
+          <Divider orientation="left">{t('divider_try_to_scrape') as ReactNode}</Divider>
+          <ScrapeContent spider={spider} data={localData} showScreenshot={true} onScraped={onScraped} />
+        </>
+      )}
 
       {evaluation && !isPopup && (
         <Space direction="horizontal">

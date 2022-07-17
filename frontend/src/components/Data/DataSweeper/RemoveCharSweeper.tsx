@@ -3,7 +3,6 @@ import { Space, Switch, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 import isNumeric from 'validator/lib/isNumeric';
 
-
 import './Sweepers.scoped.css';
 
 interface IRemoveCharSweeperProps {

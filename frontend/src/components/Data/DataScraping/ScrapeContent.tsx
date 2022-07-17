@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Space, Spin, Button, Tooltip } from 'antd';
+import React, { useState, useContext, useEffect, useRef, ReactNode } from 'react';
+import { Space, Spin, Button, Tooltip, Divider } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import isURL from 'validator/lib/isURL';
@@ -239,7 +239,12 @@ export const ScrapeContent = (props: IScrapingPropsType): JSX.Element => {
         </Space>
       )}
 
-      {evaluation && <PreviewContent showScreenshot={showScreenshot} content={evaluation} />}
+      {evaluation && (
+        <>
+          <Divider orientation="left">{t('divider_scraping_preview') as ReactNode}</Divider>
+          <PreviewContent showScreenshot={showScreenshot} content={evaluation} />
+        </>
+      )}
 
       {isBackendError && (
         <Space data-testid="backend-error-message" direction="vertical" size="middle" style={{ width: '100%' }}>

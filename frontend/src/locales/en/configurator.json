@@ -31,9 +31,6 @@
       "sweep_data_cta": "clean the scraped data"
     }
   },
-  "sweepers": {
-    "result_title": "Data cleaning result:"
-  },
   "field": {
     "title": "Configure the scraping",
     "selector": {
@@ -66,8 +63,9 @@
       "fresh_version": "You are viewing fresh version of the page"
     },
     "action": {
-      "evaluate_selector": "Evaluate this selector",
-      "save_data_configuration": "Save"
+      "evaluate_selector": "Get content",
+      "save_data_configuration": "Save",
+      "select_sample_url": "Select a sample URL to scrape content"
     },
     "css": {
       "valid": "This selector is valid",
@@ -75,5 +73,7 @@
     },
     "alterators_title": "Adapt the data"
   },
-  "loading": "Wait a bit please..."
+  "loading": "Wait a bit please...",
+  "divider_try_to_scrape": "Try to scrape",
+  "divider_scraping_preview": "Scraping preview"
 }

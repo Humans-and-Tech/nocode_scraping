@@ -17,16 +17,15 @@ interface ISweepersResultPropsType {
  * @returns JSX.Element
  */
 export const SweepersResult = (props: ISweepersResultPropsType): JSX.Element => {
-  const { t } = useTranslation('configurator');
+  const { t } = useTranslation('sweepers');
 
   const { contentBefore, contentAfter } = props;
 
   return (
     <>
       {contentAfter && (
-        <Space data-testid="preview-success-message" direction="vertical" size="middle" style={{ width: '100%' }}>
-          <h3>{t('sweepers.result_title')}</h3>
-          <Space direction="horizontal">
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space direction="horizontal" style={{ justifyContent: 'center', textAlign: 'center', width: '100%' }}>
             <span className="highlight">{contentBefore}</span>
             <RightOutlined></RightOutlined>
             <span className="highlight">{contentAfter}</span>
