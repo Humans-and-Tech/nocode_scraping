@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import './Sweepers.scoped.css';
 
 interface IPadSweeperProps {
-  onConfigured: (append: string | undefined, prepend: string | undefined) => void;
+  onConfigured: (regex: string | undefined) => void;
 }
 
 const layout = {
@@ -13,42 +13,36 @@ const layout = {
   wrapperCol: { span: 12 }
 };
 
-export const PadSweeper = ({ onConfigured }: IPadSweeperProps): JSX.Element => {
+export const ExtractData = ({ onConfigured }: IPadSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
-  const [form] = Form.useForm<{ append: string; prepend: string }>();
+  const [form] = Form.useForm<{ regex: string }>();
 
-  const appendValue = Form.useWatch('append', form);
-
-  const prependValue = Form.useWatch('prepend', form);
+  const regexValue = Form.useWatch('regex', form);
 
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
     if (!checked) {
-      onConfigured(undefined, undefined);
+      onConfigured(undefined);
     }
   };
 
   useEffect(() => {
-    onConfigured(appendValue, prependValue);
-  }, [appendValue, prependValue]);
+    onConfigured(regexValue);
+  }, [regexValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <Space direction="horizontal" size="middle">
         <Switch onChange={onSelection} checked={isChecked} />
-        <h4>{t('pad_chars.title')}</h4>
+        <h4>{t('regex.title')}</h4>
       </Space>
       {isChecked && (
         <Form form={form} {...layout} autoComplete="off" labelWrap>
-          <Form.Item label={t('pad_chars.prepend_label')} name="prepend">
-            <Input placeholder={t('pad_chars.prepend_placeholder')} />
-          </Form.Item>
-
-          <Form.Item label={t('pad_chars.append_label')} name="append">
-            <Input placeholder={t('pad_chars.append_placeholder')} />
+          <Form.Item label={t('regex.label')} name="regex" hasFeedback>
+            <Input placeholder="I'm the content is being validated" />
           </Form.Item>
         </Form>
       )}

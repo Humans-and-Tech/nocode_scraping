@@ -40,7 +40,7 @@ export const RemoveCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): JS
         <h4>{t('remove_char.title')}</h4>
       </Space>
       {isChecked && (
-        <Form form={form} {...layout} autoComplete="off">
+        <Form form={form} {...layout} autoComplete="off" labelWrap>
           <Form.Item label={t('remove_char.remove_at_index_label')} name="charIndex">
             <InputNumber />
           </Form.Item>

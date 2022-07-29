@@ -8,6 +8,7 @@ import { RemoveCharSweeper } from './RemoveCharSweeper';
 import { ReplaceCharSweeper } from './ReplaceCharSweeper';
 import { SweepersResult } from './SweepersResult';
 import { PadSweeper } from './PadSweeper';
+import { ExtractData } from './RegexSweeper';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 
 import './Sweepers.scoped.css';
@@ -55,6 +56,10 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
     }
   };
 
+  const onDataExtract = (regex: string | undefined) => {
+    console.log(regex);
+  };
+
   /**
    * the `raw` content scraped
    *
@@ -98,6 +103,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       <RemoveCharSweeper onConfigured={removeChar} />
       <ReplaceCharSweeper onConfigured={replaceChar} />
       <PadSweeper onConfigured={setPadSweeper} />
+      <ExtractData onConfigured={onDataExtract} />
       <Divider orientation="left">{t('divider_try_on_real_data') as ReactNode}</Divider>
       <ScrapeContent spider={spider} data={data} showScreenshot={false} onScraped={getContentBefore} />
       {contentBefore && contentAfter && (

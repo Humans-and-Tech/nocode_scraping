@@ -41,13 +41,13 @@ export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): J
         <h4>{t('replace_char.title')}</h4>
       </Space>
       {isChecked && (
-        <Form form={form} {...layout} autoComplete="off">
+        <Form form={form} {...layout} autoComplete="off" labelWrap>
           <Form.Item label={t('replace_char.replaced_placeholder')} name="replaced">
-            <Input />
+            <Input placeholder={t('replace_char.replaced_placeholder')} />
           </Form.Item>
 
           <Form.Item label={t('replace_char.replaced_by_input_label')} name="replacedBy">
-            <Input />
+            <Input placeholder={t('replace_char.replaced_by_placeholder')} />
           </Form.Item>
         </Form>
       )}
