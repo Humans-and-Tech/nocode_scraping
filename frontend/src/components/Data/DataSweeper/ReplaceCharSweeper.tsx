@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Space, Switch, Form, Input } from 'antd';
+import { Space, Switch, Form, Input, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
 
 interface IRemoveCharSweeperProps {
-  onConfigured: (replaced: string | undefined, replacedBy: string | undefined) => void;
+  onConfigured: (val: string | undefined) => void;
+  testdata: string;
 }
 
 const layout = {
@@ -13,7 +14,9 @@ const layout = {
   wrapperCol: { span: 12 }
 };
 
-export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): JSX.Element => {
+const { Text } = Typography;
+
+export const ReplaceCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -23,15 +26,21 @@ export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): J
   const replacedValue = Form.useWatch('replaced', form);
   const replacedByValue = Form.useWatch('replacedBy', form);
 
+  const [contentAfter, setContentAfter] = useState<string>('');
+
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
     if (!checked) {
-      onConfigured(undefined, undefined);
+      onConfigured(undefined);
     }
   };
 
   useEffect(() => {
-    onConfigured(replacedValue, replacedByValue);
+    if (replacedValue && replacedByValue && testdata) {
+      const finalString = testdata.replace(replacedValue, replacedByValue);
+      setContentAfter(finalString);
+      onConfigured(finalString);
+    }
   }, [isChecked, replacedValue, replacedByValue]);
 
   return (
@@ -49,6 +58,12 @@ export const ReplaceCharSweeper = ({ onConfigured }: IRemoveCharSweeperProps): J
           <Form.Item label={t('replace_char.replaced_by_input_label')} name="replacedBy">
             <Input placeholder={t('replace_char.replaced_by_placeholder')} />
           </Form.Item>
+          {contentAfter && (
+            <>
+              {t('sweeper_result_intro')}
+              <Text code>{contentAfter}</Text>
+            </>
+          )}
         </Form>
       )}
     </Space>

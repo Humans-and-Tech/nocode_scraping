@@ -1,4 +1,6 @@
 {
+  "loading_error": "There was an error loading the scraped data",
+  "sweeper_result_intro": "With this cleaner, your data will be transformed into:",
   "remove_char": {
     "title": "Remove a character",
     "remove_at_index_label": "What is the place of the character to be removed ?",
@@ -14,7 +16,15 @@
   "pad_chars": {
     "title": "Prefix / Suffix data",
     "prepend_label": "Prefix data with",
-    "append_label": "Suffix data with"
+    "append_label": "Suffix data with",
+    "prepend_placeholder": "Enter any character to prefix the content",
+    "append_placeholder": "Enter any character to suffix the content"
+  },
+  "regex": {
+    "title": "Regular Expression (Regex)",
+    "label": "Python Regex",
+    "intro": "The data is going to be scraped with a software written in python, that's why you need to enter here a valid python regex. Use a Regex testing tool like <a href='https://www.regex101.com' _target='blank'>Regex101.com</a> to validate your regex",
+    "placeholder": "Enter a valid python regex"
   },
   "result_title": "Data cleaning result:",
   "divider_try_on_real_data": "Try to clean real data",
