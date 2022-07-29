@@ -2,5 +2,9 @@
   "helper": {
     "title": "How to use ?",
     "content": "Hover the layout, you will notice that you can interact with the elements of the page. When clicking on an element, a new configuration drawer will appear on the right where you'll be able to configure the selectors to apply"
+  },
+  "errors": {
+    "title": "Error occured",
+    "description": "We are sorry, but un unexpected error occured: {{ message }}"
   }
 }

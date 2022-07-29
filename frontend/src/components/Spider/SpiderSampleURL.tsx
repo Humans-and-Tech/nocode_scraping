@@ -1,8 +1,11 @@
-import React, { useState, useContext, useEffect, useRef, Fragment } from 'react';
+import React, { useState, useContext } from 'react';
 import { Space, List, Button, Input, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import isURL from 'validator/lib/isURL';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSpider } from '../../spiderSlice';
 
+import isURL from 'validator/lib/isURL';
+import clone from 'lodash/clone';
 import { Spider } from '../../interfaces/spider';
 import { SpiderContext } from '../../BackendContext';
 import { ISpiderBackend } from '../../BackendProvider';
@@ -16,6 +19,10 @@ interface ISampleUrlSelectorProps {
   spider: Spider;
   onSelect: (url: URL) => void;
   initialSelectedUrl: URL | undefined;
+}
+
+interface SpiderState {
+  current: Spider;
 }
 
 /**
@@ -67,13 +74,12 @@ export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.E
 
   const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
-  const spiderName = useRef<string>('');
+  const dispatch = useDispatch();
+  const localSpider = useSelector((state: SpiderState) => state.current);
 
   const [inputClass, setInputClass] = useState<string>('');
   const [sampleUrl, setSampleUrl] = useState<string>('');
   const [isValid, setIsValid] = useState<boolean>(false);
-  const [localSpider, setLocalSpider] = useState<Spider | undefined>(undefined);
-  const [listLength, setListLength] = useState<number | undefined>(0);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -91,8 +97,7 @@ export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.E
   const updateSpider = (_spider: Spider) => {
     backendProvider.upsert(_spider, (b: boolean, err: Error | undefined) => {
       if (b) {
-        setLocalSpider(_spider);
-        setListLength(_spider.sampleURLs?.length);
+        dispatch(setSpider(_spider));
         displayMessage(NotificationLevel.SUCCESS, t('spider.actions.update_success'));
       } else {
         console.error('upsert failed', err);
@@ -107,42 +112,44 @@ export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.E
       : t('spider.actions.sample_urls_add_more');
   };
 
+  /**
+   * localSpider coming from the redux store, it is immutable
+   * hence, we create a local copy of the data to manipulate them
+   *
+   */
   const addSampleURL = () => {
     if (sampleUrl && sampleUrl !== '') {
-      if (!spider.sampleURLs) {
-        spider.sampleURLs = [];
+      let cloneSampleUrls = clone(localSpider.sampleURLs);
+      if (!cloneSampleUrls) {
+        cloneSampleUrls = [];
       }
-      spider.sampleURLs.push(new URL(sampleUrl));
-      updateSpider(spider);
+      cloneSampleUrls.push(new URL(sampleUrl));
+      const cloneSpider = clone(localSpider);
+      cloneSpider.sampleURLs = cloneSampleUrls;
+      updateSpider(cloneSpider);
     }
   };
 
-  const deleteSampleUrl = (sampleUrl: URL) => {
-    const _sampleUrls = localSpider?.sampleURLs;
+  /**
+   * localSpider coming from the redux store, it is immutable
+   * hence, we create a local copy of the data to manipulate them
+   *
+   * @param __sampleUrl a URL
+   */
+  const deleteSampleUrl = (__sampleUrl: URL) => {
+    const _sampleUrls = clone(localSpider.sampleURLs);
     localSpider?.sampleURLs?.forEach((item, index) => {
-      if (item.toString() == sampleUrl.toString()) {
+      if (item.toString() == __sampleUrl.toString()) {
         // for TS
         if (_sampleUrls) {
           _sampleUrls.splice(index, 1);
         }
       }
     });
-    spider.sampleURLs = _sampleUrls;
-    updateSpider(spider);
+    const cloneSpider = clone(localSpider);
+    cloneSpider.sampleURLs = _sampleUrls;
+    updateSpider(cloneSpider);
   };
-
-  /**
-   * initiate the localSpider & refresh each time the sampleUrlsList changes
-   * thanks to the listLength which is a dependency
-   */
-  useEffect(() => {
-    // refreshes when spider changes
-    if (spider.name !== spiderName.current) {
-      spiderName.current = spider.name;
-      setLocalSpider(spider);
-      setListLength(spider.sampleURLs?.length);
-    }
-  }, [spiderName, listLength]);
 
   return (
     <>

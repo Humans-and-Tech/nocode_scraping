@@ -4,6 +4,7 @@ import { GiBroom } from 'react-icons/gi';
 import { BiTargetLock } from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
 
+import clone from 'lodash/clone';
 import { Data, Spider, mergeSpiderData, SelectorStatus } from '../../interfaces/spider';
 import { SpiderContext } from '../../BackendContext';
 import { ISpiderBackend } from '../../BackendProvider';
@@ -72,13 +73,21 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
     }
   };
 
+  /**
+   * the localSpider coming from the redux store
+   * we create a clone before saving its data
+   *
+   * @param _data Data object
+   */
   const saveSpiderData = (_data: Data) => {
     // update the local spider
     // when updated, the useEffect will be triggered
     // to save the spider
     if (localSpider !== undefined) {
       // merge the data into the spider
-      const _spider = mergeSpiderData(localSpider, _data);
+
+      const cloneSpider = clone(localSpider);
+      const _spider = mergeSpiderData(cloneSpider, _data);
 
       // sync the DB
       backendProvider.upsert(_spider, (b: boolean, err: Error | undefined) => {

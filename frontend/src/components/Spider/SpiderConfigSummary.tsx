@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { Space, Spin, Tabs, Button } from 'antd';
+import { Space, Tabs, Button } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 
-import { SpiderContext } from '../../BackendContext';
-import { ISpiderBackend } from '../../BackendProvider';
 import { Spider } from '../../interfaces/spider';
-import { displayMessage, NotificationLevel } from '../Layout/UserNotification';
 
 import { SampleURLManager } from './SpiderSampleURL';
 import { ConfigSidebar } from '../Layout/ConfigSidebar';
@@ -16,6 +13,10 @@ import './SpiderConfig.scoped.css';
 
 const { TabPane } = Tabs;
 
+interface SpiderState {
+  current: Spider;
+}
+
 /**
  * Provides access to the Spider Config from a Page layout
  *
@@ -23,17 +24,9 @@ const { TabPane } = Tabs;
 export const SpiderConfigSummary = (): JSX.Element => {
   const { t } = useTranslation('configurator');
 
-  const spider = useRef<Spider | undefined>(undefined);
-
-  const backendProvider = useContext<ISpiderBackend>(SpiderContext);
+  const spider = useSelector((state: SpiderState) => state.current);
 
   const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
-
-  // the spider name is fetched from the URL path !
-  // it is NOT the data name !
-  const { name } = useParams();
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const configureSampleUrls = () => {
     setIsSideBarOpen(true);
@@ -44,18 +37,9 @@ export const SpiderConfigSummary = (): JSX.Element => {
   };
 
   const triggerSave = () => {
-    if (spider.current) {
-      backendProvider.upsert(spider.current, (b: boolean, err: Error | undefined) => {
-        if (b) {
-          displayMessage(NotificationLevel.SUCCESS, t('spider.actions.update_success'));
-          closeSideBar();
-        } else {
-          displayMessage(NotificationLevel.ERROR, t('spider.actions.update_error'));
-          closeSideBar();
-        }
-      });
-    }
+    setIsSideBarOpen(false);
   };
+
   const onTabChange = (key: string) => {
     console.log(key);
   };
@@ -66,37 +50,19 @@ export const SpiderConfigSummary = (): JSX.Element => {
     </Button>
   );
 
-  useEffect(() => {
-    if (spider.current?.name !== name && name !== undefined) {
-      setIsLoading(true);
-      backendProvider.get(name, (_spider: Spider | undefined) => {
-        if (_spider) {
-          spider.current = _spider;
-        } else {
-          // TODO
-          // notify the user,
-          // the spider wasn't found
-          // propose to navigate to another screen ?
-          // or redirect the user ?
-        }
-        setIsLoading(false);
-      });
-    }
-  }, [backendProvider, name]);
-
   return (
     <>
-      {isSideBarOpen && spider.current && (
+      {isSideBarOpen && spider && (
         <ConfigSidebar
           isVisible={isSideBarOpen}
           onClose={closeSideBar}
-          title={t('spider.configuration_title', { spider: spider.current?.name })}
+          title={t('spider.configuration_title', { spider: spider.name })}
         >
           <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>
             <TabPane tab={t('spider.config_sidebar.tab_sample_urls')} key="1">
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <p>{t('spider.sample_urls_intro')}</p>
-                <SampleURLManager spider={spider.current} />
+                <SampleURLManager spider={spider} />
               </Space>
             </TabPane>
           </Tabs>
@@ -104,17 +70,11 @@ export const SpiderConfigSummary = (): JSX.Element => {
       )}
 
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        {isLoading && (
-          <Space direction="horizontal" size="middle">
-            <Spin />
-            <span>{t('loading')}</span>
-          </Space>
-        )}
-        {!isLoading && (
+        {spider && (
           <>
-            <h4 dangerouslySetInnerHTML={{ __html: t('spider.title', { spider: spider.current?.name }) }}></h4>
+            <h4 dangerouslySetInnerHTML={{ __html: t('spider.title', { spider: spider.name }) }}></h4>
 
-            {!spider.current?.sampleURLs && (
+            {!spider.sampleURLs && (
               <Space direction="horizontal">
                 <CloseCircleOutlined className="error"></CloseCircleOutlined>
                 <span>{t('spider.cannot_start_scraping')}</span>
@@ -123,7 +83,7 @@ export const SpiderConfigSummary = (): JSX.Element => {
                 </a>
               </Space>
             )}
-            {spider.current?.sampleURLs && (
+            {spider.sampleURLs && (
               <a onClick={configureSampleUrls} title={t('spider.define_sample_urls')}>
                 {t('spider.access_configuration')}
               </a>

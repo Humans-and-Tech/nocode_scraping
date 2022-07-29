@@ -111,9 +111,10 @@ export interface Settings {
 }
 
 /**
- * care for overriding a spider data with a given Data object
+ * cares for overriding a spider data with a given Data object
  *
- * @param s
+ *
+ * @param s Spider
  * @return a spider object, updated wit the given data
  */
 export const mergeSpiderData = (spider: Spider, data: Data): Spider => {

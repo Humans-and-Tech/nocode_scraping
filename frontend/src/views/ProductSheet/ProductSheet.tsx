@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Row, Col, Breadcrumb, Rate, Image, List, Space, Tooltip, Spin, Collapse, Badge, Card } from 'antd';
+import React, { useState } from 'react';
+import { Row, Col, Breadcrumb, Rate, Image, List, Space, Tooltip, Collapse, Badge, Card } from 'antd';
 import {
   HomeOutlined,
   FolderOpenOutlined,
@@ -12,10 +12,8 @@ import {
 } from '@ant-design/icons';
 import { FiPackage } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-import { SpiderContext } from '../../BackendContext';
-import { ISpiderBackend } from '../../BackendProvider';
 import { Data, Spider, SelectorStatus, DataGroup } from '../../interfaces/spider';
 import { DataConfig } from '../../components/Data/DataConfig';
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
@@ -30,22 +28,16 @@ interface IDataConfig {
   group: DataGroup;
 }
 
+interface SpiderState {
+  current: Spider;
+}
+
 const ProductSheet: React.FC = () => {
   const { t } = useTranslation('product_sheet');
 
-  const spider = useRef<Spider | undefined>(undefined);
-
-  const backendProvider = useContext<ISpiderBackend>(SpiderContext);
+  const spider = useSelector((state: SpiderState) => state.current);
 
   const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
-
-  // deactivate user actions
-  // while loading the spider config
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  // the spider name is fetched from the URL path !
-  // it is NOT the data name !
-  const { name } = useParams();
 
   // the data that will be passed to the config sidebar
   // will be updated when the spider is loaded and the user clicks on an element
@@ -60,10 +52,10 @@ const ProductSheet: React.FC = () => {
    * @param element
    */
   const showSideBar = (element: IDataConfig): void => {
-    if (spider.current) {
+    if (spider) {
       // load the spider data for this element
       let dataIndex = -1;
-      spider.current.data?.forEach((d: Data, index: number) => {
+      spider.data?.forEach((d: Data, index: number) => {
         if (d.name === element.name) {
           // set the group if not set (legacy)
           d.group = element.group;
@@ -121,7 +113,7 @@ const ProductSheet: React.FC = () => {
    */
   const isSelectorValid = (dataName: string): boolean => {
     let isConfigured = false;
-    spider.current?.data?.forEach((d: Data) => {
+    spider?.data?.forEach((d: Data) => {
       if (d.name === dataName) {
         if (d.selector && d.selector.status == SelectorStatus.VALID) {
           isConfigured = true;
@@ -139,7 +131,7 @@ const ProductSheet: React.FC = () => {
    */
   const validDataCount = (dataGroup: DataGroup): number => {
     let count = 0;
-    spider.current?.data?.forEach((d: Data) => {
+    spider?.data?.forEach((d: Data) => {
       if (d.group && d.group === dataGroup) {
         if (isSelectorValid(d.name)) {
           count++;
@@ -149,35 +141,17 @@ const ProductSheet: React.FC = () => {
     return count;
   };
 
-  useEffect(() => {
-    if (spider.current?.name !== name && name !== undefined) {
-      setIsLoading(true);
-      backendProvider.get(name, (_spider: Spider | undefined) => {
-        if (_spider) {
-          spider.current = _spider;
-        } else {
-          // TODO
-          // notify the user,
-          // the spider wasn't found
-          // propose to navigate to another screen ?
-          // or redirect the user ?
-        }
-        setIsLoading(false);
-      });
-    }
-  }, [name]);
-
   return (
     <>
-      {data && spider.current && (
+      {data && spider && (
         <ConfigSidebar isVisible={isSideBarOpen} onClose={closeSideBar}>
-          <DataConfig data={data} spider={spider.current} onSave={closeSideBar} />
+          <DataConfig data={data} spider={spider} onSave={closeSideBar} />
         </ConfigSidebar>
       )}
       {
         <Space size={['large', 0]} direction="vertical" className="gus-main-content">
-          <Spin spinning={isLoading} size="large" style={{ width: '100%', marginTop: '3em', marginBottom: '3em' }} />
-          <Row className="gus-main-row" style={{ visibility: !isLoading ? 'visible' : 'hidden' }}>
+          {/* <Spin spinning={isLoading} size="large" style={{ width: '100%', marginTop: '3em', marginBottom: '3em' }} /> */}
+          <Row className="gus-main-row">
             <Col>
               <Row className="gus-row-breathe">
                 <Col style={{ width: '100%' }}>
@@ -269,7 +243,7 @@ const ProductSheet: React.FC = () => {
                                   key={item.name}
                                   className="gus-scrapable"
                                   onClick={() => {
-                                    if (spider.current?.sampleURLs) {
+                                    if (spider?.sampleURLs) {
                                       showSideBar(item);
                                     }
                                   }}
