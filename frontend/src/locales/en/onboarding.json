@@ -1,45 +1,45 @@
 {
-    "step": {
-        "configure": "Configure the spider",
-        "configure_desc": "give it a name and optionnally a proxy configuration",
-        "choose_page_type": "Choose the kind of page you want to scrape ",
-        "choose_page_type_desc": "Supported page types are Product sheets and Category pages",
-        "finished": "Finished",
-        "finished_desc": "You can start scraping data !"
-    },
-    "configure": {
-        "name_input_title": "Enter the name of the spider",
-        "name_input_subtitle": "Scrapy for instance requires a spider name",
-        "name_placeholder": "it can be any string...",
-        "name_input_invalid": "the name cannot be null !",
-        "proxy_title": "Optionnally you can add a proxy configuration",
-        "proxy_subtitle": "The configuration of the proxy is very depending on the proxy provider and on the scraping system.",
-        "proxy_placeholder": "For scrapy for example, the proxy config is usually a JSON",
-        "proposal": "We have found an existing spider with this name",
-        "proposal_spider": "{{ name }} ({{ type }})",
-        "edit_config_title": "Editing the spider {{ name }}",
-        "no_proposal_found": "No spider with this name could be found",
-        "create_spider": "Go on to create a new spider"
-    },
-    "page_type": {
-        "product_sheet_image": "image of a product sheet",
-        "product_sheet_selected": "You chose to scrape a product sheet",
-        "click_to_select_helper": "Click the card to select this kind of page",
-        "product_sheet": "Product sheet",
-        "product_sheet_desc": "A product sheet contains all the details of the product: offer, reviews, delivery options...",
-        "category_page_image": "image of a category page",
-        "category_page_selected": "You chose to scrape a category page",
-        "category_page": "Category page",
-        "category_page_desc": "A category page presents several products with summary infos like price, availability, ranking in ths category..."
-    },
-    "action": {
-        "previous_step": "Go back",
-        "next_step": "Continue",
-        "start_scraping_action": "Start scraping",
-        "reset": "Reset the configuration"
-    },
-    "finished": {
-        "start_scraping": "Congrats !",
-        "start_scraping_subtitle": "Your spider {{ name }} has been create, you can now start scraping data"
-    }
+  "step": {
+    "configure": "Configure the spider",
+    "configure_desc": "give it a name and optionnally a proxy configuration",
+    "choose_page_type": "Choose the kind of page you want to scrape ",
+    "choose_page_type_desc": "Supported page types are Product sheets and Category pages",
+    "finished": "Finished",
+    "finished_desc": "You can start scraping data !"
+  },
+  "configure": {
+    "name_input_title": "Enter the name of the spider",
+    "name_input_subtitle": "Scrapy for instance requires a spider name",
+    "name_placeholder": "it can be any string...",
+    "name_input_invalid": "the name cannot be null !",
+    "proxy_title": "Optionnally you can add a proxy configuration",
+    "proxy_subtitle": "The configuration of the proxy is very depending on the proxy provider and on the scraping system.",
+    "proxy_placeholder": "For scrapy for example, the proxy config is usually a JSON",
+    "proposal": "We have found an existing spider with this name",
+    "proposal_spider": "{{ name }} ({{ type }})",
+    "edit_config_title": "Editing the spider {{ name }}",
+    "no_proposal_found": "No spider with this name could be found",
+    "create_spider": "Go on to create a new spider"
+  },
+  "page_type": {
+    "product_sheet_image": "image of a product sheet",
+    "product_sheet_selected": "You chose to scrape a product sheet",
+    "click_to_select_helper": "Click the card to select this kind of page",
+    "product_sheet": "Product sheet",
+    "product_sheet_desc": "A product sheet contains all the details of the product: offer, reviews, delivery options...",
+    "category_page_image": "image of a category page",
+    "category_page_selected": "You chose to scrape a category page",
+    "category_page": "Category page",
+    "category_page_desc": "A category page presents several products with summary infos like price, availability, ranking in ths category..."
+  },
+  "action": {
+    "previous_step": "Go back",
+    "next_step": "Continue",
+    "start_scraping_action": "Start scraping",
+    "reset": "Reset the configuration"
+  },
+  "finished": {
+    "start_scraping": "Congrats !",
+    "start_scraping_subtitle": "Your spider {{ name }} has been create, you can now start scraping data"
+  }
 }

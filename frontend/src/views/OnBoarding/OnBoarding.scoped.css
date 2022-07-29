@@ -1,7 +1,7 @@
 input {
-    min-width: 400px;
+  min-width: 400px;
 }
 
 .error {
-    color: var(--gus-red);
+  color: var(--gus-red);
 }

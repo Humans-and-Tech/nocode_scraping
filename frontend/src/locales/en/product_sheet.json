@@ -40,7 +40,7 @@
       "manage_custom_data": "Manage your custom data"
     }
   },
-  "tooltips" : {
+  "tooltips": {
     "data_properly_configured": "This data is ready to be scraped",
     "data_improperly_configured": "This data is not correctly configured",
     "scraping_not_available": "this element cannot be scraped"

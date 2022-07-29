@@ -1,18 +1,18 @@
 .gus-main-content {
-    width: 100vw;
-    height: 100vh;
+  width: 100vw;
+  height: 100vh;
 }
 
 .gus-main-row {
-    padding: 1em 2em;
+  padding: 1em 2em;
 }
 
 .gus-row-breathe {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 .gus-col-breathe {
-    margin-right: 1em;
+  margin-right: 1em;
 }
 /* 
 * buggy

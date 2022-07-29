@@ -1,22 +1,22 @@
 {
-    "remove_char": {
-        "title": "Remove a character",
-        "remove_at_index_label": "What is the place of the character to be removed ?",
-        "placeholder": "Enter an number"
-    },
-    "replace_char": {
-        "title": "Replace a character",
-        "replaced_input_label": "What is the character you want to replace ?",
-        "replaced_placeholder": "Enter any character",
-        "replaced_by_input_label": "What is the character to put instead?",
-        "replaced_by_placeholder": "Enter any character"
-    },
-    "pad_chars": {
-        "title": "Prefix / Suffix data",
-        "prepend_label": "Prefix data with",
-        "append_label": "Suffix data with"
-    },
-    "result_title": "Data cleaning result:",
-    "divider_try_on_real_data": "Try to clean real data",
-    "divider_cleaning_preview": "Preview of cleaned data"
+  "remove_char": {
+    "title": "Remove a character",
+    "remove_at_index_label": "What is the place of the character to be removed ?",
+    "placeholder": "Enter an number"
+  },
+  "replace_char": {
+    "title": "Replace a character",
+    "replaced_input_label": "What is the character you want to replace ?",
+    "replaced_placeholder": "Enter any character",
+    "replaced_by_input_label": "What is the character to put instead?",
+    "replaced_by_placeholder": "Enter any character"
+  },
+  "pad_chars": {
+    "title": "Prefix / Suffix data",
+    "prepend_label": "Prefix data with",
+    "append_label": "Suffix data with"
+  },
+  "result_title": "Data cleaning result:",
+  "divider_try_on_real_data": "Try to clean real data",
+  "divider_cleaning_preview": "Preview of cleaned data"
 }

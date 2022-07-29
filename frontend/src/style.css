@@ -1,4 +1,4 @@
-@import "~antd/dist/antd.css";
+@import '~antd/dist/antd.css';
 
 :root {
   --gus-white: white;
@@ -9,7 +9,6 @@
   --gus-green: green;
   --gus-broken-white: beige;
   --gus-code: #f7af3d;
-
 }
 
 p {
@@ -22,15 +21,15 @@ code {
   font-size: small;
 }
 
-li[role="menuitem"].gus-item {
+li[role='menuitem'].gus-item {
   height: auto;
 }
 
-li[role="menuitem"] .menu-title {
+li[role='menuitem'] .menu-title {
   font-size: larger;
 }
 
-li[role="menuitem"] em {
+li[role='menuitem'] em {
   white-space: normal;
   line-height: normal;
   font-size: small;
@@ -50,4 +49,3 @@ li.ant-list-item.gus-scrapable:hover {
   color: var(--gus-white);
   padding: 0.3em;
 }
-

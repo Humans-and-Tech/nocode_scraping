@@ -1,18 +1,16 @@
 .card-selected {
-    font-size: medium;
-    color: var(--gus-green);
-    display: flex;
-    align-items: center;
+  font-size: medium;
+  color: var(--gus-green);
+  display: flex;
+  align-items: center;
 }
-
 
 input.success,
 textarea.success {
-    border-color: var(--gus-green);
+  border-color: var(--gus-green);
 }
 
 input.error,
 textarea.error {
-    border-color: var(--gus-red);
+  border-color: var(--gus-red);
 }
-
