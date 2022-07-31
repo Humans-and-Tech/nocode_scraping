@@ -6,7 +6,7 @@ import './Sweepers.scoped.css';
 
 interface IRemoveCharSweeperProps {
   onConfigured: (val: string | undefined) => void;
-  testdata: string;
+  testdata: string | undefined;
 }
 
 const layout = {
@@ -26,7 +26,7 @@ export const ReplaceCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweepe
   const replacedValue = Form.useWatch('replaced', form);
   const replacedByValue = Form.useWatch('replacedBy', form);
 
-  const [contentAfter, setContentAfter] = useState<string>('');
+  const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
@@ -36,12 +36,17 @@ export const ReplaceCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweepe
   };
 
   useEffect(() => {
-    if (replacedValue && replacedByValue && testdata) {
-      const finalString = testdata.replace(replacedValue, replacedByValue);
-      setContentAfter(finalString);
-      onConfigured(finalString);
+    if (isChecked) {
+      if (replacedValue && replacedByValue && testdata) {
+        const finalString = testdata.replace(replacedValue, replacedByValue);
+        setContentAfter(finalString);
+        onConfigured(finalString);
+      }
+    } else {
+      setContentAfter(undefined);
+      onConfigured(undefined);
     }
-  }, [isChecked, replacedValue, replacedByValue]);
+  }, [testdata, isChecked, replacedValue, replacedByValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>

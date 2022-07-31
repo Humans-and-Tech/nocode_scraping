@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState, useContext } from 'react';
-import { Divider, Space, Spin } from 'antd';
+import { Divider, Space, Spin, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { ScrapingContext } from '../../../BackendContext';
@@ -12,7 +12,6 @@ import { PadSweeper } from './PadSweeper';
 import { ExtractData } from './RegexSweeper';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { displayMessage, NotificationLevel } from '../../Layout/UserNotification';
-// import {ScrapeContent} from '../DataScraping/ScrapeContent';
 
 import './Sweepers.scoped.css';
 
@@ -28,6 +27,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   const backendProvider = useContext<IScrapingBackend>(ScrapingContext);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRetry, setIsRety] = useState<boolean>(false);
 
   /**
    * the content before being sweeped by a sweeper
@@ -39,35 +39,75 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
    */
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
-  /**
-   * the content transformed by the accumulation of all sweepers
-   */
-  // const [contentCumulatedAfter, setContentCumulatedAfter] = useState<string | undefined>(undefined);
+  const [contentBeforeRemove, setContentBeforeRemove] = useState<string | undefined>(undefined);
+  const [contentAfterRemove, setContentAfterRemove] = useState<string | undefined>(undefined);
+  const [contentBeforeReplace, setContentBeforeReplace] = useState<string | undefined>(undefined);
+  const [contentAfterReplace, setContentAfterReplace] = useState<string | undefined>(undefined);
+  const [contentBeforePad, setContentBeforePad] = useState<string | undefined>(undefined);
+  const [contentAfterPad, setContentAfterPad] = useState<string | undefined>(undefined);
+  const [contentBeforeRegex, setContentBeforeRegex] = useState<string | undefined>(undefined);
+  const [contentAfterRegex, setContentAfterRegex] = useState<string | undefined>(undefined);
 
   /**
    * when the value passed is undefined, it means that the sweeper is deactivated
    * @param val
    */
-  const updateContentAfter = (val: string | undefined) => {
+  const updateContentAfterRemove = (val: string | undefined) => {
     if (val) {
-      setContentAfter(val);
+      setContentAfterRemove(val);
+      setContentBeforeReplace(val);
     } else {
-      // reset the sweepers and replay them
-      setContentBefore(undefined);
+      setContentAfterRemove(contentBefore);
+      setContentBeforeReplace(contentBefore);
     }
   };
 
-  const onDataExtract = (regex: string | undefined) => {
-    console.log(regex);
+  const updateContentAfterReplace = (val: string | undefined) => {
+    if (val) {
+      setContentAfterReplace(val);
+      setContentBeforePad(val);
+    } else {
+      setContentAfterReplace(contentBeforeReplace);
+      setContentBeforePad(contentBeforeReplace);
+    }
   };
 
-  /**
-   * scrape content based on a sample URL
-   */
-  useEffect(() => {
-    if (!contentBefore && data.selector && spider.sampleURLs) {
-      setIsLoading(true);
+  const updateContentAfterPad = (val: string | undefined) => {
+    if (val) {
+      setContentAfterPad(val);
+      setContentBeforeRegex(val);
+    } else {
+      setContentAfterPad(contentBeforePad);
+      setContentBeforeRegex(contentBeforePad);
+    }
+  };
 
+  const updateContentAfterRegex = (val: string | undefined) => {
+    if (val) {
+      setContentAfterRegex(val);
+    } else {
+      setContentAfterRegex(contentBeforeRegex);
+    }
+  };
+
+  const updateContentAfter = () => {
+    if (contentAfterRegex) {
+      setContentAfter(contentAfterRegex);
+    } else if (contentAfterPad) {
+      setContentAfter(contentAfterPad);
+    } else if (contentAfterReplace) {
+      setContentAfter(contentAfterReplace);
+    } else if (contentAfterRemove) {
+      setContentAfter(contentAfterRemove);
+    } else {
+      setContentAfter(undefined);
+    }
+  };
+
+  const loadContentBefore = () => {
+    if (data.selector && spider.sampleURLs) {
+      setIsRety(false);
+      setIsLoading(true);
       backendProvider.getContent(
         {},
         data.selector,
@@ -76,42 +116,52 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
         (response: ScrapingResponse | ScrapingError) => {
           if (response.status == ScrapingStatus.SUCCESS && response.content) {
             setContentBefore(response.content);
+            setContentBeforeRemove(response.content);
             setContentAfter(undefined);
           } else {
-            console.error('error', response);
             displayMessage(NotificationLevel.ERROR, t('loading_error'));
+            // retry in case of failure
+            setIsRety(true);
           }
 
           setIsLoading(false);
         }
       );
-    } else {
-      // accumulate the sweepers
-      // --> each time contentAfter is updated,
-      // the contentBefore becomes the contentAfter
-      if (contentAfter) {
-        setContentBefore(contentAfter);
-      }
     }
-  }, [contentBefore, contentAfter]);
+  };
+
+  /**
+   * scrape content based on a sample URL
+   */
+  useEffect(() => {
+    if (!contentBefore) {
+      loadContentBefore();
+    }
+    updateContentAfter();
+  }, [contentBefore, contentAfterRemove, contentAfterReplace, contentAfterPad, contentAfterRegex]);
 
   return (
     <>
       {<Spin spinning={isLoading} size="large" style={{ width: '100%', marginTop: '3em', marginBottom: '3em' }} />}
+      {isRetry && (
+        <Button onClick={loadContentBefore} danger>
+          {t('retry')}
+        </Button>
+      )}
       {contentBefore && (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <RemoveCharSweeper onConfigured={updateContentAfter} testdata={contentBefore} />
-          <ReplaceCharSweeper onConfigured={updateContentAfter} testdata={contentBefore} />
-          <PadSweeper onConfigured={updateContentAfter} testdata={contentBefore} />
-          <ExtractData onConfigured={onDataExtract} testdata={contentBefore} />
-          {/* <Divider orientation="left">{t('divider_try_on_real_data') as ReactNode}</Divider>
-          <ScrapeContent spider={spider} data={data} showScreenshot={false}  /> */}
-          {/* {contentCumulatedAfter && contentBefore && ( */}
-          {/* <> */}
-          {/* <Divider orientation="left">{t('divider_cleaning_preview') as ReactNode}</Divider> */}
-          {/* <SweepersResult contentBefore={contentBefore} contentAfter={contentCumulatedAfter} /> */}
-          {/* </> */}
-          {/* )} */}
+          <RemoveCharSweeper onConfigured={updateContentAfterRemove} testdata={contentBeforeRemove} />
+          <ReplaceCharSweeper onConfigured={updateContentAfterReplace} testdata={contentBeforeReplace} />
+          <PadSweeper onConfigured={updateContentAfterPad} testdata={contentBeforePad} />
+          <ExtractData onConfigured={updateContentAfterRegex} testdata={contentBeforeRegex} />
+          
+          {contentAfter && (
+            <>
+              <Divider orientation="left">{t('divider_cleaning_preview') as ReactNode}</Divider>
+              <SweepersResult contentBefore={contentBefore} contentAfter={contentAfter} />
+            </>
+          )}
+
         </Space>
       )}
     </>

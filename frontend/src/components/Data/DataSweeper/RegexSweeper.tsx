@@ -6,7 +6,7 @@ import './Sweepers.scoped.css';
 
 interface IPadSweeperProps {
   onConfigured: (regex: string | undefined) => void;
-  testdata: string;
+  testdata: string | undefined;
 }
 
 const layout = {
@@ -31,8 +31,12 @@ export const ExtractData = ({ onConfigured, testdata }: IPadSweeperProps): JSX.E
   };
 
   useEffect(() => {
-    onConfigured(regexValue);
-  }, [regexValue]);
+    if (isChecked) {
+      onConfigured(regexValue);
+    } else {
+      onConfigured(undefined);
+    }
+  }, [testdata, regexValue, isChecked]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>

@@ -6,7 +6,7 @@ import './Sweepers.scoped.css';
 
 interface IPadSweeperProps {
   onConfigured: (val: string | undefined) => void;
-  testdata: string;
+  testdata: string | undefined;
 }
 
 const layout = {
@@ -27,7 +27,7 @@ export const PadSweeper = ({ onConfigured, testdata }: IPadSweeperProps): JSX.El
 
   const prependValue = Form.useWatch('prepend', form);
 
-  const [contentAfter, setContentAfter] = useState<string>('');
+  const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
   const onSelection = (checked: boolean) => {
     setIsChecked(checked);
@@ -37,18 +37,23 @@ export const PadSweeper = ({ onConfigured, testdata }: IPadSweeperProps): JSX.El
   };
 
   useEffect(() => {
-    if ((appendValue || prependValue) && testdata) {
-      let finalString = testdata;
-      if (prependValue) {
-        finalString = prependValue.concat(finalString);
+    if (isChecked) {
+      if ((appendValue || prependValue) && testdata) {
+        let finalString = testdata;
+        if (prependValue) {
+          finalString = prependValue.concat(finalString);
+        }
+        if (appendValue) {
+          finalString = finalString.concat(appendValue);
+        }
+        setContentAfter(finalString);
+        onConfigured(finalString);
       }
-      if (appendValue) {
-        finalString = finalString.concat(appendValue);
-      }
-      setContentAfter(finalString);
-      onConfigured(finalString);
+    } else {
+      setContentAfter(undefined);
+      onConfigured(undefined);
     }
-  }, [appendValue, prependValue]);
+  }, [testdata, appendValue, prependValue, isChecked]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>

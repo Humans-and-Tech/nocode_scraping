@@ -6,7 +6,7 @@ import './Sweepers.scoped.css';
 
 interface IRemoveCharSweeperProps {
   onConfigured: (value: string | undefined) => void;
-  testdata: string;
+  testdata: string | undefined;
 }
 
 const layout = {
@@ -35,18 +35,21 @@ export const RemoveCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweeper
   };
 
   useEffect(() => {
-    console.log('testdata', testdata, charIndexValue);
-
-    if (charIndexValue && testdata) {
-      const finalString =
-        testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
-      setContentAfter(finalString);
-      onConfigured(finalString);
-    } else if (testdata) {
-      setContentAfter(testdata);
-      onConfigured(testdata);
+    if (isChecked) {
+      if (charIndexValue && testdata) {
+        const finalString =
+          testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
+        setContentAfter(finalString);
+        onConfigured(finalString);
+      } else if (testdata) {
+        setContentAfter(testdata);
+        onConfigured(testdata);
+      }
+    } else {
+      setContentAfter(undefined);
+      onConfigured(undefined);
     }
-  }, [charIndexValue]);
+  }, [testdata, charIndexValue, isChecked]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>

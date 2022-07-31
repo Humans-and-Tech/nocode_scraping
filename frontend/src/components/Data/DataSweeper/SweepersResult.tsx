@@ -1,7 +1,6 @@
 import React from 'react';
 import { Space } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
 
@@ -17,7 +16,6 @@ interface ISweepersResultPropsType {
  * @returns JSX.Element
  */
 export const SweepersResult = (props: ISweepersResultPropsType): JSX.Element => {
-  // const { t } = useTranslation('sweepers');
 
   const { contentBefore, contentAfter } = props;
 
