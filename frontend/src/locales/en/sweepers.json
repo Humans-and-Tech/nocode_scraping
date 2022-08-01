@@ -1,6 +1,10 @@
 {
+  "loading_scraped_content": "We are loading some scraped content to facilitate the configuration of data cleaning",
   "loading_error": "There was an error loading the scraped data",
   "sweeper_result_intro": "With this cleaner, your data will be transformed into:",
+  "delete_sweeper": "Delete",
+  "add_first_sweeper": "Select a sweeper to start cleaning the data scraped",
+  "add_more_sweepers": "Add more sweepers to clean you data",
   "remove_char": {
     "title": "Remove a character",
     "remove_at_index_label": "What is the place of the character to be removed ?",

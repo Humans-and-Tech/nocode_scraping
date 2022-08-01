@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Space, Switch, Input, Form, Typography } from 'antd';
+import { Space, Input, Form, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
 
+export interface PadFormState {
+  appendValue: string | undefined;
+  prependValue: string | undefined;
+}
+
 interface IPadSweeperProps {
-  onConfigured: (val: string | undefined) => void;
+  onConfigured: (state: PadFormState, val: string | undefined) => void;
   testdata: string | undefined;
+  initialState?: PadFormState;
 }
 
 const layout = {
@@ -16,10 +22,8 @@ const layout = {
 
 const { Text } = Typography;
 
-export const PadSweeper = ({ onConfigured, testdata }: IPadSweeperProps): JSX.Element => {
+export const PadSweeper = ({ onConfigured, testdata, initialState }: IPadSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
-
-  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const [form] = Form.useForm<{ append: string; prepend: string }>();
 
@@ -29,55 +33,49 @@ export const PadSweeper = ({ onConfigured, testdata }: IPadSweeperProps): JSX.El
 
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
-  const onSelection = (checked: boolean) => {
-    setIsChecked(checked);
-    if (!checked) {
-      onConfigured(undefined);
-    }
-  };
-
   useEffect(() => {
-    if (isChecked) {
-      if ((appendValue || prependValue) && testdata) {
-        let finalString = testdata;
-        if (prependValue) {
-          finalString = prependValue.concat(finalString);
-        }
-        if (appendValue) {
-          finalString = finalString.concat(appendValue);
-        }
-        setContentAfter(finalString);
-        onConfigured(finalString);
+    if ((appendValue || prependValue) && testdata) {
+      let finalString = testdata;
+      if (prependValue) {
+        finalString = prependValue.concat(finalString);
       }
-    } else {
-      setContentAfter(undefined);
-      onConfigured(undefined);
+      if (appendValue) {
+        finalString = finalString.concat(appendValue);
+      }
+      setContentAfter(finalString);
+      onConfigured(
+        {
+          appendValue: appendValue,
+          prependValue: prependValue
+        },
+        finalString
+      );
     }
-  }, [testdata, appendValue, prependValue, isChecked]);
+  }, [testdata, appendValue, prependValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <Space direction="horizontal" size="middle">
-        <Switch onChange={onSelection} checked={isChecked} />
-        <h4>{t('pad_chars.title')}</h4>
-      </Space>
-      {isChecked && (
-        <Form form={form} {...layout} autoComplete="off" labelWrap>
-          <Form.Item label={t('pad_chars.prepend_label')} name="prepend">
-            <Input placeholder={t('pad_chars.prepend_placeholder')} />
-          </Form.Item>
+      <Form
+        form={form}
+        initialValues={{ append: initialState?.appendValue, prepend: initialState?.prependValue }}
+        autoComplete="off"
+        labelWrap
+        {...layout}
+      >
+        <Form.Item label={t('pad_chars.prepend_label')} name="prepend">
+          <Input placeholder={t('pad_chars.prepend_placeholder')} />
+        </Form.Item>
 
-          <Form.Item label={t('pad_chars.append_label')} name="append">
-            <Input placeholder={t('pad_chars.append_placeholder')} />
-          </Form.Item>
-          {contentAfter && (
-            <>
-              {t('sweeper_result_intro')}
-              <Text code>{contentAfter}</Text>
-            </>
-          )}
-        </Form>
-      )}
+        <Form.Item label={t('pad_chars.append_label')} name="append">
+          <Input placeholder={t('pad_chars.append_placeholder')} />
+        </Form.Item>
+        {contentAfter && (
+          <>
+            {t('sweeper_result_intro')}
+            <Text code>{contentAfter}</Text>
+          </>
+        )}
+      </Form>
     </Space>
   );
 };

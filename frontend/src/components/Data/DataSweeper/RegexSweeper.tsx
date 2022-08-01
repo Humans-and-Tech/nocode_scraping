@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Space, Switch, Input, Form, Button } from 'antd';
+import React, { useEffect } from 'react';
+import { Space, Input, Form } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
 
+export interface RegexFormState {
+  regexValue: string | undefined;
+}
+
 interface IPadSweeperProps {
-  onConfigured: (regex: string | undefined) => void;
+  onConfigured: (state: RegexFormState, regex: string | undefined) => void;
   testdata: string | undefined;
+  initialState: RegexFormState;
 }
 
 const layout = {
@@ -14,46 +19,25 @@ const layout = {
   wrapperCol: { span: 12 }
 };
 
-export const ExtractData = ({ onConfigured, testdata }: IPadSweeperProps): JSX.Element => {
+export const ExtractData = ({ onConfigured, testdata, initialState }: IPadSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
-
-  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const [form] = Form.useForm<{ regex: string }>();
 
   const regexValue = Form.useWatch('regex', form);
 
-  const onSelection = (checked: boolean) => {
-    setIsChecked(checked);
-    if (!checked) {
-      onConfigured(undefined);
-    }
-  };
-
   useEffect(() => {
-    if (isChecked) {
-      onConfigured(regexValue);
-    } else {
-      onConfigured(undefined);
-    }
-  }, [testdata, regexValue, isChecked]);
+    onConfigured({ regexValue: regexValue }, regexValue);
+  }, [testdata, regexValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <Space direction="horizontal" size="middle">
-        <Switch onChange={onSelection} checked={isChecked} />
-        <h4>{t('regex.title')}</h4>
-      </Space>
-      {isChecked && (
-        <>
-          <span dangerouslySetInnerHTML={{ __html: t('regex.intro') }}></span>
-          <Form form={form} {...layout} autoComplete="off" labelWrap>
-            <Form.Item label={t('regex.label')} name="regex">
-              <Input placeholder={t('regex.placeholder')} />
-            </Form.Item>
-          </Form>
-        </>
-      )}
+      <span dangerouslySetInnerHTML={{ __html: t('regex.intro') }}></span>
+      <Form form={form} initialValues={{ regex: initialState?.regexValue }} autoComplete="off" labelWrap {...layout}>
+        <Form.Item label={t('regex.label')} name="regex">
+          <Input placeholder={t('regex.placeholder')} />
+        </Form.Item>
+      </Form>
     </Space>
   );
 };

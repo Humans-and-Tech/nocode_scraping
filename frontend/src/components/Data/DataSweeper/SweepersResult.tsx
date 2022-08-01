@@ -16,7 +16,6 @@ interface ISweepersResultPropsType {
  * @returns JSX.Element
  */
 export const SweepersResult = (props: ISweepersResultPropsType): JSX.Element => {
-
   const { contentBefore, contentAfter } = props;
 
   return (

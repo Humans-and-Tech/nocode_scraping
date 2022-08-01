@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Space, Switch, Form, InputNumber, Typography } from 'antd';
+import { Space, Form, InputNumber, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
 
+export interface RemoveFormState {
+  charIndexValue: number | undefined;
+}
+
 interface IRemoveCharSweeperProps {
-  onConfigured: (value: string | undefined) => void;
+  onConfigured: (state: RemoveFormState, value: string | undefined) => void;
   testdata: string | undefined;
+  initialState: RemoveFormState;
 }
 
 const layout = {
@@ -16,10 +21,8 @@ const layout = {
 
 const { Text } = Typography;
 
-export const RemoveCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweeperProps): JSX.Element => {
+export const RemoveCharSweeper = ({ onConfigured, testdata, initialState }: IRemoveCharSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
-
-  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const [form] = Form.useForm<{ charIndex: number }>();
 
@@ -27,49 +30,43 @@ export const RemoveCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweeper
 
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
-  const onSelection = (checked: boolean) => {
-    setIsChecked(checked);
-    if (!checked) {
-      onConfigured(undefined);
-    }
-  };
-
   useEffect(() => {
-    if (isChecked) {
-      if (charIndexValue && testdata) {
-        const finalString =
-          testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
-        setContentAfter(finalString);
-        onConfigured(finalString);
-      } else if (testdata) {
-        setContentAfter(testdata);
-        onConfigured(testdata);
-      }
-    } else {
-      setContentAfter(undefined);
-      onConfigured(undefined);
+    if (charIndexValue && testdata) {
+      const finalString =
+        testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
+      setContentAfter(finalString);
+      onConfigured(
+        {
+          charIndexValue: charIndexValue
+        },
+        finalString
+      );
     }
-  }, [testdata, charIndexValue, isChecked]);
+    // else if (testdata) {
+    //   setContentAfter(testdata);
+    //   onConfigured(testdata);
+    // }
+  }, [testdata, charIndexValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <Space direction="horizontal" size="middle">
-        <Switch onChange={onSelection} checked={isChecked} />
-        <h4>{t('remove_char.title')}</h4>
-      </Space>
-      {isChecked && (
-        <Form form={form} {...layout} autoComplete="off" labelWrap>
-          <Form.Item label={t('remove_char.remove_at_index_label')} name="charIndex">
-            <InputNumber />
-          </Form.Item>
-          {contentAfter && (
-            <>
-              {t('sweeper_result_intro')}
-              <Text code>{contentAfter}</Text>
-            </>
-          )}
-        </Form>
-      )}
+      <Form
+        form={form}
+        initialValues={{ charIndex: initialState?.charIndexValue }}
+        autoComplete="off"
+        labelWrap
+        {...layout}
+      >
+        <Form.Item label={t('remove_char.remove_at_index_label')} name="charIndex">
+          <InputNumber />
+        </Form.Item>
+        {contentAfter && (
+          <>
+            {t('sweeper_result_intro')}
+            <Text code>{contentAfter}</Text>
+          </>
+        )}
+      </Form>
     </Space>
   );
 };

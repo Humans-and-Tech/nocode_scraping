@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Space, Switch, Form, Input, Typography } from 'antd';
+import { Space, Form, Input, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
 
+export interface ReplaceFormState {
+  replacedValue: string | undefined;
+  replacedByValue: string | undefined;
+}
+
 interface IRemoveCharSweeperProps {
-  onConfigured: (val: string | undefined) => void;
+  onConfigured: (state: ReplaceFormState, value: string) => void;
   testdata: string | undefined;
+  initialState?: ReplaceFormState;
 }
 
 const layout = {
@@ -16,10 +22,8 @@ const layout = {
 
 const { Text } = Typography;
 
-export const ReplaceCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweeperProps): JSX.Element => {
+export const ReplaceCharSweeper = ({ onConfigured, testdata, initialState }: IRemoveCharSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
-
-  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const [form] = Form.useForm<{ replaced: string; replacedBy: string }>();
 
@@ -28,49 +32,44 @@ export const ReplaceCharSweeper = ({ onConfigured, testdata }: IRemoveCharSweepe
 
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
-  const onSelection = (checked: boolean) => {
-    setIsChecked(checked);
-    if (!checked) {
-      onConfigured(undefined);
-    }
-  };
-
   useEffect(() => {
-    if (isChecked) {
-      if (replacedValue && replacedByValue && testdata) {
-        const finalString = testdata.replace(replacedValue, replacedByValue);
-        setContentAfter(finalString);
-        onConfigured(finalString);
-      }
-    } else {
-      setContentAfter(undefined);
-      onConfigured(undefined);
+    if (replacedValue && replacedByValue && testdata) {
+      const finalString = testdata.replace(replacedValue, replacedByValue);
+      setContentAfter(finalString);
+      onConfigured(
+        {
+          replacedValue: replacedValue,
+          replacedByValue: replacedByValue
+        },
+        finalString
+      );
     }
-  }, [testdata, isChecked, replacedValue, replacedByValue]);
+  }, [testdata, replacedValue, replacedByValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <Space direction="horizontal" size="middle">
-        <Switch onChange={onSelection} checked={isChecked} />
-        <h4>{t('replace_char.title')}</h4>
-      </Space>
-      {isChecked && (
-        <Form form={form} {...layout} autoComplete="off" labelWrap>
-          <Form.Item label={t('replace_char.replaced_placeholder')} name="replaced">
-            <Input placeholder={t('replace_char.replaced_placeholder')} />
-          </Form.Item>
+      <Form
+        form={form}
+        initialValues={{ replaced: initialState?.replacedValue, replacedBy: initialState?.replacedByValue }}
+        autoComplete="off"
+        labelWrap
+        {...layout}
+      >
+        <Form.Item label={t('replace_char.replaced_placeholder')} name="replaced">
+          <Input placeholder={t('replace_char.replaced_placeholder')} />
+        </Form.Item>
 
-          <Form.Item label={t('replace_char.replaced_by_input_label')} name="replacedBy">
-            <Input placeholder={t('replace_char.replaced_by_placeholder')} />
-          </Form.Item>
-          {contentAfter && (
-            <>
-              {t('sweeper_result_intro')}
-              <Text code>{contentAfter}</Text>
-            </>
-          )}
-        </Form>
-      )}
+        <Form.Item label={t('replace_char.replaced_by_input_label')} name="replacedBy">
+          <Input placeholder={t('replace_char.replaced_by_placeholder')} />
+        </Form.Item>
+
+        {contentAfter && (
+          <>
+            {t('sweeper_result_intro')}
+            <Text code>{contentAfter}</Text>
+          </>
+        )}
+      </Form>
     </Space>
   );
 };
