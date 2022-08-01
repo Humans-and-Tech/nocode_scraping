@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Space, Input, Form } from 'antd';
+import { Space, Input, Form, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import './Sweepers.scoped.css';
@@ -19,6 +19,8 @@ const layout = {
   wrapperCol: { span: 12 }
 };
 
+const { Text } = Typography;
+
 export const ExtractData = ({ onConfigured, testdata, initialState }: IPadSweeperProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
 
@@ -27,7 +29,9 @@ export const ExtractData = ({ onConfigured, testdata, initialState }: IPadSweepe
   const regexValue = Form.useWatch('regex', form);
 
   useEffect(() => {
-    onConfigured({ regexValue: regexValue }, regexValue);
+    if (regexValue && testdata) {
+      onConfigured({ regexValue: regexValue }, regexValue);
+    }
   }, [testdata, regexValue]);
 
   return (
@@ -37,6 +41,12 @@ export const ExtractData = ({ onConfigured, testdata, initialState }: IPadSweepe
         <Form.Item label={t('regex.label')} name="regex">
           <Input placeholder={t('regex.placeholder')} />
         </Form.Item>
+
+        {regexValue && (
+          <>
+            <Text italic>{t('regex.outro')}</Text>
+          </>
+        )}
       </Form>
     </Space>
   );

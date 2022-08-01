@@ -5,6 +5,11 @@
   "delete_sweeper": "Delete",
   "add_first_sweeper": "Select a sweeper to start cleaning the data scraped",
   "add_more_sweepers": "Add more sweepers to clean you data",
+  "select_sweeper_placeholder": "Select a way to clean your data",
+  "select_remove_char_label": "Remove a char",
+  "select_replace_char_label": "Replace a char with another one",
+  "select_pad_label": "Add a prefix and/or a suffix",
+  "select_regex_label": "Apply a Regular Expression",
   "remove_char": {
     "title": "Remove a character",
     "remove_at_index_label": "What is the place of the character to be removed ?",
@@ -28,7 +33,8 @@
     "title": "Regular Expression (Regex)",
     "label": "Python Regex",
     "intro": "The data is going to be scraped with a software written in python, that's why you need to enter here a valid python regex. Use a Regex testing tool like <a href='https://www.regex101.com' _target='blank'>Regex101.com</a> to validate your regex",
-    "placeholder": "Enter a valid python regex"
+    "placeholder": "Enter a valid python regex",
+    "outro": "The effect of this cleaner cannot be previewed"
   },
   "result_title": "Data cleaning result:",
   "divider_try_on_real_data": "Try to clean real data",

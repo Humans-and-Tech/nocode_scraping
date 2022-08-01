@@ -142,6 +142,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   };
 
   const onAddSweeper = (value: SweeperKey) => {
+    console.log('onAddSweeper', value);
     let label = '';
     if (value == SweeperKey.removeChar) {
       label = t('remove_char_label');
@@ -204,10 +205,14 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
         />
       );
     } else if (item.value == SweeperKey.regex) {
+      // the regex contentAfter is not renderable
+      // thus we pass the sweeperContentBefore as sweeperContentAfter
       return (
         <ExtractData
           initialState={item.state as RegexFormState}
-          onConfigured={(state: RegexFormState, value: string | undefined) => updateContentAfter(item, state, value)}
+          onConfigured={(state: RegexFormState, value: string | undefined) =>
+            updateContentAfter(item, state, item.sweeperContentBefore)
+          }
           testdata={item.sweeperContentBefore}
         />
       );
@@ -260,11 +265,11 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Text italic>{addMoreText()}</Text>
 
-          <Select placeholder="Select a person" optionFilterProp="children" onChange={onAddSweeper}>
-            <Option value="removeChar">{t('select_remove_char')}</Option>
-            <Option value="replaceChar">{t('select_replace_char')}</Option>
-            <Option value="pad">{t('select_pad')}</Option>
-            <Option value="regex">{t('select_regex')}</Option>
+          <Select placeholder={t('select_sweeper_placeholder')} onSelect={onAddSweeper} style={{ width: '100%' }}>
+            <Option value="removeChar">{t('select_remove_char_label')}</Option>
+            <Option value="replaceChar">{t('select_replace_char_label')}</Option>
+            <Option value="pad">{t('select_pad_label')}</Option>
+            <Option value="regex">{t('select_regex_label')}</Option>
           </Select>
 
           <List
