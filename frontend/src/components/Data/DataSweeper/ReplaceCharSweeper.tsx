@@ -48,6 +48,9 @@ export const ReplaceCharSweeper = ({ onConfigured, testdata, initialState }: IRe
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Typography>
+        <h5>{t('replace_char.title')}</h5>
+      </Typography>
       <Form
         form={form}
         initialValues={{ replaced: initialState?.replacedValue, replacedBy: initialState?.replacedByValue }}

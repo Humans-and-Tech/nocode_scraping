@@ -1,8 +1,10 @@
 import React, { ReactNode, useEffect, useState, useContext } from 'react';
 import { Divider, Space, Spin, Button, List, Select, Alert, Typography } from 'antd';
+import { DragOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 import clone from 'lodash/clone';
+import ReactDragListView from 'react-drag-listview';
 
 import { ScrapingContext } from '../../../BackendContext';
 import { IScrapingBackend } from '../../../BackendProvider';
@@ -36,14 +38,9 @@ interface SweeperItem {
   state: unknown;
 }
 
-function logSweeperItemList(items: Array<SweeperItem | undefined>) {
-  const tmp = items.map((x) => `${x?.index}: ${x?.label}, ${x?.sweeperContentBefore} --> ${x?.sweeperContentAfter}`);
-  console.log(tmp);
-}
-
 /**
- * Sweepers are meant to slightly cleanup the data scraped.
- * They are not meant to "change" the data, but to make them more readable / standard
+ * Sweepers are meant to cleanup the scraped data.
+ * They are not meant to "change" the data, but to facilitate their integration
  *
  * @returns a JSX.Element
  */
@@ -68,12 +65,57 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   const [selectedSweepersList, setSelectedSweepersList] = useState<Array<SweeperItem | undefined>>([]);
 
   /**
-   * runs each time a sweeper is configured
+   * - each sweeper's ContentBefore, is the previous Sweeper's contentAfter
+   * - a sweeper's index is aligned with the sweeper's position in the list
+   *
+   * @param _selectedSweepersList
+   * @returns
+   */
+  const alignSweepersContentBeforeAndAfter = (_selectedSweepersList: Array<SweeperItem | undefined>) => {
+    // re-align index with position in array
+    // and re-align content before and content after
+    _selectedSweepersList.forEach((item: SweeperItem | undefined, index: number) => {
+      if (item) {
+        item.index = index;
+        if (index == 0) {
+          item.sweeperContentBefore = contentBefore;
+        } else {
+          item.sweeperContentBefore = _selectedSweepersList[index - 1]?.sweeperContentAfter;
+        }
+      }
+    });
+    return _selectedSweepersList;
+  };
+
+  /**
+   * when a sweeper is dragged n dropped in the list
+   *
+   * @param fromIndex
+   * @param toIndex
+   * @returns
+   */
+  const onDragEnd = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0) return; // Ignores if outside designated area
+
+    let _selectedSweepersList = clone(selectedSweepersList);
+    const _sweep = _selectedSweepersList.splice(fromIndex, 1)[0];
+    _selectedSweepersList.splice(toIndex, 0, _sweep);
+
+    // re-align index with position in array
+    // and re-align content before and content after
+    _selectedSweepersList = alignSweepersContentBeforeAndAfter(_selectedSweepersList);
+
+    setSelectedSweepersList(_selectedSweepersList);
+  };
+
+  /**
+   * recalculates the sweeper's contentAfter each time a sweeper is configured
+   * and updates the next sweeper's contentBefore with this current sweeper's contentAfter
    *
    * @param item
    * @param value
    */
-  const updateContentAfter = (item: SweeperItem, state: unknown, value: string | undefined) => {
+  const updateSweeperContentAfter = (item: SweeperItem, state: unknown, value: string | undefined) => {
     if (!value) {
       deleteSweeper(item);
     } else {
@@ -81,12 +123,19 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       item.sweeperContentAfter = value;
       item.state = state;
       _selectedSweepersList[item.index] = item;
+
+      //next sweeper:
+      const next = _selectedSweepersList[item.index + 1];
+      if (next) {
+        next.sweeperContentBefore = value;
+      }
+
       setSelectedSweepersList(_selectedSweepersList);
     }
   };
 
   /**
-   * initially
+   * initialize contentBefore & contentAfter
    */
   const init = () => {
     if (data.selector && spider.sampleURLs) {
@@ -130,19 +179,19 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
     });
 
     // re-align index with position in array
-    _selectedSweepersList.forEach((item: SweeperItem | undefined, index: number) => {
-      if (item) {
-        item.index = index;
-      }
-    });
-
-    logSweeperItemList(_selectedSweepersList);
+    // and re-align content before and content after
+    _selectedSweepersList = alignSweepersContentBeforeAndAfter(_selectedSweepersList);
 
     setSelectedSweepersList(_selectedSweepersList);
   };
 
+  /**
+   * creates a new sweeper
+   * by default the sweeper's contentAfter = sweeper's contentBefore
+   *
+   * @param value
+   */
   const onAddSweeper = (value: SweeperKey) => {
-    console.log('onAddSweeper', value);
     let label = '';
     if (value == SweeperKey.removeChar) {
       label = t('remove_char_label');
@@ -172,7 +221,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       label: label,
       index: selectedSweepersList.length,
       sweeperContentBefore: _sweeperContentBefore,
-      sweeperContentAfter: undefined,
+      sweeperContentAfter: _sweeperContentBefore,
       state: undefined
     });
 
@@ -184,7 +233,9 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       return (
         <RemoveCharSweeper
           initialState={item.state as RemoveFormState}
-          onConfigured={(state: RemoveFormState, value: string | undefined) => updateContentAfter(item, state, value)}
+          onConfigured={(state: RemoveFormState, value: string | undefined) =>
+            updateSweeperContentAfter(item, state, value)
+          }
           testdata={item.sweeperContentBefore}
         />
       );
@@ -192,7 +243,9 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       return (
         <ReplaceCharSweeper
           initialState={item.state as ReplaceFormState}
-          onConfigured={(state: ReplaceFormState, value: string | undefined) => updateContentAfter(item, state, value)}
+          onConfigured={(state: ReplaceFormState, value: string | undefined) =>
+            updateSweeperContentAfter(item, state, value)
+          }
           testdata={item.sweeperContentBefore}
         />
       );
@@ -200,7 +253,9 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       return (
         <PadSweeper
           initialState={item.state as PadFormState}
-          onConfigured={(state: PadFormState, value: string | undefined) => updateContentAfter(item, state, value)}
+          onConfigured={(state: PadFormState, value: string | undefined) =>
+            updateSweeperContentAfter(item, state, value)
+          }
           testdata={item.sweeperContentBefore}
         />
       );
@@ -211,7 +266,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
         <ExtractData
           initialState={item.state as RegexFormState}
           onConfigured={(state: RegexFormState, value: string | undefined) =>
-            updateContentAfter(item, state, item.sweeperContentBefore)
+            updateSweeperContentAfter(item, state, item.sweeperContentBefore)
           }
           testdata={item.sweeperContentBefore}
         />
@@ -220,9 +275,10 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   };
 
   /**
-   * scrape content based on a sample URL
+   * recalculate the contentAfter
    */
   useEffect(() => {
+    console.log('> useEffect');
     if (!contentBefore) {
       init();
     } else if (selectedSweepersList.length == 0) {
@@ -232,14 +288,18 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       //  first sweeper's content before is the content before
       const firstSweeper = selectedSweepersList[0];
       if (firstSweeper) {
-        console.log('firstSweeper >> sweeperContentBefore', contentBefore);
         firstSweeper.sweeperContentBefore = contentBefore;
       }
 
       // the content after is the latest sweeper's content after
       const lastSweeper = selectedSweepersList[selectedSweepersList.length - 1];
+      console.log(
+        '> useEffect - lastSweeper',
+        lastSweeper?.value,
+        lastSweeper?.sweeperContentBefore,
+        lastSweeper?.sweeperContentAfter
+      );
       if (lastSweeper && lastSweeper.sweeperContentAfter) {
-        console.log('lastSweeper >> setContentAfter', lastSweeper.sweeperContentAfter);
         setContentAfter(lastSweeper.sweeperContentAfter);
       }
     }
@@ -272,29 +332,34 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
             <Option value="regex">{t('select_regex_label')}</Option>
           </Select>
 
-          <List
-            size="large"
-            bordered
-            dataSource={selectedSweepersList}
-            renderItem={(item) =>
-              item && (
-                <List.Item
-                  actions={[
-                    <a
-                      onClick={() => {
-                        deleteSweeper(item);
-                      }}
-                      key={`delete-${item.value}`}
-                    >
-                      {t('delete_sweeper')}
-                    </a>
-                  ]}
-                >
-                  {renderSweeper(item)}
-                </List.Item>
-              )
-            }
-          />
+          <ReactDragListView nodeSelector="li.draggable" handleSelector="li" onDragEnd={onDragEnd}>
+            <List
+              size="large"
+              bordered
+              dataSource={selectedSweepersList}
+              renderItem={(item) =>
+                item && (
+                  <List.Item
+                    className="draggable"
+                    style={{ width: '100%' }}
+                    actions={[
+                      <a
+                        onClick={() => {
+                          deleteSweeper(item);
+                        }}
+                        key={`delete-${item.value}`}
+                      >
+                        {t('delete_sweeper')}
+                      </a>
+                    ]}
+                  >
+                    <DragOutlined />
+                    {renderSweeper(item)}
+                  </List.Item>
+                )
+              }
+            />
+          </ReactDragListView>
           {contentAfter && (
             <>
               <Divider orientation="left">{t('divider_cleaning_preview') as ReactNode}</Divider>

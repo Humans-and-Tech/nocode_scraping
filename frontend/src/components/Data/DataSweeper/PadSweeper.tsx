@@ -55,6 +55,9 @@ export const PadSweeper = ({ onConfigured, testdata, initialState }: IPadSweeper
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Typography>
+        <h5>{t('pad_chars.title')}</h5>
+      </Typography>
       <Form
         form={form}
         initialValues={{ append: initialState?.appendValue, prepend: initialState?.prependValue }}

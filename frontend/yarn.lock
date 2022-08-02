@@ -8133,7 +8133,7 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.1, prop-types@^15.8.1:
+prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -8646,6 +8646,14 @@ react-dom@^18.1.0:
   dependencies:
     loose-envify "^1.1.0"
     scheduler "^0.22.0"
+
+react-drag-listview@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/react-drag-listview/-/react-drag-listview-0.2.1.tgz#922fa3c37ed4d84f2a349a93b01a623ac565f7dc"
+  integrity sha512-LFR/14CpmiieITCywfe2rxAg1szAqsynpqgquSgirT9cansDwJdpqAVEjzIRSEql/DRIYTvBYLvMI/HJcVeU4w==
+  dependencies:
+    babel-runtime "^6.26.0"
+    prop-types "^15.5.8"
 
 react-error-boundary@^3.1.4:
   version "3.1.4"

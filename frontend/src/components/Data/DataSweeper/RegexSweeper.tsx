@@ -36,6 +36,9 @@ export const ExtractData = ({ onConfigured, testdata, initialState }: IPadSweepe
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Typography>
+        <h5>{t('regex.title')}</h5>
+      </Typography>
       <span dangerouslySetInnerHTML={{ __html: t('regex.intro') }}></span>
       <Form form={form} initialValues={{ regex: initialState?.regexValue }} autoComplete="off" labelWrap {...layout}>
         <Form.Item label={t('regex.label')} name="regex">

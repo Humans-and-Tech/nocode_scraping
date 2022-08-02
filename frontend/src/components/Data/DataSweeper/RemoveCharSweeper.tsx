@@ -31,25 +31,33 @@ export const RemoveCharSweeper = ({ onConfigured, testdata, initialState }: IRem
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (charIndexValue && testdata) {
-      const finalString =
-        testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
-      setContentAfter(finalString);
-      onConfigured(
-        {
-          charIndexValue: charIndexValue
-        },
-        finalString
-      );
+    if (testdata) {
+      if (charIndexValue) {
+        const finalString =
+          testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
+        setContentAfter(finalString);
+        onConfigured(
+          {
+            charIndexValue: charIndexValue
+          },
+          finalString
+        );
+      } else {
+        onConfigured(
+          {
+            charIndexValue: charIndexValue
+          },
+          testdata
+        );
+      }
     }
-    // else if (testdata) {
-    //   setContentAfter(testdata);
-    //   onConfigured(testdata);
-    // }
   }, [testdata, charIndexValue]);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Typography>
+        <h5>{t('remove_char.title')}</h5>
+      </Typography>
       <Form
         form={form}
         initialValues={{ charIndex: initialState?.charIndexValue }}
