@@ -2,17 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Space, Form, Input, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import { ReplaceSweeperType, SweeperFunctionType } from '../../../interfaces/spider';
 import './Sweepers.scoped.css';
 
-export interface ReplaceFormState {
-  replacedValue: string | undefined;
-  replacedByValue: string | undefined;
-}
-
 interface IRemoveCharSweeperProps {
-  onConfigured: (state: ReplaceFormState, value: string) => void;
+  onConfigured: (state: ReplaceSweeperType, value: string) => void;
   testdata: string | undefined;
-  initialState?: ReplaceFormState;
+  initialState?: ReplaceSweeperType;
 }
 
 const layout = {
@@ -38,8 +34,11 @@ export const ReplaceCharSweeper = ({ onConfigured, testdata, initialState }: IRe
       setContentAfter(finalString);
       onConfigured(
         {
-          replacedValue: replacedValue,
-          replacedByValue: replacedByValue
+          key: SweeperFunctionType.replaceChar,
+          params: {
+            replaced: replacedValue,
+            replacedBy: replacedByValue
+          }
         },
         finalString
       );
@@ -53,7 +52,7 @@ export const ReplaceCharSweeper = ({ onConfigured, testdata, initialState }: IRe
       </Typography>
       <Form
         form={form}
-        initialValues={{ replaced: initialState?.replacedValue, replacedBy: initialState?.replacedByValue }}
+        initialValues={{ replaced: initialState?.params?.replaced, replacedBy: initialState?.params?.replacedBy }}
         autoComplete="off"
         labelWrap
         {...layout}

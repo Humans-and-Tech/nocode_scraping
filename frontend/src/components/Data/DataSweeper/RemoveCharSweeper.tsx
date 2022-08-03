@@ -2,16 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Space, Form, InputNumber, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import { RemoveSweeperType, SweeperFunctionType } from '../../../interfaces/spider';
 import './Sweepers.scoped.css';
 
-export interface RemoveFormState {
-  charIndexValue: number | undefined;
-}
-
 interface IRemoveCharSweeperProps {
-  onConfigured: (state: RemoveFormState, value: string | undefined) => void;
+  onConfigured: (state: RemoveSweeperType, value: string | undefined) => void;
   testdata: string | undefined;
-  initialState: RemoveFormState;
+  initialState?: RemoveSweeperType;
 }
 
 const layout = {
@@ -31,25 +28,19 @@ export const RemoveCharSweeper = ({ onConfigured, testdata, initialState }: IRem
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (testdata) {
-      if (charIndexValue) {
-        const finalString =
-          testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
-        setContentAfter(finalString);
-        onConfigured(
-          {
-            charIndexValue: charIndexValue
-          },
-          finalString
-        );
-      } else {
-        onConfigured(
-          {
-            charIndexValue: charIndexValue
-          },
-          testdata
-        );
-      }
+    if (charIndexValue && testdata) {
+      const finalString =
+        testdata.substring(0, charIndexValue - 1) + testdata.substring(charIndexValue, testdata.length);
+      setContentAfter(finalString);
+      onConfigured(
+        {
+          key: SweeperFunctionType.removeChar,
+          params: {
+            charIndex: charIndexValue
+          }
+        },
+        finalString
+      );
     }
   }, [testdata, charIndexValue]);
 
@@ -60,7 +51,7 @@ export const RemoveCharSweeper = ({ onConfigured, testdata, initialState }: IRem
       </Typography>
       <Form
         form={form}
-        initialValues={{ charIndex: initialState?.charIndexValue }}
+        initialValues={{ charIndex: initialState?.params?.charIndex }}
         autoComplete="off"
         labelWrap
         {...layout}

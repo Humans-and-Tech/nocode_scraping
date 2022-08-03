@@ -2,17 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Space, Input, Form, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import { PadSweeperType, SweeperFunctionType } from '../../../interfaces/spider';
 import './Sweepers.scoped.css';
 
-export interface PadFormState {
-  appendValue: string | undefined;
-  prependValue: string | undefined;
-}
-
 interface IPadSweeperProps {
-  onConfigured: (state: PadFormState, val: string | undefined) => void;
+  onConfigured: (state: PadSweeperType, val: string | undefined) => void;
   testdata: string | undefined;
-  initialState?: PadFormState;
+  initialState?: PadSweeperType;
 }
 
 const layout = {
@@ -45,8 +41,11 @@ export const PadSweeper = ({ onConfigured, testdata, initialState }: IPadSweeper
       setContentAfter(finalString);
       onConfigured(
         {
-          appendValue: appendValue,
-          prependValue: prependValue
+          key: SweeperFunctionType.pad,
+          params: {
+            append: appendValue,
+            prepend: prependValue
+          }
         },
         finalString
       );
@@ -60,7 +59,7 @@ export const PadSweeper = ({ onConfigured, testdata, initialState }: IPadSweeper
       </Typography>
       <Form
         form={form}
-        initialValues={{ append: initialState?.appendValue, prepend: initialState?.prependValue }}
+        initialValues={{ append: initialState?.params?.append, prepend: initialState?.params?.prepend }}
         autoComplete="off"
         labelWrap
         {...layout}

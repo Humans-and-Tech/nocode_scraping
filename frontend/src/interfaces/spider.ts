@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash/cloneDeep';
 import { GenericResponseStatus } from '.';
 
 export enum SelectorStatus {
@@ -12,8 +13,11 @@ export interface DataSelector {
 }
 
 export enum DataGroup {
-  PRICE = 'price'
+  PRICE = 'price',
+  STOCK = 'stock'
 }
+
+export type SweeperType = RemoveSweeperType | ReplaceSweeperType | PadSweeperType | RegexSweeperType;
 
 export interface Data {
   // the name is just a marker
@@ -29,7 +33,7 @@ export interface Data {
   // ex: cookie popup...
   isPopup?: boolean;
   popupSelector?: DataSelector;
-  sweepers?: Set<DataSweeperFunction>;
+  sweepers?: Array<SweeperType | undefined>;
 }
 
 /**
@@ -51,22 +55,42 @@ export interface DataSelectorValidityError {
   status: GenericResponseStatus.ERROR;
 }
 
-/**
- * to sweep data, you must stringify the data
- * and you get it back as a string,
- * then it's up to you to cast it to the desired type
- *
- * A DataSweeper can be called with an optional param,
- *
- * Example: the following function replaces commas by dots
- *
- * MySweeper: DataSweeperFunction = (input, char, replace_by) => {
- *     return input.replace(char, replace_by);
- * }
- *
- * const cleanData = MySweeper(data, ',', '.');
- */
-export type DataSweeperFunction = (input: string, ...args: (string | number | boolean)[]) => string;
+export enum SweeperFunctionType {
+  removeChar = 'removeChar',
+  replaceChar = 'replaceChar',
+  pad = 'pad',
+  regex = 'regex'
+}
+
+export interface RemoveSweeperType {
+  key: SweeperFunctionType.removeChar;
+  params?: {
+    charIndex: number;
+  };
+}
+
+export interface ReplaceSweeperType {
+  key: SweeperFunctionType.replaceChar;
+  params?: {
+    replaced: string;
+    replacedBy: string;
+  };
+}
+
+export interface PadSweeperType {
+  key: SweeperFunctionType.pad;
+  params?: {
+    append: string;
+    prepend: string;
+  };
+}
+
+export interface RegexSweeperType {
+  key: SweeperFunctionType.regex;
+  params?: {
+    regex: string;
+  };
+}
 
 export interface Item {
   name: string;
@@ -113,27 +137,34 @@ export interface Settings {
 /**
  * cares for overriding a spider data with a given Data object
  *
+ * makes a deep clone of the spider which is deeply immutable
  *
  * @param s Spider
  * @return a spider object, updated wit the given data
  */
 export const mergeSpiderData = (spider: Spider, data: Data): Spider => {
   let existingDataIndex = -1;
-  spider.data?.forEach((d: Data, index: number) => {
-    if (d.name == data.name) {
+  const localSpider = cloneDeep(spider);
+
+  localSpider.data?.forEach((d: Data, index: number) => {
+    if (d.name === data.name) {
       existingDataIndex = index;
-      d = data;
     }
   });
 
-  if (spider.data === undefined) {
-    spider.data = [];
-  }
-  if (existingDataIndex == -1) {
-    spider.data.push(data);
-  } else {
-    spider.data[existingDataIndex] = data;
+  if (localSpider.data === undefined) {
+    localSpider.data = [];
   }
 
-  return spider;
+  // for TS compilation
+  if (localSpider.data) {
+    if (existingDataIndex === -1) {
+      localSpider.data.push(data);
+    } else {
+      localSpider.data[existingDataIndex] = data;
+      console.log('sweepers:', localSpider.data[existingDataIndex].sweepers?.length);
+    }
+  }
+
+  return localSpider;
 };

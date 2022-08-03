@@ -22,7 +22,7 @@
   "rules": {
     "no-console": 0, // ignore
     "prettier/prettier": 1, // Means error
-    "@typescript-eslint/ban-ts-comment": 0 // ignore ts comments
+    "@typescript-eslint/ban-ts-comment": 0, // ignore ts comments
   }
 }
 

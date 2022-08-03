@@ -3,17 +3,25 @@ import { Divider, Space, Spin, Button, List, Select, Alert, Typography } from 'a
 import { DragOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
-import clone from 'lodash/clone';
+import cloneDeep from 'lodash/cloneDeep';
 import ReactDragListView from 'react-drag-listview';
 
 import { ScrapingContext } from '../../../BackendContext';
 import { IScrapingBackend } from '../../../BackendProvider';
 import { Data, Spider } from '../../../interfaces/spider';
-import { RemoveCharSweeper, RemoveFormState } from './RemoveCharSweeper';
-import { ReplaceCharSweeper, ReplaceFormState } from './ReplaceCharSweeper';
+import { RemoveCharSweeper } from './RemoveCharSweeper';
+import { ReplaceCharSweeper } from './ReplaceCharSweeper';
 import { SweepersResult } from './SweepersResult';
-import { PadSweeper, PadFormState } from './PadSweeper';
-import { ExtractData, RegexFormState } from './RegexSweeper';
+import { PadSweeper } from './PadSweeper';
+import { ExtractData } from './RegexSweeper';
+import {
+  ReplaceSweeperType,
+  RemoveSweeperType,
+  PadSweeperType,
+  RegexSweeperType,
+  SweeperFunctionType,
+  SweeperType
+} from '../../../interfaces/spider';
 import { ScrapingError, ScrapingResponse, ScrapingStatus } from '../../../interfaces/scraping';
 import { displayMessage, NotificationLevel } from '../../Layout/UserNotification';
 
@@ -22,20 +30,19 @@ import './Sweepers.scoped.css';
 const { Option } = Select;
 const { Text } = Typography;
 
-enum SweeperKey {
-  removeChar = 'removeChar',
-  replaceChar = 'replaceChar',
-  pad = 'pad',
-  regex = 'regex'
-}
-
 interface SweeperItem {
-  value: SweeperKey;
-  label: string;
+  value: SweeperFunctionType;
+  label: string | undefined;
   index: number;
   sweeperContentBefore: string | undefined;
   sweeperContentAfter: string | undefined;
-  state: unknown;
+  state: SweeperType | undefined;
+}
+
+interface ISweepersConfigProps {
+  data: Data;
+  spider: Spider;
+  onConfigured: (data: Data) => void;
 }
 
 /**
@@ -44,8 +51,43 @@ interface SweeperItem {
  *
  * @returns a JSX.Element
  */
-export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spider }): JSX.Element => {
+export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConfigProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
+
+  const sweeperTypeLabel = (value: SweeperFunctionType) => {
+    let label;
+    if (value == SweeperFunctionType.removeChar) {
+      label = t('remove_char_label');
+    } else if (value == SweeperFunctionType.replaceChar) {
+      label = t('replace_char_label');
+    } else if (value == SweeperFunctionType.pad) {
+      label = t('pad_label');
+    } else if (value == SweeperFunctionType.regex) {
+      label = t('regex_label');
+    }
+    return label;
+  };
+
+  /**
+   * to init the selectedSweepersList state with the data prop
+   * @returns
+   */
+  const initializeSweepersList = () => {
+    const _l: Array<SweeperItem> = [];
+    data.sweepers?.forEach((s: SweeperType | undefined, i: number) => {
+      if (s) {
+        _l.push({
+          value: s.key,
+          label: sweeperTypeLabel(s.key),
+          index: i,
+          sweeperContentBefore: undefined,
+          sweeperContentAfter: undefined,
+          state: s
+        });
+      }
+    });
+    return _l;
+  };
 
   const backendProvider = useContext<IScrapingBackend>(ScrapingContext);
 
@@ -62,7 +104,9 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
    */
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
-  const [selectedSweepersList, setSelectedSweepersList] = useState<Array<SweeperItem | undefined>>([]);
+  const [selectedSweepersList, setSelectedSweepersList] = useState<Array<SweeperItem | undefined>>(() => {
+    return initializeSweepersList();
+  });
 
   /**
    * - each sweeper's ContentBefore, is the previous Sweeper's contentAfter
@@ -97,7 +141,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   const onDragEnd = (fromIndex: number, toIndex: number) => {
     if (toIndex < 0) return; // Ignores if outside designated area
 
-    let _selectedSweepersList = clone(selectedSweepersList);
+    let _selectedSweepersList = cloneDeep(selectedSweepersList);
     const _sweep = _selectedSweepersList.splice(fromIndex, 1)[0];
     _selectedSweepersList.splice(toIndex, 0, _sweep);
 
@@ -115,11 +159,11 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
    * @param item
    * @param value
    */
-  const updateSweeperContentAfter = (item: SweeperItem, state: unknown, value: string | undefined) => {
+  const updateSweeperContentAfter = (item: SweeperItem, state: SweeperType | undefined, value: string | undefined) => {
     if (!value) {
       deleteSweeper(item);
     } else {
-      const _selectedSweepersList = clone(selectedSweepersList);
+      const _selectedSweepersList = cloneDeep(selectedSweepersList);
       item.sweeperContentAfter = value;
       item.state = state;
       _selectedSweepersList[item.index] = item;
@@ -137,7 +181,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
   /**
    * initialize contentBefore & contentAfter
    */
-  const init = () => {
+  const initContent = () => {
     if (data.selector && spider.sampleURLs) {
       setIsRety(false);
       setIsLoading(true);
@@ -155,7 +199,6 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
             // retry in case of failure
             setIsRety(true);
           }
-
           setIsLoading(false);
         }
       );
@@ -173,7 +216,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
    * @param _item
    */
   const deleteSweeper = (_item: SweeperItem) => {
-    let _selectedSweepersList = clone(selectedSweepersList);
+    let _selectedSweepersList = cloneDeep(selectedSweepersList);
     _selectedSweepersList = _selectedSweepersList.filter((item: SweeperItem | undefined) => {
       return item && item.index !== _item.index;
     });
@@ -191,18 +234,8 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
    *
    * @param value
    */
-  const onAddSweeper = (value: SweeperKey) => {
-    let label = '';
-    if (value == SweeperKey.removeChar) {
-      label = t('remove_char_label');
-    } else if (value == SweeperKey.replaceChar) {
-      label = t('replace_char_label');
-    } else if (value == SweeperKey.pad) {
-      label = t('pad_label');
-    } else if (value == SweeperKey.regex) {
-      label = t('regex_label');
-    }
-    const _selectedSweepersList = clone(selectedSweepersList);
+  const onAddSweeper = (value: SweeperFunctionType) => {
+    const _selectedSweepersList = cloneDeep(selectedSweepersList);
 
     let _sweeperContentBefore = undefined;
 
@@ -218,54 +251,56 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
 
     _selectedSweepersList.push({
       value: value,
-      label: label,
+      label: sweeperTypeLabel(value),
       index: selectedSweepersList.length,
       sweeperContentBefore: _sweeperContentBefore,
       sweeperContentAfter: _sweeperContentBefore,
-      state: undefined
+      state: {
+        key: value
+      }
     });
 
     setSelectedSweepersList(_selectedSweepersList);
   };
 
   const renderSweeper = (item: SweeperItem): ReactNode => {
-    if (item.value == SweeperKey.removeChar) {
+    if (item.value == SweeperFunctionType.removeChar) {
       return (
         <RemoveCharSweeper
-          initialState={item.state as RemoveFormState}
-          onConfigured={(state: RemoveFormState, value: string | undefined) =>
+          initialState={item.state as RemoveSweeperType}
+          onConfigured={(state: RemoveSweeperType, value: string | undefined) =>
             updateSweeperContentAfter(item, state, value)
           }
           testdata={item.sweeperContentBefore}
         />
       );
-    } else if (item.value == SweeperKey.replaceChar) {
+    } else if (item.value == SweeperFunctionType.replaceChar) {
       return (
         <ReplaceCharSweeper
-          initialState={item.state as ReplaceFormState}
-          onConfigured={(state: ReplaceFormState, value: string | undefined) =>
+          initialState={item.state as ReplaceSweeperType}
+          onConfigured={(state: ReplaceSweeperType, value: string | undefined) =>
             updateSweeperContentAfter(item, state, value)
           }
           testdata={item.sweeperContentBefore}
         />
       );
-    } else if (item.value == SweeperKey.pad) {
+    } else if (item.value == SweeperFunctionType.pad) {
       return (
         <PadSweeper
-          initialState={item.state as PadFormState}
-          onConfigured={(state: PadFormState, value: string | undefined) =>
+          initialState={item.state as PadSweeperType}
+          onConfigured={(state: PadSweeperType, value: string | undefined) =>
             updateSweeperContentAfter(item, state, value)
           }
           testdata={item.sweeperContentBefore}
         />
       );
-    } else if (item.value == SweeperKey.regex) {
+    } else if (item.value == SweeperFunctionType.regex) {
       // the regex contentAfter is not renderable
       // thus we pass the sweeperContentBefore as sweeperContentAfter
       return (
         <ExtractData
-          initialState={item.state as RegexFormState}
-          onConfigured={(state: RegexFormState, value: string | undefined) =>
+          initialState={item.state as RegexSweeperType}
+          onConfigured={(state: RegexSweeperType, value: string | undefined) =>
             updateSweeperContentAfter(item, state, item.sweeperContentBefore)
           }
           testdata={item.sweeperContentBefore}
@@ -278,29 +313,44 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
    * recalculate the contentAfter
    */
   useEffect(() => {
-    console.log('> useEffect');
     if (!contentBefore) {
-      init();
-    } else if (selectedSweepersList.length == 0) {
-      // there is no selected sweeper in the list
-      setContentAfter(contentBefore);
+      initContent();
     } else {
-      //  first sweeper's content before is the content before
-      const firstSweeper = selectedSweepersList[0];
-      if (firstSweeper) {
-        firstSweeper.sweeperContentBefore = contentBefore;
+      // proceed to an update  of content
+
+      if (selectedSweepersList.length == 0) {
+        // there is no selected sweeper in the list
+        setContentAfter(contentBefore);
+      } else {
+        //  first sweeper's content before is the content before
+        const firstSweeper = selectedSweepersList[0];
+        if (firstSweeper) {
+          firstSweeper.sweeperContentBefore = contentBefore;
+        }
+
+        // the content after is the latest sweeper's content after
+        const lastSweeper = selectedSweepersList[selectedSweepersList.length - 1];
+        if (lastSweeper && lastSweeper.sweeperContentAfter) {
+          setContentAfter(lastSweeper.sweeperContentAfter);
+        }
       }
 
-      // the content after is the latest sweeper's content after
-      const lastSweeper = selectedSweepersList[selectedSweepersList.length - 1];
-      console.log(
-        '> useEffect - lastSweeper',
-        lastSweeper?.value,
-        lastSweeper?.sweeperContentBefore,
-        lastSweeper?.sweeperContentAfter
-      );
-      if (lastSweeper && lastSweeper.sweeperContentAfter) {
-        setContentAfter(lastSweeper.sweeperContentAfter);
+      // in all cases
+      // finally, save the configuration of the sweepers
+      // by creating a clone of the data which is immutable
+      const dataClone = cloneDeep(data);
+      dataClone.sweepers = [];
+
+      selectedSweepersList.forEach((item: SweeperItem | undefined) => {
+        if (item && item.state) {
+          dataClone.sweepers?.push(item.state);
+        }
+      });
+
+      console.log('dataClone', dataClone.sweepers.length);
+      if (dataClone) {
+        console.log('onConfigured', dataClone.sweepers.length);
+        onConfigured(dataClone);
       }
     }
   }, [contentBefore, selectedSweepersList]);
@@ -310,7 +360,7 @@ export const DataSweepersConfig = ({ data, spider }: { data: Data; spider: Spide
       {isRetry && (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Alert message={t('loading_error')} type="error" />
-          <Button onClick={init} danger>
+          <Button onClick={initContent} danger>
             {t('retry')}
           </Button>
         </Space>

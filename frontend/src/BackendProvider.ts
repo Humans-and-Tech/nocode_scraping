@@ -122,6 +122,7 @@ function useSpiderBackend(): ISpiderBackend {
 
     debounce(() => {
       spiderSocket.emit('upsert', params, (resp: IWebSocketResponse) => {
+        console.log('emit', params);
         if (resp.status == GenericResponseStatus.ERROR) {
           callback(false, new Error(resp.message));
         } else if (resp.data) {

@@ -85,9 +85,8 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
     // to save the spider
     if (localSpider !== undefined) {
       // merge the data into the spider
-
-      const cloneSpider = clone(localSpider);
-      const _spider = mergeSpiderData(cloneSpider, _data);
+      console.log('saveSpiderData > sweepers', _data.sweepers?.length);
+      const _spider = mergeSpiderData(localSpider, _data);
 
       // sync the DB
       backendProvider.upsert(_spider, (b: boolean, err: Error | undefined) => {
@@ -164,7 +163,7 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
           }
           key="2"
         >
-          {localData && <DataSweepersConfig data={localData} spider={spider} />}
+          {localData && <DataSweepersConfig data={localData} spider={spider} onConfigured={saveSpiderData} />}
         </TabPane>
       )}
     </Tabs>

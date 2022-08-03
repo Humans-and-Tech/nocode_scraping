@@ -2,16 +2,13 @@ import React, { useEffect } from 'react';
 import { Space, Input, Form, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import { RegexSweeperType, SweeperFunctionType } from '../../../interfaces/spider';
 import './Sweepers.scoped.css';
 
-export interface RegexFormState {
-  regexValue: string | undefined;
-}
-
 interface IPadSweeperProps {
-  onConfigured: (state: RegexFormState, regex: string | undefined) => void;
+  onConfigured: (state: RegexSweeperType, regex: string | undefined) => void;
   testdata: string | undefined;
-  initialState: RegexFormState;
+  initialState?: RegexSweeperType;
 }
 
 const layout = {
@@ -30,7 +27,15 @@ export const ExtractData = ({ onConfigured, testdata, initialState }: IPadSweepe
 
   useEffect(() => {
     if (regexValue && testdata) {
-      onConfigured({ regexValue: regexValue }, regexValue);
+      onConfigured(
+        {
+          key: SweeperFunctionType.regex,
+          params: {
+            regex: regexValue
+          }
+        },
+        regexValue
+      );
     }
   }, [testdata, regexValue]);
 
@@ -40,7 +45,7 @@ export const ExtractData = ({ onConfigured, testdata, initialState }: IPadSweepe
         <h5>{t('regex.title')}</h5>
       </Typography>
       <span dangerouslySetInnerHTML={{ __html: t('regex.intro') }}></span>
-      <Form form={form} initialValues={{ regex: initialState?.regexValue }} autoComplete="off" labelWrap {...layout}>
+      <Form form={form} initialValues={{ regex: initialState?.params?.regex }} autoComplete="off" labelWrap {...layout}>
         <Form.Item label={t('regex.label')} name="regex">
           <Input placeholder={t('regex.placeholder')} />
         </Form.Item>
