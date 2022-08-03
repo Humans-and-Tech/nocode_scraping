@@ -1,5 +1,5 @@
 const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {
     plugins: [
@@ -27,9 +27,9 @@ module.exports = {
                 path: path.resolve(__dirname, "public"),
                 filename: "app.js",
             },
-            plugins: [
-                new MiniCssExtractPlugin(),
-            ],
+            // plugins: [
+            //     new MiniCssExtractPlugin(),
+            // ],
             module: {
                 /** "rules"
                  * use the ts-loader to transform tsx or ts files before adding it to the bundle. 

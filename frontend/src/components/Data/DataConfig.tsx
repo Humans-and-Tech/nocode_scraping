@@ -31,12 +31,12 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
   const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
   const initIsSelectorConfigured = () => {
-      // activate the tab if the selector is oK
-      if (data.selector?.status == SelectorStatus.VALID) {
-        return true
-      }
-      return false;
-  }
+    // activate the tab if the selector is oK
+    if (data.selector?.status == SelectorStatus.VALID) {
+      return true;
+    }
+    return false;
+  };
 
   // keep track of the current data loaded in this component
   // so that the component states are re-init when the data change
@@ -44,7 +44,9 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
 
   const [localData, setLocalData] = useState<Data | undefined>(data);
   const [localSpider, setLocalSpider] = useState<Spider | undefined>(spider);
-  const [isSelectorConfigured, setIsSelectorConfigured] = useState<boolean>(() => {return initIsSelectorConfigured()});
+  const [isSelectorConfigured, setIsSelectorConfigured] = useState<boolean>(() => {
+    return initIsSelectorConfigured();
+  });
 
   // for tabs changes
   const [activeKey, setActiveKey] = useState<string>('1');
@@ -107,21 +109,21 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
   };
 
   // useEffect(() => {
-    // when mouting initially
-    // if (localData === undefined || data.name !== dataName.current) {
-    //   dataName.current = data.name;
-    //   setLocalData(data);
-    // }
+  // when mouting initially
+  // if (localData === undefined || data.name !== dataName.current) {
+  //   dataName.current = data.name;
+  //   setLocalData(data);
+  // }
 
-    // if (localSpider === undefined) {
-    //   setLocalSpider(spider);
+  // if (localSpider === undefined) {
+  //   setLocalSpider(spider);
 
-    //   // activate the tab if the selector is oK
-    //   if (data.selector?.status == SelectorStatus.VALID) {
-    //     console.log('data is configured');
-    //     setIsSelectorConfigured(true);
-    //   }
-    // }
+  //   // activate the tab if the selector is oK
+  //   if (data.selector?.status == SelectorStatus.VALID) {
+  //     console.log('data is configured');
+  //     setIsSelectorConfigured(true);
+  //   }
+  // }
   // }, [data, spider, activeKey]);
 
   const saveBtn = (

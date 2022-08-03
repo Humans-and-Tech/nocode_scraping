@@ -59,7 +59,7 @@ const ProductSheet: React.FC = () => {
       spider.data?.forEach((d: Data, index: number) => {
         if (d.name === element.name) {
           // set the group if not set (legacy)
-          const _localData = cloneDeep(d)
+          const _localData = cloneDeep(d);
           _localData.group = element.group;
           dataIndex = index;
           setData(_localData);
