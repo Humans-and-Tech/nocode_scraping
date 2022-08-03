@@ -32,7 +32,6 @@ const { Text } = Typography;
 
 interface SweeperItem {
   value: SweeperFunctionType;
-  label: string | undefined;
   index: number;
   sweeperContentBefore: string | undefined;
   sweeperContentAfter: string | undefined;
@@ -54,22 +53,8 @@ interface ISweepersConfigProps {
 export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConfigProps): JSX.Element => {
   const { t } = useTranslation('sweepers');
 
-  const sweeperTypeLabel = (value: SweeperFunctionType) => {
-    let label;
-    if (value == SweeperFunctionType.removeChar) {
-      label = t('remove_char_label');
-    } else if (value == SweeperFunctionType.replaceChar) {
-      label = t('replace_char_label');
-    } else if (value == SweeperFunctionType.pad) {
-      label = t('pad_label');
-    } else if (value == SweeperFunctionType.regex) {
-      label = t('regex_label');
-    }
-    return label;
-  };
-
   /**
-   * to init the selectedSweepersList state with the data prop
+   * init the selectedSweepersList state with the data prop
    * @returns
    */
   const initializeSweepersList = () => {
@@ -78,7 +63,6 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
       if (s) {
         _l.push({
           value: s.key,
-          label: sweeperTypeLabel(s.key),
           index: i,
           sweeperContentBefore: undefined,
           sweeperContentAfter: undefined,
@@ -92,6 +76,11 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
   const backendProvider = useContext<IScrapingBackend>(ScrapingContext);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  /**
+   * in case of error to fetch scraped data
+   * that will be used to visualize the effect of the sweepers
+   */
   const [isRetry, setIsRety] = useState<boolean>(false);
 
   /**
@@ -104,6 +93,9 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
    */
   const [contentAfter, setContentAfter] = useState<string | undefined>(undefined);
 
+  /**
+   * the list of selected sweepers
+   */
   const [selectedSweepersList, setSelectedSweepersList] = useState<Array<SweeperItem | undefined>>(() => {
     return initializeSweepersList();
   });
@@ -116,8 +108,6 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
    * @returns
    */
   const alignSweepersContentBeforeAndAfter = (_selectedSweepersList: Array<SweeperItem | undefined>) => {
-    // re-align index with position in array
-    // and re-align content before and content after
     _selectedSweepersList.forEach((item: SweeperItem | undefined, index: number) => {
       if (item) {
         item.index = index;
@@ -251,7 +241,6 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
 
     _selectedSweepersList.push({
       value: value,
-      label: sweeperTypeLabel(value),
       index: selectedSweepersList.length,
       sweeperContentBefore: _sweeperContentBefore,
       sweeperContentAfter: _sweeperContentBefore,
@@ -310,7 +299,8 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
   };
 
   /**
-   * recalculate the contentAfter
+   * - recalculate the contentAfter
+   * - callback the onConfigured() when the selectedSweepersList changes
    */
   useEffect(() => {
     if (!contentBefore) {
@@ -374,10 +364,10 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
           <Text italic>{addMoreText()}</Text>
 
           <Select placeholder={t('select_sweeper_placeholder')} onSelect={onAddSweeper} style={{ width: '100%' }}>
-            <Option value="removeChar">{t('select_remove_char_label')}</Option>
-            <Option value="replaceChar">{t('select_replace_char_label')}</Option>
-            <Option value="pad">{t('select_pad_label')}</Option>
-            <Option value="regex">{t('select_regex_label')}</Option>
+            <Option value="removeChar">{t('remove_char_label')}</Option>
+            <Option value="replaceChar">{t('replace_char_label')}</Option>
+            <Option value="pad">{t('pad_label')}</Option>
+            <Option value="regex">{t('regex_label')}</Option>
           </Select>
 
           <ReactDragListView nodeSelector="li.draggable" handleSelector="li" onDragEnd={onDragEnd}>

@@ -65,16 +65,18 @@ export const PadSweeper = ({ onConfigured, testdata, initialState }: IPadSweeper
         {...layout}
       >
         <Form.Item label={t('pad_chars.prepend_label')} name="prepend">
-          <Input placeholder={t('pad_chars.prepend_placeholder')} />
+          <Input placeholder={t('pad_chars.prepend_placeholder')} data-testid="prepend-input" />
         </Form.Item>
 
         <Form.Item label={t('pad_chars.append_label')} name="append">
-          <Input placeholder={t('pad_chars.append_placeholder')} />
+          <Input placeholder={t('pad_chars.append_placeholder')} data-testid="append-input" />
         </Form.Item>
         {contentAfter && (
           <>
             {t('sweeper_result_intro')}
-            <Text code>{contentAfter}</Text>
+            <Text code data-testid="content-after">
+              {contentAfter}
+            </Text>
           </>
         )}
       </Form>

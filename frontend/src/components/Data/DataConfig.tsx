@@ -30,6 +30,12 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
 
   const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
+  /**
+   * loads the existing selector definition and its Status
+   * if the status is VALID, then the selector is valid
+   *
+   * @returns boolean
+   */
   const initIsSelectorConfigured = () => {
     // activate the tab if the selector is oK
     if (data.selector?.status == SelectorStatus.VALID) {
@@ -37,10 +43,6 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
     }
     return false;
   };
-
-  // keep track of the current data loaded in this component
-  // so that the component states are re-init when the data change
-  const dataName = useRef<string>('');
 
   const [localData, setLocalData] = useState<Data | undefined>(data);
   const [localSpider, setLocalSpider] = useState<Spider | undefined>(spider);
@@ -107,24 +109,6 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
       });
     }
   };
-
-  // useEffect(() => {
-  // when mouting initially
-  // if (localData === undefined || data.name !== dataName.current) {
-  //   dataName.current = data.name;
-  //   setLocalData(data);
-  // }
-
-  // if (localSpider === undefined) {
-  //   setLocalSpider(spider);
-
-  //   // activate the tab if the selector is oK
-  //   if (data.selector?.status == SelectorStatus.VALID) {
-  //     console.log('data is configured');
-  //     setIsSelectorConfigured(true);
-  //   }
-  // }
-  // }, [data, spider, activeKey]);
 
   const saveBtn = (
     <Button type="primary" onClick={triggerSave}>

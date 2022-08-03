@@ -9,9 +9,5 @@ const config = {
 
 module.exports = config;
 
-// Ou fonction asynchrone
-module.exports = async () => {
-    return {
-        verbose: true,
-    };
-};
+
+

@@ -92,6 +92,13 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/tests/mocks.js",
+    "src/components/Data/DataSweeper/PadSweeper.test.js",
+    "src/components/Data/DataSweeper/PadSweeper.test.js",
+    "src/tests/i18n.js"
+  ],
   "exclude": ["*.json", "*.js"]
 }
