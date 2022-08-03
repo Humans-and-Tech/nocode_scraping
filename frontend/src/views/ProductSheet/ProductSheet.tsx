@@ -19,6 +19,7 @@ import { DataConfig } from '../../components/Data/DataConfig';
 import { ConfigSidebar } from '../../components/Layout/ConfigSidebar';
 
 import './ProductSheet.scoped.css';
+import { cloneDeep } from 'lodash';
 
 const { Panel } = Collapse;
 
@@ -58,9 +59,10 @@ const ProductSheet: React.FC = () => {
       spider.data?.forEach((d: Data, index: number) => {
         if (d.name === element.name) {
           // set the group if not set (legacy)
-          d.group = element.group;
+          const _localData = cloneDeep(d)
+          _localData.group = element.group;
           dataIndex = index;
-          setData(d);
+          setData(_localData);
         }
       });
 

@@ -347,9 +347,7 @@ export const DataSweepersConfig = ({ data, spider, onConfigured }: ISweepersConf
         }
       });
 
-      console.log('dataClone', dataClone.sweepers.length);
       if (dataClone) {
-        console.log('onConfigured', dataClone.sweepers.length);
         onConfigured(dataClone);
       }
     }

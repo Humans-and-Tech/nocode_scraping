@@ -162,7 +162,6 @@ export const mergeSpiderData = (spider: Spider, data: Data): Spider => {
       localSpider.data.push(data);
     } else {
       localSpider.data[existingDataIndex] = data;
-      console.log('sweepers:', localSpider.data[existingDataIndex].sweepers?.length);
     }
   }
 

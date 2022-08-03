@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { Tabs, Space, Button } from 'antd';
 import { GiBroom } from 'react-icons/gi';
 import { BiTargetLock } from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
 
-import clone from 'lodash/clone';
 import { Data, Spider, mergeSpiderData, SelectorStatus } from '../../interfaces/spider';
 import { SpiderContext } from '../../BackendContext';
 import { ISpiderBackend } from '../../BackendProvider';
@@ -31,13 +30,21 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
 
   const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
+  const initIsSelectorConfigured = () => {
+      // activate the tab if the selector is oK
+      if (data.selector?.status == SelectorStatus.VALID) {
+        return true
+      }
+      return false;
+  }
+
   // keep track of the current data loaded in this component
   // so that the component states are re-init when the data change
   const dataName = useRef<string>('');
 
-  const [localData, setLocalData] = useState<Data | undefined>(undefined);
-  const [localSpider, setLocalSpider] = useState<Spider | undefined>(undefined);
-  const [isSelectorConfigured, setIsSelectorConfigured] = useState<boolean>(false);
+  const [localData, setLocalData] = useState<Data | undefined>(data);
+  const [localSpider, setLocalSpider] = useState<Spider | undefined>(spider);
+  const [isSelectorConfigured, setIsSelectorConfigured] = useState<boolean>(() => {return initIsSelectorConfigured()});
 
   // for tabs changes
   const [activeKey, setActiveKey] = useState<string>('1');
@@ -85,7 +92,6 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
     // to save the spider
     if (localSpider !== undefined) {
       // merge the data into the spider
-      console.log('saveSpiderData > sweepers', _data.sweepers?.length);
       const _spider = mergeSpiderData(localSpider, _data);
 
       // sync the DB
@@ -100,23 +106,23 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
     }
   };
 
-  useEffect(() => {
+  // useEffect(() => {
     // when mouting initially
-    if (localData === undefined || data.name !== dataName.current) {
-      dataName.current = data.name;
-      setLocalData(data);
-    }
+    // if (localData === undefined || data.name !== dataName.current) {
+    //   dataName.current = data.name;
+    //   setLocalData(data);
+    // }
 
-    if (localSpider === undefined) {
-      setLocalSpider(spider);
+    // if (localSpider === undefined) {
+    //   setLocalSpider(spider);
 
-      // activate the tab if the selector is oK
-      if (data.selector?.status == SelectorStatus.VALID) {
-        console.log('data is configured');
-        setIsSelectorConfigured(true);
-      }
-    }
-  }, [data, spider, activeKey]);
+    //   // activate the tab if the selector is oK
+    //   if (data.selector?.status == SelectorStatus.VALID) {
+    //     console.log('data is configured');
+    //     setIsSelectorConfigured(true);
+    //   }
+    // }
+  // }, [data, spider, activeKey]);
 
   const saveBtn = (
     <Button type="primary" onClick={triggerSave}>

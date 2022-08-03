@@ -1,4 +1,5 @@
 const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {
     plugins: [
@@ -26,17 +27,23 @@ module.exports = {
                 path: path.resolve(__dirname, "public"),
                 filename: "app.js",
             },
+            plugins: [
+                new MiniCssExtractPlugin(),
+            ],
             module: {
                 /** "rules"
                  * use the ts-loader to transform tsx or ts files before adding it to the bundle. 
                  */
-                rules: [
-                    {
-                        test: /\.(ts|tsx)$/, //kind of file extension this rule should look for and apply in test
-                        exclude: /node_modules/, //folder to be excluded
-                        use: "ts-loader", //loader which we are going to use
-                    }
-                ],
+                // rules: [
+                //     {
+                //         test: /\.css$/,
+                //         use: [
+                //             'style-loader', 'postcss-loader', MiniCssExtractPlugin.loader
+                //         ],
+                //         exclude: /\.css$/,
+                //     },
+                    
+                // ],
             },
         }
     }
