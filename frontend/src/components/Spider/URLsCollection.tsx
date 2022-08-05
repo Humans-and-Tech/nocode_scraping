@@ -31,7 +31,7 @@ export const URLsCollectionsList = (): JSX.Element => {
   const { t } = useTranslation('configurator');
 
   const localSpider = useSelector((state: SpiderState) => state.current);
-  
+
   const dispatch = useDispatch();
 
   const deleteCollection = (item: URLsCollection) => {
@@ -39,13 +39,15 @@ export const URLsCollectionsList = (): JSX.Element => {
     deleteUrlsCollection(localSpider, item.name)
       .then(() => {
         // refresh the spider
-        // and store it 
-        getSpider(localSpider.name).then((s: Spider) => {
-          displayMessage(NotificationLevel.SUCCESS, t('spider.actions.delete_collection_success'));
-          dispatch(setSpider(s));
-        }).catch(() => {
-          displayMessage(NotificationLevel.ERROR, t('spider.actions.delete_collection_error'));
-        })
+        // and store it
+        getSpider(localSpider.name)
+          .then((s: Spider) => {
+            displayMessage(NotificationLevel.SUCCESS, t('spider.actions.delete_collection_success'));
+            dispatch(setSpider(s));
+          })
+          .catch(() => {
+            displayMessage(NotificationLevel.ERROR, t('spider.actions.delete_collection_error'));
+          });
       })
       .catch(() => {
         displayMessage(NotificationLevel.ERROR, t('spider.actions.delete_collection_error'));
@@ -72,7 +74,8 @@ export const URLsCollectionsList = (): JSX.Element => {
                 </a>
               ]}
             >
-              <Typography.Text strong>{item.name}</Typography.Text> (<Typography.Text italic>{item.urlsList?.length} URLs</Typography.Text>)
+              <Typography.Text strong>{item.name}</Typography.Text> (
+              <Typography.Text italic>{item.urlsList?.length} URLs</Typography.Text>)
             </List.Item>
           )}
         />
@@ -116,7 +119,7 @@ export const URLsListForm = ({ ...rest }): JSX.Element => {
       if (formValid) {
         setNameStatus('success');
         setListStatus('success');
-        
+
         const dto = {
           name: form.getFieldValue('collectionName'),
           urlsList: urlsList
@@ -125,13 +128,15 @@ export const URLsListForm = ({ ...rest }): JSX.Element => {
         createUrlsCollection(localSpider, dto)
           .then(() => {
             // refresh the spider
-            // and store it 
-            getSpider(localSpider.name).then((s: Spider) => {
-              displayMessage(NotificationLevel.SUCCESS, t('spider.actions.add_collection_success'));
-              dispatch(setSpider(s));
-            }).catch(() => {
-              displayMessage(NotificationLevel.ERROR, t('spider.actions.add_collection_error'));
-            })
+            // and store it
+            getSpider(localSpider.name)
+              .then((s: Spider) => {
+                displayMessage(NotificationLevel.SUCCESS, t('spider.actions.add_collection_success'));
+                dispatch(setSpider(s));
+              })
+              .catch(() => {
+                displayMessage(NotificationLevel.ERROR, t('spider.actions.add_collection_error'));
+              });
           })
           .catch(() => {
             displayMessage(NotificationLevel.ERROR, t('spider.actions.add_collection_error'));
