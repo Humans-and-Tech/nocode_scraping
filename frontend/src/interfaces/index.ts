@@ -11,3 +11,10 @@ export interface IWebSocketResponse {
   data?: unknown;
   selector?: DataSelector;
 }
+
+export interface IAPIResponse {
+  status: GenericResponseStatus;
+  message?: string;
+  data?: unknown;
+  selector?: DataSelector;
+}

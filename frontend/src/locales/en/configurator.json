@@ -23,7 +23,9 @@
       "update_error": "Spider update failed",
       "delete": "Delete",
       "add_collection_error": "An error occured adding the collection",
-      "add_collection_success": "Successfully added the collection"
+      "add_collection_success": "Successfully added the collection",
+      "delete_collection_error": "An error occured deleting the collection",
+      "delete_collection_success": "Successfully deleted the collection"
     },
     "config_sidebar": {
       "tab_sample_urls": "Sample URLs",

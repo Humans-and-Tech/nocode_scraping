@@ -35,7 +35,7 @@ export function isFireStoreError(obj: unknown): obj is FireStoreError {
  * @returns
  */
 // @ts-ignore
-export async function upsert<T extends Storable>(organization: Organization, data: T): Promise<boolean> {
+export async function  upsert<T extends Storable>(organization: Organization, data: T): Promise<boolean> {
   const docPath = `${organization.name}/${data.constructor.name.toLowerCase()}s/${data.key}`;
   const configCollection: DocumentData = firestore.collection(`organizations`);
   const document = configCollection.doc(docPath);
@@ -47,11 +47,12 @@ export async function upsert<T extends Storable>(organization: Organization, dat
     return !(value === undefined);
   });
 
-  logger.info(`upserting ${JSON.stringify(cleanData)}`);
+
+  logger.debug(`upserting ${JSON.stringify(cleanData)}`);
 
   try {
     await document.update(cleanData);
-    logger.info(`Updated doc with key ${data.key}`);
+    logger.debug(`Updated doc with key ${data.key}`);
     return Promise.resolve(true);
   } catch (error: unknown) {
     if (isFireStoreError(error) && error.code === 5) {

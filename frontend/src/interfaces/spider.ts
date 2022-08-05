@@ -109,7 +109,7 @@ export interface Website {
 
 export interface URLsCollection {
   name: string;
-  urls?: Array<URL>;
+  urlsList?: Array<URL>;
 }
 
 export interface Spider {

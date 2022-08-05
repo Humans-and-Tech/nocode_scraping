@@ -1,4 +1,6 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Delete } from '@nestjs/common';
+
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Spider, URLsCollection } from '../models/core';
 import { IResponse, ResponseStatus } from '../models/api';
@@ -7,26 +9,23 @@ import { SpiderService } from '../services/SpiderService';
 import {CreateUrlsCollectionDto} from './create-urls-collection.dto';
 import logger from '../logging';
 
+/**
+ * REST API to access / modify a spider
+ */
 @Controller('spider')
 export class SpiderController {
   constructor(private readonly spiderService: SpiderService) {}
 
   @Get(':name')
   async onSpiderGet(@Param() params): Promise<IResponse> {
-    try {
-      const user = new User(params.userId);
-      const result: Spider = await this.spiderService.getSpider(user, params.name);
-      return Promise.resolve({
-        status: ResponseStatus.SUCCESS,
-        data: result
-      });
-    } catch (err) {
-      logger.error(err);
-      return Promise.resolve({
-        status: ResponseStatus.ERROR,
-        message: JSON.stringify(err)
-      });
-    }
+    
+    const user = new User(params.userId);
+    const result: Spider = await this.spiderService.getSpider(user, params.name);
+    return Promise.resolve({
+      status: ResponseStatus.SUCCESS,
+      data: result
+    });
+    
   }
 
   /**
@@ -38,7 +37,7 @@ export class SpiderController {
    * @returns 
    */
   @Post(':name/urls-collection')
-  async onUrlsCollectionPost(@Param() params, @Body() createDto: CreateUrlsCollectionDto): Promise<IResponse> {
+  async addUrlsCollection(@Param() params, @Body() createDto: CreateUrlsCollectionDto): Promise<IResponse> {
 
     // TODO: userId or orgId fetched by header token ?
     const user = new User(1);
@@ -48,34 +47,83 @@ export class SpiderController {
 
     if (spider) {
 
+      // spider is immutable
+      // make a clone
+      const cloneSpider = new Spider(cloneDeep(spider));
+
       let existingCollectionIndex = -1
-      spider.urlsCollections?.every((item: URLsCollection, index: number) => {
+      cloneSpider.urlsCollections?.every((item: URLsCollection, index: number) => {
         if (item.name === createDto.name) {
           existingCollectionIndex = index;
           // break
           return false;
         }
+        return true;
       })
 
-      if (existingCollectionIndex>0){
-        spider.urlsCollections[existingCollectionIndex] = createDto;
+      if (existingCollectionIndex>-1){
+        cloneSpider.urlsCollections[existingCollectionIndex] = createDto;
         logger.info(`urlsCollection ${createDto.name} is existing, its urls will be replaced`);
       } else {
         logger.info(`urlsCollection ${createDto.name} does not exist, it will be created`)
-        if (!spider.urlsCollections) {
-          spider.urlsCollections = []
+        if (!cloneSpider.urlsCollections) {
+          cloneSpider.urlsCollections = []
         }
-        spider.urlsCollections.push(createDto);
+        cloneSpider.urlsCollections.push(createDto);
       }
 
-      await this.spiderService.updateSpider(user, spider);
-      logger.info(`Updated spider ${spider.name} with urlsCollection ${createDto.name}`)
+      await this.spiderService.updateSpider(user, cloneSpider);
+      logger.info(`Updated spider ${cloneSpider.name} with urlsCollection ${createDto.name}`)
       return Promise.resolve({
         status: ResponseStatus.SUCCESS,
       });
 
     } else {
       throw new Error(`Unknown spider ${createDto.name}`);
+    }
+    
+  }
+
+  @Delete(':name/urls-collections/:collectionName')
+  async DeleteUrlsCollection(@Param() params): Promise<IResponse> {
+
+    // TODO: userId or orgId fetched by header token ?
+    const user = new User(1);
+    const spider = await this.spiderService.getSpider(user, params.name);
+
+    logger.info(`retrieved spider ${params.name}, with ${spider.urlsCollections?.length} urlsCollection`);
+
+    if (spider) {
+
+      // spider is immutable
+      // make a clone
+      const cloneSpider = new Spider(cloneDeep(spider));
+
+      let existingCollectionIndex = -1
+      cloneSpider.urlsCollections?.every((item: URLsCollection, index: number) => {
+        if (item.name === params.collectionName) {
+          existingCollectionIndex = index;
+          // break
+          return false;
+        }
+        return true;
+      })
+
+      if (existingCollectionIndex>-1){
+        cloneSpider.urlsCollections.splice(existingCollectionIndex, 1);
+        logger.info(`urlsCollection ${params.collectionName} removed on spider ${cloneSpider.name}`)
+      } else {
+        //ignore
+        logger.info(`urlsCollection ${params.collectionName} not existing on spider ${cloneSpider.name}, DELETE ignored`)
+      }
+
+      await this.spiderService.updateSpider(user, cloneSpider);
+      return Promise.resolve({
+        status: ResponseStatus.SUCCESS,
+      });
+
+    } else {
+      throw new Error(`Unknown spider ${params.name}`);
     }
     
   }
