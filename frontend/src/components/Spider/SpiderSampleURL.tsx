@@ -69,7 +69,7 @@ export const SampleUrlSelector = ({ spider, onSelect, initialSelectedUrl }: ISam
  *
  * @returns JSX.Element
  */
-export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.Element => {
+export const SampleURLManager = ({ ...rest }): JSX.Element => {
   const { t } = useTranslation('configurator');
 
   const backendProvider = useContext<ISpiderBackend>(SpiderContext);
@@ -107,7 +107,7 @@ export const SampleURLManager = ({ spider, ...rest }: { spider: Spider }): JSX.E
   };
 
   const btnText = () => {
-    return !spider.sampleURLs || spider.sampleURLs?.length == 0
+    return !localSpider.sampleURLs || localSpider.sampleURLs?.length == 0
       ? t('spider.actions.sample_urls_add_first_one')
       : t('spider.actions.sample_urls_add_more');
   };

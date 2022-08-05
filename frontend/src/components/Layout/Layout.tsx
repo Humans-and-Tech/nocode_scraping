@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useMemo, useCallback } from 'react';
 import { Layout, Space, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -47,7 +47,10 @@ export const ScrapingLayout = ({ header, children }: { header: React.ReactNode; 
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
+  /**
+   * Optimize backend calls
+   */
+  const loadSpider = useMemo(() => {
     if (name) {
       backendProvider.get(name, (_spider: Spider | undefined) => {
         if (_spider) {

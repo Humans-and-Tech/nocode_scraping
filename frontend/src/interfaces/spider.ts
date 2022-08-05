@@ -107,12 +107,17 @@ export interface Website {
   baseUrl?: URL;
 }
 
+export interface URLsCollection {
+  name: string;
+  urls?: Array<URL>;
+}
+
 export interface Spider {
   name: string;
   website?: Website;
   data?: Array<Data>;
   pipelines?: Array<Pipeline>;
-  urlSet?: Array<URL>;
+  urlsCollections?: Array<URLsCollection>;
   pageType?: PageType;
   items?: Array<Item>;
   settings?: Settings; // will be typed later

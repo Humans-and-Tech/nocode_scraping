@@ -12,7 +12,6 @@
     "access_configuration": "Modify the configuration of the spider",
     "define_sample_urls": "Define sample URLs to start scraping",
     "sample_urls_title": "Sample URLs",
-    "sample_urls_intro": "To start scraping, you need to give some examples of URLs to be scraped",
     "sample_url_input_placeholder": "Enter a valid URL",
     "sample_url_select_placeholder": "Select a sample URL",
     "actions": {
@@ -21,14 +20,27 @@
       "sample_urls_add_more": "Add another sample URL",
       "sample_url_delete": "delete",
       "update_success": "Spider updated",
-      "update_error": "Spider update failed"
+      "update_error": "Spider update failed",
+      "delete": "Delete",
+      "add_collection_error": "An error occured adding the collection",
+      "add_collection_success": "Successfully added the collection"
     },
     "config_sidebar": {
       "tab_sample_urls": "Sample URLs",
+      "sample_urls_intro": "To start scraping, you need to give some examples of URLs to be scraped",
+      "tab_urls_collection": "URLs collection",
+      "urls_collection_intro": "A collection of URL is a set of URL that will be scraped for real when you trigger the spider. It can be a list of URLS of a products category, or any grouping of URLS. You can add as many collections as you want, and you can have as many URLs per collection as you want. It is just a way to organize the pages that are going to be scraped. Indeed, when scraping, the spider will proceed to scraping per collection.",
       "tab_selector_config": "Selector",
       "tab_sweepers": "Data Cleaning",
       "sweep_data_cta_intro": "Your selector is now configured, you can optionnally clean the scraped data",
-      "sweep_data_cta": "clean the scraped data"
+      "sweep_data_cta": "clean the scraped data",
+      "add_urls_collection": "Add a collection of URLs",
+      "form_coll_name_label": "Name of the collection",
+      "form_coll_name_placeholder": "Enter a name, a collection name cannot be blank",
+      "form_urls_list_label": "List of URLs for this collection",
+      "form_urls_list_placeholder": "https://url1\nhttps://url2\nnhttps://url3\n...",
+      "form_urls_list_helper": "enter 1 URL per line",
+      "form_submit": "Add a new collection of URLs"
     }
   },
   "field": {

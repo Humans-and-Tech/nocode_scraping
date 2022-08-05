@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { Spider } from '../../interfaces/spider';
 
 import { SampleURLManager } from './SpiderSampleURL';
+import { URLsCollectionsConfig } from './URLsCollection';
 import { ConfigSidebar } from '../Layout/ConfigSidebar';
 
 import './SpiderConfig.scoped.css';
@@ -61,8 +62,15 @@ export const SpiderConfigSummary = (): JSX.Element => {
           <Tabs defaultActiveKey="1" onChange={onTabChange} tabBarExtraContent={saveBtn}>
             <TabPane tab={t('spider.config_sidebar.tab_sample_urls')} key="1">
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                <p>{t('spider.sample_urls_intro')}</p>
-                <SampleURLManager spider={spider} />
+                <p>{t('spider.config_sidebar.sample_urls_intro')}</p>
+                <SampleURLManager />
+              </Space>
+            </TabPane>
+
+            <TabPane tab={t('spider.config_sidebar.tab_urls_collection')} key="2">
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <p>{t('spider.config_sidebar.urls_collection_intro')}</p>
+                <URLsCollectionsConfig />
               </Space>
             </TabPane>
           </Tabs>

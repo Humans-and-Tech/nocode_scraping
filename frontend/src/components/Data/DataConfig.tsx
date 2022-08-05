@@ -28,6 +28,8 @@ interface IDataConfigProps {
 export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Element => {
   const { t } = useTranslation('configurator');
 
+  console.log('DataConfig');
+
   const backendProvider = useContext<ISpiderBackend>(SpiderContext);
 
   /**
@@ -56,7 +58,6 @@ export const DataConfig = ({ data, spider, onSave }: IDataConfigProps): JSX.Elem
 
   const goToSweepersTab = () => {
     setActiveKey('2');
-    console.log('goToSweepersTab');
   };
 
   const onConfigured = (_data: Data): void => {
