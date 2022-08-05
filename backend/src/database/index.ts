@@ -47,6 +47,8 @@ export async function upsert<T extends Storable>(organization: Organization, dat
     return !(value === undefined);
   });
 
+  logger.info(`upserting ${JSON.stringify(cleanData)}`);
+
   try {
     await document.update(cleanData);
     logger.info(`Updated doc with key ${data.key}`);

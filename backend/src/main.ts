@@ -29,6 +29,7 @@ async function bootstrap() {
   app.enableCors({
     origin: config.get('server.cors.allowedOrigin'),
     allowedHeaders: config.get('server.cors.allowedHeaders'),
+    methods: config.get('server.cors.methods'),
     credentials: false
   });
   await app.listen(config.get('server.port'));

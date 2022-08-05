@@ -308,8 +308,12 @@ export class ScrapingService {
       let imageAsBase64 = '';
       await page.locator(req.selector.path).screenshot({ path: screenshotPath });
       imageAsBase64 = await readFile(screenshotPath, { encoding: 'base64' });
-      // remove the screenshot file
-      await unlink(screenshotPath);
+      // remove the screenshot file is existing
+      try {
+        await unlink(screenshotPath);
+      } catch (e) {
+        logger.warn(`failed unlinkin ${screenshotPath}` )
+      }
 
       await page.close();
       await browser.close();

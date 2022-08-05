@@ -20,6 +20,43 @@ export enum SelectorStatus {
 
 export type Class<T> = new (...args: any[]) => T;
 
+export enum SweeperFunctionType {
+  removeChar = 'removeChar',
+  replaceChar = 'replaceChar',
+  pad = 'pad',
+  regex = 'regex'
+}
+
+export interface RemoveSweeperType {
+  key: SweeperFunctionType.removeChar;
+  params?: {
+    charIndex: number;
+  }
+}
+
+export interface ReplaceSweeperType {
+  key: SweeperFunctionType.replaceChar;
+  params?: {
+    replaced: string;
+    replacedBy: string;
+  }
+}
+
+export interface PadSweeperType {
+  key: SweeperFunctionType.pad;
+  params?: {
+    append: string;
+    prepend: string;
+  }
+}
+
+export interface RegexSweeperType {
+  key: SweeperFunctionType.regex;
+  params?: {
+    regex: string;
+  }
+}
+
 export class DataSelector {
   path: string | undefined;
   language?: 'css' | 'xpath' | 'jsonld' | 'js';
@@ -82,7 +119,7 @@ export class DataSelectorValidityResponse {
   }
 }
 
-export type DataSweeperFunction = (input: string, ...args: (string | number | boolean)[]) => string;
+
 
 export enum DataGroup {
   PRICE = 'price'
@@ -103,7 +140,7 @@ export class Data implements Storable {
   // ex: cookie popup...
   isPopup?: boolean;
   popupSelector?: DataSelector;
-  sweepers?: Set<DataSweeperFunction>;
+  sweepers?: Array<RemoveSweeperType|ReplaceSweeperType|PadSweeperType|RegexSweeperType>;
 
   constructor(
     name: string,
@@ -113,7 +150,7 @@ export class Data implements Storable {
     selector?: DataSelector,
     isPopup?: boolean,
     popupSelector?: DataSelector,
-    sweepers?: Set<DataSweeperFunction>
+    sweepers?: Array<RemoveSweeperType|ReplaceSweeperType|PadSweeperType|RegexSweeperType>
   ) {
     this.key = name;
     this.name = name;
@@ -149,11 +186,11 @@ export class Website {
 export interface ISpider {
   name: string;
   website?: Website;
-  data?: Set<Data>;
-  pipelines?: Set<ExportPipeline>;
-  urlSet?: Set<URL>;
+  data?: Array<Data>;
+  pipelines?: Array<ExportPipeline>;
+  urlsCollections?: Array<URLsCollection>;
   pageType?: PageType;
-  items?: Set<ExportItem>;
+  items?: Array<ExportItem>;
   settings?: Settings; // will be typed later
   headers?: unknown;
   cookies?: unknown;
@@ -165,15 +202,20 @@ export interface ISpider {
   sampleURLs?: Array<URL>;
 }
 
+export class URLsCollection {
+  name: string;
+  urls?: Array<URL>;
+}
+
 export class Spider implements Storable, ISpider {
   key: string;
   name: string;
   website?: Website;
-  data?: Set<Data>;
-  pipelines?: Set<ExportPipeline>;
-  urlSet?: Set<URL>;
+  data?: Array<Data>;
+  pipelines?: Array<ExportPipeline>;
+  urlsCollections?: Array<URLsCollection>;
   pageType?: PageType;
-  items?: Set<ExportItem>;
+  items?: Array<ExportItem>;
   settings?: Settings; // will be typed later
   headers?: unknown;
   cookies?: unknown;
@@ -185,7 +227,7 @@ export class Spider implements Storable, ISpider {
   sampleURLs?: Array<URL>;
 
   constructor(obj: ISpider) {
-    const { name, website, sampleURLs, urlSet, pageType, data, pipelines, items, settings, headers, cookies } = obj;
+    const { name, website, sampleURLs, urlsCollections, pageType, data, pipelines, items, settings, headers, cookies } = obj;
 
     // the key is the spider name
     // acts as a storage id
@@ -193,7 +235,7 @@ export class Spider implements Storable, ISpider {
     this.name = name;
     this.website = website;
     this.sampleURLs = sampleURLs;
-    this.urlSet = urlSet;
+    this.urlsCollections = urlsCollections;
     this.pageType = pageType;
     this.data = data;
     this.pipelines = pipelines;

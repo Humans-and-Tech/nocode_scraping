@@ -9,7 +9,7 @@ import { ScrapingService } from './services/ScrapingService';
 
 @Module({
   imports: [],
-  controllers: [],
-  providers: [SpiderEventGateway, SpiderController, ScrapingEventGateway, SpiderService, ScrapingService]
+  controllers: [SpiderController],
+  providers: [SpiderEventGateway, ScrapingEventGateway, SpiderService, ScrapingService]
 })
 export class AppModule {}
