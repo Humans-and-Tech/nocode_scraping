@@ -93,7 +93,6 @@ jest.mock('playwright-chromium', () => ({
   }
 }));
 
-
 jest.mock('../cache/FirestoreCache');
 
 /**

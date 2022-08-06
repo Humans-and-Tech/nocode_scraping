@@ -108,7 +108,9 @@ export interface Website {
 }
 
 export interface URLsCollection {
-  name: string;
+  key: string; // the unique key in the DB
+  spiderName: string;
+  name: string; // the collection name
   urlsList?: Array<URL>;
 }
 
@@ -117,7 +119,10 @@ export interface Spider {
   website?: Website;
   data?: Array<Data>;
   pipelines?: Array<Pipeline>;
-  urlsCollections?: Array<URLsCollection>;
+  // only the keys of the collections
+  // for perf reasons
+  // because the collections can be huge (100K's of URLS)
+  urlsCollections?: Array<string>;
   pageType?: PageType;
   items?: Array<Item>;
   settings?: Settings; // will be typed later

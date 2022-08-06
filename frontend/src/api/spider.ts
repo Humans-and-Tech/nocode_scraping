@@ -8,19 +8,6 @@ axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 
-export interface CreateUrlsCollectionDto {
-  name: string;
-  urlsList: Array<URL>;
-}
-
-export const createUrlsCollection = async (spider: Spider, data: CreateUrlsCollectionDto) => {
-  return await axios.post(`spider/${spider.name}/urls-collection`, data);
-};
-
-export const deleteUrlsCollection = async (spider: Spider, collectionName: string) => {
-  return await axios.delete(`spider/${spider.name}/urls-collections/${collectionName}`);
-};
-
 export const getSpider = async (name: string): Promise<Spider> => {
   const result = await axios.get<IAPIResponse>(`spider/${name}`);
   if (result.data?.status === GenericResponseStatus.SUCCESS) {

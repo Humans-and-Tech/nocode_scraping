@@ -31,7 +31,7 @@ export interface RemoveSweeperType {
   key: SweeperFunctionType.removeChar;
   params?: {
     charIndex: number;
-  }
+  };
 }
 
 export interface ReplaceSweeperType {
@@ -39,7 +39,7 @@ export interface ReplaceSweeperType {
   params?: {
     replaced: string;
     replacedBy: string;
-  }
+  };
 }
 
 export interface PadSweeperType {
@@ -47,14 +47,14 @@ export interface PadSweeperType {
   params?: {
     append: string;
     prepend: string;
-  }
+  };
 }
 
 export interface RegexSweeperType {
   key: SweeperFunctionType.regex;
   params?: {
     regex: string;
-  }
+  };
 }
 
 export class DataSelector {
@@ -119,8 +119,6 @@ export class DataSelectorValidityResponse {
   }
 }
 
-
-
 export enum DataGroup {
   PRICE = 'price'
 }
@@ -140,7 +138,7 @@ export class Data implements Storable {
   // ex: cookie popup...
   isPopup?: boolean;
   popupSelector?: DataSelector;
-  sweepers?: Array<RemoveSweeperType|ReplaceSweeperType|PadSweeperType|RegexSweeperType>;
+  sweepers?: Array<RemoveSweeperType | ReplaceSweeperType | PadSweeperType | RegexSweeperType>;
 
   constructor(
     name: string,
@@ -150,7 +148,7 @@ export class Data implements Storable {
     selector?: DataSelector,
     isPopup?: boolean,
     popupSelector?: DataSelector,
-    sweepers?: Array<RemoveSweeperType|ReplaceSweeperType|PadSweeperType|RegexSweeperType>
+    sweepers?: Array<RemoveSweeperType | ReplaceSweeperType | PadSweeperType | RegexSweeperType>
   ) {
     this.key = name;
     this.name = name;
@@ -188,7 +186,8 @@ export interface ISpider {
   website?: Website;
   data?: Array<Data>;
   pipelines?: Array<ExportPipeline>;
-  urlsCollections?: Array<URLsCollection>;
+  // only the keys of the collections
+  urlsCollections?: Array<string>;
   pageType?: PageType;
   items?: Array<ExportItem>;
   settings?: Settings; // will be typed later
@@ -202,9 +201,28 @@ export interface ISpider {
   sampleURLs?: Array<URL>;
 }
 
-export class URLsCollection {
+export interface IUrlsCollection {
+  spiderName: string;
   name: string;
-  urls?: Array<URL>;
+  urlsList?: Array<URL>;
+}
+
+export class URLsCollection {
+  key: string;
+  spiderName: string;
+  name: string;
+  urlsList?: Array<URL>;
+
+  constructor(obj: IUrlsCollection) {
+    const { spiderName, name, urlsList } = obj;
+
+    // the key is the spider name
+    // acts as a storage id
+    this.key = `${spiderName}-${name}`;
+    this.spiderName = spiderName;
+    this.name = name;
+    this.urlsList = urlsList;
+  }
 }
 
 export class Spider implements Storable, ISpider {
@@ -213,7 +231,9 @@ export class Spider implements Storable, ISpider {
   website?: Website;
   data?: Array<Data>;
   pipelines?: Array<ExportPipeline>;
-  urlsCollections?: Array<URLsCollection>;
+  // only the collection keys are conveyed
+  // for performance reasons
+  urlsCollections?: Array<string>;
   pageType?: PageType;
   items?: Array<ExportItem>;
   settings?: Settings; // will be typed later
@@ -227,7 +247,8 @@ export class Spider implements Storable, ISpider {
   sampleURLs?: Array<URL>;
 
   constructor(obj: ISpider) {
-    const { name, website, sampleURLs, urlsCollections, pageType, data, pipelines, items, settings, headers, cookies } = obj;
+    const { name, website, sampleURLs, urlsCollections, pageType, data, pipelines, items, settings, headers, cookies } =
+      obj;
 
     // the key is the spider name
     // acts as a storage id

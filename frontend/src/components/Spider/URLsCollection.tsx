@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Space, List, Button, Input, Typography, Form } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSpider } from '../../spiderSlice';
+import Async from 'react-async';
 
 import isURL from 'validator/lib/isURL';
 
-import { Spider, URLsCollection } from '../../interfaces/spider';
-import { createUrlsCollection, getSpider, deleteUrlsCollection } from '../../api/spider';
+import { setSpider } from '../../spiderSlice';
+import { Spider } from '../../interfaces/spider';
+import { getSpider } from '../../api/spider';
+import { createUrlsCollection, deleteUrlsCollection, getCollection } from '../../api/urls-collections';
 import { displayMessage, NotificationLevel } from '../Layout/UserNotification';
 
 import './SpiderConfig.scoped.css';
@@ -34,9 +36,8 @@ export const URLsCollectionsList = (): JSX.Element => {
 
   const dispatch = useDispatch();
 
-  const deleteCollection = (item: URLsCollection) => {
-    console.log('deleteCollection', item.name);
-    deleteUrlsCollection(localSpider, item.name)
+  const deleteCollection = (key: string) => {
+    deleteUrlsCollection(key)
       .then(() => {
         // refresh the spider
         // and store it
@@ -54,6 +55,10 @@ export const URLsCollectionsList = (): JSX.Element => {
       });
   };
 
+  const getCollectionDetails = async (key: string) => {
+    return await getCollection(key);
+  };
+
   return (
     <>
       {localSpider && (
@@ -61,21 +66,31 @@ export const URLsCollectionsList = (): JSX.Element => {
           size="large"
           bordered
           dataSource={localSpider.urlsCollections}
-          renderItem={(item: URLsCollection) => (
+          renderItem={(key: string) => (
             <List.Item
               actions={[
                 <a
-                  key={`delete-${item.name}`}
+                  key={`delete-${key}`}
                   onClick={() => {
-                    deleteCollection(item);
+                    deleteCollection(key);
                   }}
                 >
                   {t('spider.actions.delete')}
                 </a>
               ]}
             >
-              <Typography.Text strong>{item.name}</Typography.Text> (
-              <Typography.Text italic>{item.urlsList?.length} URLs</Typography.Text>)
+              <Async promise={getCollectionDetails(key)}>
+                {({ data }) => {
+                  if (data)
+                    return (
+                      <>
+                        <Typography.Text strong>{data.name}</Typography.Text>
+                        <Typography.Text italic>({data.urlsList?.length} URLs)</Typography.Text>
+                      </>
+                    );
+                  return null;
+                }}
+              </Async>
             </List.Item>
           )}
         />
@@ -122,10 +137,11 @@ export const URLsListForm = ({ ...rest }): JSX.Element => {
 
         const dto = {
           name: form.getFieldValue('collectionName'),
+          spiderName: localSpider.name,
           urlsList: urlsList
         };
 
-        createUrlsCollection(localSpider, dto)
+        createUrlsCollection(dto)
           .then(() => {
             // refresh the spider
             // and store it

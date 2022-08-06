@@ -35,7 +35,7 @@ export function isFireStoreError(obj: unknown): obj is FireStoreError {
  * @returns
  */
 // @ts-ignore
-export async function  upsert<T extends Storable>(organization: Organization, data: T): Promise<boolean> {
+export async function upsert<T extends Storable>(organization: Organization, data: T): Promise<boolean> {
   const docPath = `${organization.name}/${data.constructor.name.toLowerCase()}s/${data.key}`;
   const configCollection: DocumentData = firestore.collection(`organizations`);
   const document = configCollection.doc(docPath);
@@ -46,7 +46,6 @@ export async function  upsert<T extends Storable>(organization: Organization, da
   const cleanData = pickBy(data, function (value) {
     return !(value === undefined);
   });
-
 
   logger.debug(`upserting ${JSON.stringify(cleanData)}`);
 
@@ -97,5 +96,22 @@ export async function get<T extends Storable>(organization: Organization, dataTy
       logger.error('Unhandled error', error);
       return Promise.reject(error);
     }
+  }
+}
+
+// @ts-ignore
+export async function remove<T extends Storable>(organization: Organization, data: T): Promise<boolean> {
+  const docPath = `${organization.name}/${data.constructor.name.toLowerCase()}s/${data.key}`;
+  const configCollection: DocumentData = firestore.collection(`organizations`);
+  const document = configCollection.doc(docPath);
+
+  logger.info('Looking for doc in Path ' + docPath);
+
+  try {
+    await document.delete();
+    return Promise.resolve(true);
+  } catch (error) {
+    logger.error('Unhandled error', error);
+    return Promise.reject(error);
   }
 }

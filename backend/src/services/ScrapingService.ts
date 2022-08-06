@@ -312,7 +312,7 @@ export class ScrapingService {
       try {
         await unlink(screenshotPath);
       } catch (e) {
-        logger.warn(`failed unlinkin ${screenshotPath}` )
+        logger.warn(`failed unlinkin ${screenshotPath}`);
       }
 
       await page.close();
