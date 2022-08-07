@@ -1,0 +1,3 @@
+.venv
+**/firestore-creds.json
+__pycache__
